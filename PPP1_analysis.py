@@ -105,6 +105,17 @@ class Session(object):
             self.licksR = []
             self.licksR_off = []
             
+        if self.leftTrials == True and self.rightTrials == True:
+            print('pref')
+            first = [idx for idx, x in enumerate(self.trialsL) if x in self.trialsR][0]
+            print(first)
+            self.trialsL = self.trialsL[:first-1]
+            self.trialsL_off = self.trialsL_off[:first-1]
+            self.trialsR = self.trialsR[:first-1]
+            self.trialsR_off = self.trialsR_off[:first-1]
+            self.trialsboth = self.trialsL[first:]
+            self.trialsboth_off = self.trialsL_off[first:]
+                        
     def removephantomlicks(self):
         if self.leftTrials == True:
             phlicks = jmf.findphantomlicks(self.licksL, self.trialsL, delay=3)
@@ -281,7 +292,7 @@ for i in metafileData:
 #for i in rats:
 #    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
 #    for j in rats[i].sessions:        
-for i in ['PPP1.7']:
+for i in rats:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
     for j in ['s10']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
