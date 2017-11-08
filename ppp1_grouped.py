@@ -38,14 +38,18 @@ def prefcalc(x):
     print(pref)
     
     return pref
-    
+
+pref1_data = {}
+  
 for i in rats:
     for j in ['s11']:
         x = rats[i].sessions[j]
+        ratkey = i
               
         x.choices = choicetest(x)
-        prefcalc(x)
+        pref1_data[i]['pref'].append(prefcalc(x))
+        
+        pref1_data[i]['casmean']
 
 
 
-#print(x.choices)
