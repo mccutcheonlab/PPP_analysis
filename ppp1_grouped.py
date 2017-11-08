@@ -9,6 +9,7 @@ Created on Wed Nov  8 08:47:56 2017
 # Need to run PPP1_analysis first to load sessions into
 # Choice data
 import string
+import pandas as pd
 
 def choicetest(x):
     choices = []
@@ -40,6 +41,7 @@ def prefcalc(x):
     return pref
 
 pref1_data = {}
+
   
 for i in rats:
     for j in ['s11']:
@@ -47,9 +49,12 @@ for i in rats:
         ratkey = i
               
         x.choices = choicetest(x)
-        pref1_data[i]['pref'].append(prefcalc(x))
-        
-        pref1_data[i]['casmean']
+#        pref1_data[i]['pref'].append(prefcalc(x))
+#        
+#        pref1_data[i]['casmean']
 
-
+df = pd.DataFrame([x for x in rats])
+df.insert(1,'diet', [rats[x].diet for x in rats])
+#df = pd.DataFrame([[(rats[x].sessions['s11'].choices)] for x in rats])
+#df.columns = ['choices']
 
