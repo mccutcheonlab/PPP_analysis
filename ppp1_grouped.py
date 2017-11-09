@@ -96,7 +96,7 @@ df.insert(5,'forcedtrialsMalt', [np.mean(rats[x].sessions[j].forcedtrials['malt'
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.wspace'] = 0.1
 mpl.rcParams['figure.subplot.left'] = 0.15
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(3.2, 2.4))
+fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6.4, 4.8))
 
 prefhistFig(ax[0], ax[1], df, 'forcedtrialsCas', 'forcedtrialsMalt')
 #fig.text(0.55, 0.04, 'Time (min)', ha='center')
