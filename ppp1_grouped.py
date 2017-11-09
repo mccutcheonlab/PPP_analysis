@@ -48,7 +48,7 @@ for i in rats:
         x.pref = prefcalc(x)
 
 df = pd.DataFrame([x for x in rats])
-df.insert(1,'diet', [rats[x].diet for x in rats])
+df.insert(1,'diet', [rats[x].dietgroup for x in rats])
 df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in rats])
 #df.columns = ['choices']
 

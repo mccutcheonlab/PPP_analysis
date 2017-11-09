@@ -28,21 +28,22 @@ class Rat(object):
     nRats = 0
     nSessions = 0
     
-    def __init__(self, data):      
-        self.rat = data
+    def __init__(self, rat, diet):      
+        self.rat = rat
         self.sessions = {}
+        self.dietgroup = dietgroup
         
         Rat.nRats += 1
                 
     def loadsession(self, data, header):
         self.session = str(data[3]) #should reference column of data with session number
-        self.sessions[self.session] = Session(data, header, self.rat, self.session, self.diet)
+        self.sessions[self.session] = Session(data, header, self.rat, self.session, self.dietgroup)
        
         Rat.nSessions += 1
         
 class Session(object):
     
-    def __init__(self, data, header, rat, session, diet):
+    def __init__(self, data, header, rat, session, dietgroup):
         self.hrow = {}
         for idx, col in enumerate(header):
             self.hrow[col] = data[idx]
@@ -52,7 +53,7 @@ class Session(object):
         self.bottleR = self.hrow['bottleR']
         self.rat = str(rat)
         self.session = session
-        self.diet = str(diet)
+        self.dietgroup = str(dietgroup)
         
         self.bottles = {}
 
@@ -285,8 +286,9 @@ rats = {}
 for i in metafileData:
     if int(i[includecol]) == 1:
         rowrat = str(i[2])
+        dietgroup = str(i[5])
         if rowrat not in rats:
-            rats[rowrat] = Rat(rowrat)
+            rats[rowrat] = Rat(rowrat, dietgroup)
         rats[rowrat].loadsession(i, metafileHeader)
               
 #for i in rats:
