@@ -38,6 +38,17 @@ def prefcalc(x):
     
     return pref
 
+def side2subs(x):
+    
+    x.forcedtrials = {}
+    
+    for subs in ['cas', 'malt']:
+        if subs in x.bottleL and subs in x.bottleR:
+            print('Same substance in both bottles!')
+        if subs in x.bottleL:
+            x.forcedtrials[subs] = x.trialsLSnips
+        if subs in x.bottleR:
+            x.forcedtrials[subs] = x.trialsRSnips
   
 for i in rats:
     for j in ['s11']:
@@ -46,10 +57,13 @@ for i in rats:
               
         x.choices = choicetest(x)
         x.pref = prefcalc(x)
+        side2subs(x)
 
 df = pd.DataFrame([x for x in rats])
 df.insert(1,'diet', [rats[x].dietgroup for x in rats])
 df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in rats])
 df.insert(3,'pref', [rats[x].sessions[j].pref for x in rats])
+
+#df.insert(4,'trialCas', )
 #df.columns = ['choices']
 
