@@ -31,7 +31,6 @@ class Rat(object):
     def __init__(self, data):      
         self.rat = data
         self.sessions = {}
-        self.diet = str(data[5])
         
         Rat.nRats += 1
                 

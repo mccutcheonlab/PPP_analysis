@@ -35,12 +35,8 @@ def prefcalc(x):
     cas = sum([1 for trial in x.choices if trial == 'cas'])
     malt = sum([1 for trial in x.choices if trial == 'mal'])
     pref = cas/(cas+malt)
-    print(x.rat)
-    print(pref)
     
     return pref
-
-pref1_data = {}
 
   
 for i in rats:
@@ -49,12 +45,10 @@ for i in rats:
         ratkey = i
               
         x.choices = choicetest(x)
-#        pref1_data[i]['pref'].append(prefcalc(x))
-#        
-#        pref1_data[i]['casmean']
+        x.pref = prefcalc(x)
 
 df = pd.DataFrame([x for x in rats])
 df.insert(1,'diet', [rats[x].diet for x in rats])
-#df = pd.DataFrame([[(rats[x].sessions['s11'].choices)] for x in rats])
+df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in rats])
 #df.columns = ['choices']
 
