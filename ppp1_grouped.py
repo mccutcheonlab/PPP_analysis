@@ -10,6 +10,7 @@ Created on Wed Nov  8 08:47:56 2017
 # Choice data
 import string
 import pandas as pd
+import matplotlib as mpl
 
 def choicetest(x):
     choices = []
@@ -49,7 +50,20 @@ def side2subs(x):
             x.forcedtrials[subs] = x.trialsLSnips
         if subs in x.bottleR:
             x.forcedtrials[subs] = x.trialsRSnips
-  
+
+def prefhistFig(ax1, ax2, df, factor1, factor2):
+    dietmsk = df.diet == 'np'
+
+    jmfig.shadedError(ax1, df[factor1][dietmsk], linecolor='black')
+    ax1 = jmfig.shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
+#    ax1.set_xticks([0,10,20,30])
+#    ax1.set_xticklabels(['0', '20', '40', '60'])
+    
+    jmfig.shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
+    ax2 = jmfig.shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
+#    ax2.set_xticks([0,10,20,30])
+#    ax2.set_xticklabels(['0', '20', '40', '60'])
+
 for i in rats:
     for j in ['s11']:
         x = rats[i].sessions[j]
@@ -59,11 +73,27 @@ for i in rats:
         x.pref = prefcalc(x)
         side2subs(x)
 
+#def makemeans
+
 df = pd.DataFrame([x for x in rats])
 df.insert(1,'diet', [rats[x].dietgroup for x in rats])
 df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in rats])
 df.insert(3,'pref', [rats[x].sessions[j].pref for x in rats])
 
-#df.insert(4,'trialCas', )
+df.insert(4,'forcedtrialsCas', [np.mean(rats[x].sessions[j].forcedtrials['cas'], axis=0) for x in rats])
+df.insert(5,'forcedtrialsMalt', [np.mean(rats[x].sessions[j].forcedtrials['malt'], axis=0) for x in rats])
+
+# Figure to show malt vs cas in PR vs NR
+mpl.rcParams['figure.subplot.wspace'] = 0.1
+mpl.rcParams['figure.subplot.left'] = 0.15
+fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(3.2, 2.4))
+
+prefhistFig(ax[0], ax[1], df, 'forcedtrialsCas', 'forcedtrialsMalt')
+#fig.text(0.55, 0.04, 'Time (min)', ha='center')
+#ax[0].set_ylabel('Licks per 2 min')
+
+
+
+np.shape(df.forcedtrialsCas[1])
 #df.columns = ['choices']
 
