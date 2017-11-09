@@ -52,17 +52,27 @@ def side2subs(x):
             x.forcedtrials[subs] = x.trialsRSnips
 
 def prefhistFig(ax1, ax2, df, factor1, factor2):
-    dietmsk = df.diet == 'np'
+    dietmsk = df.diet == 'NR'
 
-    jmfig.shadedError(ax1, df[factor1][dietmsk], linecolor='black')
-    ax1 = jmfig.shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
+    shadedError(ax1, df[factor1][dietmsk], linecolor='black')
+    ax1 = shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
 #    ax1.set_xticks([0,10,20,30])
 #    ax1.set_xticklabels(['0', '20', '40', '60'])
     
-    jmfig.shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
-    ax2 = jmfig.shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
+    shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
+    ax2 = shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
 #    ax2.set_xticks([0,10,20,30])
 #    ax2.set_xticklabels(['0', '20', '40', '60'])
+
+def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
+    yarray = np.array(yarray)
+    y = np.mean(yarray)
+    yerror = np.std(yarray)/np.sqrt(len(yarray))
+    x = np.arange(0, len(y))
+    ax.plot(x, y, color=linecolor)
+    ax.fill_between(x, y-yerror, y+yerror, color=errorcolor, alpha=0.4)
+    
+    return ax
 
 for i in rats:
     for j in ['s11']:
