@@ -50,5 +50,6 @@ for i in rats:
 df = pd.DataFrame([x for x in rats])
 df.insert(1,'diet', [rats[x].dietgroup for x in rats])
 df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in rats])
+df.insert(3,'pref', [rats[x].sessions[j].pref for x in rats])
 #df.columns = ['choices']
 
