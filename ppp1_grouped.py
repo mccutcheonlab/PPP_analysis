@@ -8,10 +8,27 @@ Created on Wed Nov  8 08:47:56 2017
 # Analysis of PPP1 grouped data
 # Need to run PPP1_analysis first to load sessions into
 # Choice data
+import numpy as np
+import scipy.io as sio
+import matplotlib.pyplot as plt
+import JM_general_functions as jmf
+import JM_custom_figs as jmfig
+
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.gridspec as gridspec
+
+plt.style.use('seaborn-muted')
+
+import os
+import timeit
+
+import dill
 import string
 import pandas as pd
 import matplotlib as mpl
-import pickle
+import dill
+
+import deepdish as dd
 
 def choicetest(x):
     choices = []
@@ -86,7 +103,7 @@ def excluderats(rats, ratstoexclude):
 
 # To import saved/pickled data
 pickle_in = open('rats.pickle', 'rb')
-rats = pickle.load(pickle_in)
+rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])
 
@@ -127,6 +144,7 @@ fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4
 prefhistFig(ax[0], ax[1], df, 'lickrunsCas', 'lickrunsMalt')
 
 
+
 np.shape(df.forcedtrialsCas[1])
 #df.columns = ['choices']
 
@@ -134,3 +152,11 @@ np.shape(df.forcedtrialsCas[1])
 # remove noise trials from grouped data
 # figure out a way of excluding certain rats (e.g. PPP1.8) maybe just a line that removes at beginning of this code
 
+# Methods of saving sessions
+# pickle or dill
+#
+#import deepdish as dd
+#
+#dd.io.load('rats.h5')
+
+#dd.io.save('rats.h5', rats)
