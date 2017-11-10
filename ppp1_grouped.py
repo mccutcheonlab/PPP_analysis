@@ -26,9 +26,7 @@ import dill
 import string
 import pandas as pd
 import matplotlib as mpl
-import dill
 
-import deepdish as dd
 
 def choicetest(x):
     choices = []
@@ -102,7 +100,7 @@ def excluderats(rats, ratstoexclude):
     return ratsX
 
 # To import saved/pickled data
-pickle_in = open('rats.pickle', 'rb')
+pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
 rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])

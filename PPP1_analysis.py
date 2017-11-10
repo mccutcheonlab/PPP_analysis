@@ -344,6 +344,6 @@ for i in rats:
     
 # For pickling data for opening later
 
-#pickle_out = open('rats.pickle', 'wb')
+#pickle_out = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'wb')
 #dill.dump(rats, pickle_out)
 #pickle_out.close()
