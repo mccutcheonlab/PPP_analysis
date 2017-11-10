@@ -19,7 +19,7 @@ plt.style.use('seaborn-muted')
 import os
 import timeit
 
-import dill
+import pickle
 
 tic = timeit.default_timer()
 
@@ -344,6 +344,6 @@ for i in rats:
     
 # For pickling data for opening later
 
-#pickle_out = open('rats.pickle', 'wb')
-#dill.dump(rats, pickle_out)
-#pickle_out.close()
+pickle_out = open('rats.pickle', 'wb')
+pickle.dump(rats, pickle_out)
+pickle_out.close()
