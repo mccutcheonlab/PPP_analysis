@@ -87,7 +87,7 @@ def excluderats(rats, ratstoexclude):
 ratsX = excluderats(rats, ['PPP1.8'])
 
 for i in rats:
-    for j in ['s11']:
+    for j in ['s10']:
         x = rats[i].sessions[j]
         ratkey = i
               

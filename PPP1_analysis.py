@@ -296,7 +296,7 @@ for i in metafileData:
 #    for j in rats[i].sessions:        
 for i in rats:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
-    for j in ['s11']:
+    for j in ['s10']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
         
         # Load in data from .mat file (convert from Tank first using Matlab script)
