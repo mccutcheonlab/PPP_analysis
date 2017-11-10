@@ -11,6 +11,7 @@ Created on Wed Nov  8 08:47:56 2017
 import string
 import pandas as pd
 import matplotlib as mpl
+import copy
 
 def choicetest(x):
     choices = []
@@ -42,12 +43,14 @@ def prefcalc(x):
 def side2subs(x):
     
     x.forcedtrials = {}
+    x.lickruns = {}
     
     for subs in ['cas', 'malt']:
         if subs in x.bottleL and subs in x.bottleR:
             print('Same substance in both bottles!')
         if subs in x.bottleL:
             x.forcedtrials[subs] = x.trialsLSnips
+            x.lickruns[subs] = x.licksLSnips
         if subs in x.bottleR:
             x.forcedtrials[subs] = x.trialsRSnips
 
@@ -74,6 +77,16 @@ def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
     
     return ax
 
+def excluderats(rats, ratstoexclude):  
+    ratsX = [x for x in rats if x not in ratstoexclude]
+    print(ratsX) 
+        
+    return ratsX
+
+ratsX = excluderats(rats, ['PPP1.8'])
+
+
+
 for i in rats:
     for j in ['s11']:
         x = rats[i].sessions[j]
@@ -85,6 +98,8 @@ for i in rats:
 
 #def makemeans
 
+
+
 df = pd.DataFrame([x for x in rats])
 df.insert(1,'diet', [rats[x].dietgroup for x in rats])
 df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in rats])
@@ -92,6 +107,10 @@ df.insert(3,'pref', [rats[x].sessions[j].pref for x in rats])
 
 df.insert(4,'forcedtrialsCas', [np.mean(rats[x].sessions[j].forcedtrials['cas'], axis=0) for x in rats])
 df.insert(5,'forcedtrialsMalt', [np.mean(rats[x].sessions[j].forcedtrials['malt'], axis=0) for x in rats])
+
+df.insert(4,'licksCas', [np.mean(rats[x].sessions[j].forcedtrials['cas'], axis=0) for x in rats])
+df.insert(5,'licksMalt', [np.mean(rats[x].sessions[j].forcedtrials['malt'], axis=0) for x in rats])
+
 
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.wspace'] = 0.1
@@ -106,4 +125,8 @@ prefhistFig(ax[0], ax[1], df, 'forcedtrialsCas', 'forcedtrialsMalt')
 
 np.shape(df.forcedtrialsCas[1])
 #df.columns = ['choices']
+
+# TO DO!!!
+# remove noise trials from grouped data
+# figure out a way of excluding certain rats (e.g. PPP1.8) maybe just a line that removes at beginning of this code
 
