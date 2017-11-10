@@ -19,6 +19,8 @@ plt.style.use('seaborn-muted')
 import os
 import timeit
 
+import pickle
+
 tic = timeit.default_timer()
 
 datafolder = 'R:/DA_and_Reward/es334/PPP1/Matlab Files/'
@@ -339,3 +341,9 @@ for i in rats:
         
     pdf_pages.close()
     plt.close('all')
+    
+# For pickling data for opening later
+
+pickle_out = open('rats.pickle', 'wb')
+pickle.dump(rats, pickle_out)
+pickle_out.close()
