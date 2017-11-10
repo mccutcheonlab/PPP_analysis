@@ -11,7 +11,7 @@ Created on Wed Nov  8 08:47:56 2017
 import string
 import pandas as pd
 import matplotlib as mpl
-import pickle
+import copy
 
 def choicetest(x):
     choices = []
@@ -84,13 +84,7 @@ def excluderats(rats, ratstoexclude):
         
     return ratsX
 
-# To import saved/pickled data
-pickle_in = open('rats.pickle', 'rb')
-rats = pickle.load(pickle_in)
-
 ratsX = excluderats(rats, ['PPP1.8'])
-
-
 
 for i in rats:
     for j in ['s10']:
