@@ -119,7 +119,6 @@ class Session(object):
             self.left['sipper_off'] = self.left['sipper'][:first-1]
             self.right['sipper'] = self.right['sipper'][:first-1]
             self.right['sipper_off'] = self.right['sipper_off'][:first-1]
-
                         
     def removephantomlicks(self):
         if self.leftTrials == True:
@@ -313,12 +312,12 @@ for i in ['PPP1.1']:
 #        x.removephantomlicks()
         x.setbottlecolors()
         
-        x.lickDataL = jmf.lickCalc(x.licksL,
-                          offset = x.licksL_off,
+        x.left['lickdata'] = jmf.lickCalc(x.left['licks'],
+                          offset = x.left['licks_off'],
                           burstThreshold = 0.50)
         
-        x.lickDataR = jmf.lickCalc(x.licksR,
-                  offset = x.licksR_off,
+        x.right['lickdata'] = jmf.lickCalc(x.right['licks'],
+                  offset = x.right['licks_off'],
                   burstThreshold = 0.50)
         
         bins = 300
