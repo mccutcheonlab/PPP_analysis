@@ -326,8 +326,8 @@ for i in ['PPP1.1']:
         x.bgTrials, x.pps = jmf.snipper(x.data, x.randomevents,
                                         t2sMap = x.t2sMap, fs = x.fs, bins=bins)
         
-        if x.leftTrials == True:
-            x.trialsLSnips, x.trialsLSnipsUV, x.trialsLnoise = x.makephotoTrials(bins, x.trialsL)
+        if x.left['exist'] == True:
+            x.left['snips_sipper'], x.leftsnips['sipper_uv'], x.left = x.makephotoTrials(bins, x.trialsL)
             x.licksLSnips, x.licksLSnipsUV, x.licksLnoise = x.makephotoTrials(bins, x.lickDataL['rStart'])
             x.latsL = jmf.latencyCalc(x.lickDataL['licks'], x.trialsL, cueoff=x.trialsL_off, lag=0)
             
