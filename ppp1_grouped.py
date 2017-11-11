@@ -11,7 +11,10 @@ Created on Wed Nov  8 08:47:56 2017
 import string
 import pandas as pd
 import matplotlib as mpl
-import copy
+import matplotlib.pyplot as plt
+import numpy as np
+
+import dill
 
 def choicetest(x):
     choices = []
@@ -83,6 +86,15 @@ def excluderats(rats, ratstoexclude):
     print(ratsX) 
         
     return ratsX
+
+# Looks for existing data and if not there loads pickled file
+try:
+    type(rats)
+    print('Using existing data')
+except NameError:
+    print('Loading in data from pickled file')
+    pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
+    rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])
 
