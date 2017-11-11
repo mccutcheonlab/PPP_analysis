@@ -121,15 +121,15 @@ class Session(object):
             self.right['sipper_off'] = self.right['sipper_off'][:first-1]
                         
     def removephantomlicks(self):
-        if self.leftTrials == True:
+        if self.left['exist'] == True:
             phlicks = jmf.findphantomlicks(self.licksL, self.trialsL, delay=3)
             self.licksL = np.delete(self.licksL, phlicks)
             self.licksL_off = np.delete(self.licksL_off, phlicks)
     
-        if self.rightTrials == True:
-            phlicks = jmf.findphantomlicks(self.licksR, self.trialsR, delay=3)
-            self.licksR = np.delete(self.licksR, phlicks)
-            self.licksR_off = np.delete(self.licksR_off, phlicks)
+        if self.right['exist'] == True:
+            phlicks = jmf.findphantomlicks(self.right['licks'], self.trialsR, delay=3)
+            self.right['licks'] = np.delete(self.right['licks'], phlicks)
+            self.right['licks_off'] = np.delete(self.right['licks_off'], phlicks)
                         
     def sessionFig(self, ax):
         ax.plot(self.data, color='blue')
@@ -157,12 +157,12 @@ class Session(object):
         return blueTrials, UVTrials, noiseindex
     
     def sessionlicksFig(self, ax):
-        if x.leftTrials == True:
+        if x.left['exist'] == True:
             ax.hist(self.lickDataL['licks'], range(0, 3600, 60), color=self.Lcol, alpha=0.4)          
             yraster = [ax.get_ylim()[1]] * len(self.lickDataL['licks'])
             ax.scatter(self.lickDataL['licks'], yraster, s=50, facecolors='none', edgecolors=self.Lcol)
 
-        if x.rightTrials == True:
+        if x.right['exist'] == True:
             ax.hist(self.lickDataR['licks'], range(0, 3600, 60), color=self.Rcol, alpha=0.4)          
             yraster = [ax.get_ylim()[1]] * len(self.lickDataR['licks'])
             ax.scatter(self.lickDataR['licks'], yraster, s=50, facecolors='none', edgecolors=self.Rcol)           
@@ -200,10 +200,10 @@ def makeBehavFigs(x):
     ax = plt.subplot(gs1[0, :])
     x.sessionlicksFig(ax)
 
-    if x.leftTrials == True:
+    if x.left['exist'] == True:
         behavFigsCol(gs1, 0, x.lickDataL, x.trialsL, x.Lcol)
         
-    if x.rightTrials == True:
+    if x.right['exist'] == True:
         behavFigsCol(gs1, 1, x.lickDataR, x.trialsR, x.Rcol)
         
     ax = plt.subplot(gs1[4, 0])
@@ -231,17 +231,17 @@ def makePhotoFigs(x):
     ax = plt.subplot(gs1[0, :])
     x.sessionFig(ax)
 
-    if x.leftTrials == True:
+    if x.left['exist'] == True:
         photoFigsCol(gs1, 0, x.pps,
                      x.trialsLSnips, x.trialsLSnipsUV, x.trialsLnoise,
                      x.licksLSnips, x.licksLSnipsUV, x.licksLnoise)
 
-    if x.rightTrials == True:
+    if x.right['exist'] == True:
         photoFigsCol(gs1, 1, x.pps,
                      x.trialsRSnips, x.trialsRSnipsUV, x.trialsRnoise,
                      x.licksRSnips, x.licksRSnipsUV, x.licksRnoise)
         
-    if x.leftTrials == True and x.rightTrials == True:
+    if x.left['exist'] == True and x.right['exist'] == True:
         diffcueL = jmf.findphotodiff(x.trialsLSnips, x.trialsLSnipsUV, x.trialsLnoise)
         diffcueR = jmf.findphotodiff(x.trialsRSnips, x.trialsRSnipsUV, x.trialsRnoise)
 
@@ -327,18 +327,18 @@ for i in ['PPP1.1']:
                                         t2sMap = x.t2sMap, fs = x.fs, bins=bins)
         
         if x.left['exist'] == True:
-            x.left['snips_sipper'], x.leftsnips['sipper_uv'], x.left = x.makephotoTrials(bins, x.trialsL)
-            x.licksLSnips, x.licksLSnipsUV, x.licksLnoise = x.makephotoTrials(bins, x.lickDataL['rStart'])
-            x.latsL = jmf.latencyCalc(x.lickDataL['licks'], x.trialsL, cueoff=x.trialsL_off, lag=0)
+            x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
+            x.left['snips_licks'] = jmf.mastersnipper(x, x.left['licks'])
+            x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
             
         
-        if x.rightTrials == True:
-            x.trialsRSnips, x.trialsRSnipsUV, x.trialsRnoise = x.makephotoTrials(bins, x.trialsR)
-            x.licksRSnips, x.licksRSnipsUV, x.licksRnoise = x.makephotoTrials(bins, x.lickDataR['rStart'])
-            x.latsR = jmf.latencyCalc(x.lickDataR['licks'], x.trialsR, cueoff=x.trialsR_off, lag=0)
+        if x.right['exist'] == True:
+            x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
+            x.right['snips_licks'] = jmf.mastersnipper(x, x.right['licks'])
+            x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
-        makeBehavFigs(x)
-        makePhotoFigs(x)
+#        makeBehavFigs(x)
+#        makePhotoFigs(x)
         
     pdf_pages.close()
     plt.close('all')
