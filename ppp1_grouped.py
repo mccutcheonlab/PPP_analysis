@@ -8,6 +8,7 @@ Created on Wed Nov  8 08:47:56 2017
 # Analysis of PPP1 grouped data
 # Need to run PPP1_analysis first to load sessions into
 # Choice data
+import os
 import string
 import pandas as pd
 import matplotlib as mpl
@@ -47,16 +48,23 @@ def side2subs(x):
     
     x.forcedtrials = {}
     x.lickruns = {}
+    x.forcedtrialsx = {}
+    x.lickrunsx = {}
     
     for subs in ['cas', 'malt']:
         if subs in x.bottleL and subs in x.bottleR:
             print('Same substance in both bottles!')
         if subs in x.bottleL:
             x.forcedtrials[subs] = x.trialsLSnips
-            x.lickruns[subs] = x.licksLSnips
+            x.lickruns[subs] = x.licksLSnips            
+            x.forcedtrialsx[subs] = makemeansnips(x.trialsLSnips, x.trialsLnoise)
+            x.lickrunsx[subs] = makemeansnips(x.licksLSnips, x.licksLnoise)
+
         if subs in x.bottleR:
             x.forcedtrials[subs] = x.trialsRSnips
             x.lickruns[subs] = x.licksRSnips
+            x.forcedtrialsx[subs] = makemeansnips(x.trialsRSnips, x.trialsRnoise)
+            x.lickrunsx[subs] = makemeansnips(x.licksRSnips, x.licksRnoise)
 
 def prefhistFig(ax1, ax2, df, factor1, factor2):
     dietmsk = df.diet == 'NR'
@@ -87,6 +95,13 @@ def excluderats(rats, ratstoexclude):
         
     return ratsX
 
+def makemeansnips(snips, noiseindex):
+    if len(noiseindex) > 0:
+        trials = np.array([i for (i,v) in zip(snips, noiseindex) if not v])
+    meansnip = np.mean(trials, axis=0)
+        
+    return meansnip
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(rats)
@@ -112,11 +127,11 @@ df.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
 df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in ratsX])
 df.insert(3,'pref', [rats[x].sessions[j].pref for x in ratsX])
 
-df.insert(4,'forcedtrialsCas', [np.mean(rats[x].sessions[j].forcedtrials['cas'], axis=0) for x in ratsX])
-df.insert(5,'forcedtrialsMalt', [np.mean(rats[x].sessions[j].forcedtrials['malt'], axis=0) for x in ratsX])
+df.insert(4,'forcedtrialsCas', [rats[x].sessions[j].forcedtrialsx['cas'] for x in ratsX])
+df.insert(5,'forcedtrialsMalt', [rats[x].sessions[j].forcedtrialsx['malt'] for x in ratsX])
 
-df.insert(6,'lickrunsCas', [np.mean(rats[x].sessions[j].lickruns['cas'], axis=0) for x in ratsX])
-df.insert(7,'lickrunsMalt', [np.mean(rats[x].sessions[j].lickruns['malt'], axis=0) for x in ratsX])
+df.insert(6,'lickrunsCas', [rats[x].sessions[j].lickrunsx['cas'] for x in ratsX])
+df.insert(7,'lickrunsMalt', [rats[x].sessions[j].lickrunsx['malt'] for x in ratsX])
 
 
 # Figure to show malt vs cas in PR vs NR
