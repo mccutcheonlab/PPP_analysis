@@ -7,15 +7,6 @@ PPP1 session figs, for individual rats when assembling data
 @author: jaimeHP
 """
 
-#import numpy as np
-#import scipy.io as sio
-#import matplotlib.pyplot as plt
-#import JM_general_functions as jmf
-#import JM_custom_figs as jmfig
-#
-#from matplotlib.backends.backend_pdf import PdfPages
-#import matplotlib.gridspec as gridspec
-
 def makeBehavFigs(x):
     # Initialize figure
     behavFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
@@ -46,3 +37,62 @@ def behavFigsCol(gs1, col, side):
     
     ax = plt.subplot(gs1[3, col])
     jmfig.cuerasterFig(ax, side['sipper'], side['lickdata']['licks'])
+    
+    
+def makePhotoFigs(x):
+    # Initialize photometry figure
+    photoFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
+    gs1 = gridspec.GridSpec(6, 2)
+    gs1.update(left=0.125, right= 0.9, wspace=0.4, hspace = 0.8)
+    plt.suptitle('Rat ' + x.rat + ': Session ' + x.session)
+
+    ax = plt.subplot(gs1[0, :])
+    x.sessionFig(ax)
+
+    if x.left['exist'] == True:
+        photoFigsCol(gs1, 0, x.pps,
+                     x.left['snips_sipper'],
+                     x.left['snips_licks'])
+
+    if x.right['exist'] == True:
+        photoFigsCol(gs1, 1, x.pps,
+                     x.right['snips_sipper'],
+                     x.right['snips_licks'])
+        
+    if x.left['exist'] == True and x.right['exist'] == True:
+        ax = plt.subplot(gs1[5, 0])
+        jmfig.trialsMultShadedFig(ax, [x.left['snips_sipper']['diff'], x.right['snips_sipper']['diff']],
+                                  x.pps,
+                                  linecolor=[x.left['color'], x.right['color']],
+                                  eventText = 'Sipper')
+
+        ax = plt.subplot(gs1[5, 1])
+        jmfig.trialsMultShadedFig(ax, [x.left['snips_licks']['diff'], x.right['snips_licks']['diff']],
+                                  x.pps,
+                                  linecolor=[x.left['color'], x.right['color']],
+                                  eventText = 'Lick')
+        
+#    plt.savefig(userhome + '/Dropbox/Python/photometry/output-thph1-lp/' + x.rat + '.eps', format='eps', dpi=1000)
+    pdf_pages.savefig(photoFig)
+    
+def photoFigsCol(gs1, col, pps, snips_sipper, snips_licks):
+    ax = plt.subplot(gs1[1, col])
+    jmfig.trialsFig(ax, snips_sipper['blue'], pps, noiseindex = snips_sipper['noise'],
+                    eventText = 'Sipper',
+                    ylabel = 'Delta F / F0')
+    
+    ax = plt.subplot(gs1[2, col])
+    jmfig.trialsMultShadedFig(ax, [snips_sipper['uv'], snips_sipper['blue']],
+                              pps, noiseindex = snips_sipper['noise'],
+                              eventText = 'Sipper')
+    
+    ax = plt.subplot(gs1[3, col])
+    jmfig.trialsFig(ax, snips_licks['blue'], pps, noiseindex=snips_licks['noise'],
+                    eventText = 'First Lick',
+                    ylabel = 'Delta F / F0')
+    
+    ax = plt.subplot(gs1[4, col])
+    jmfig.trialsMultShadedFig(ax, [snips_licks['uv'], snips_licks['blue']],
+                              pps, noiseindex=snips_licks['noise'],
+                              eventText = 'First Lick')
+    

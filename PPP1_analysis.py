@@ -192,64 +192,7 @@ class Session(object):
         if 'malt' in self.bottleR:
             self.right['color'] = malt_color
 
-    
-def makePhotoFigs(x):
-    # Initialize photometry figure
-    photoFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
-    gs1 = gridspec.GridSpec(6, 2)
-    gs1.update(left=0.125, right= 0.9, wspace=0.4, hspace = 0.8)
-    plt.suptitle('Rat ' + x.rat + ': Session ' + x.session)
 
-    ax = plt.subplot(gs1[0, :])
-    x.sessionFig(ax)
-
-    if x.left['exist'] == True:
-        photoFigsCol(gs1, 0, x.pps,
-                     x.trialsLSnips, x.trialsLSnipsUV, x.trialsLnoise,
-                     x.licksLSnips, x.licksLSnipsUV, x.licksLnoise)
-
-    if x.right['exist'] == True:
-        photoFigsCol(gs1, 1, x.pps,
-                     x.trialsRSnips, x.trialsRSnipsUV, x.trialsRnoise,
-                     x.licksRSnips, x.licksRSnipsUV, x.licksRnoise)
-        
-    if x.left['exist'] == True and x.right['exist'] == True:
-        diffcueL = jmf.findphotodiff(x.trialsLSnips, x.trialsLSnipsUV, x.trialsLnoise)
-        diffcueR = jmf.findphotodiff(x.trialsRSnips, x.trialsRSnipsUV, x.trialsRnoise)
-
-        ax = plt.subplot(gs1[5, 0])
-        jmfig.trialsMultShadedFig(ax, [diffcueL, diffcueR], x.pps,
-                                  linecolor=[x.Lcol, x.Rcol], eventText = 'Sipper')
-
-        difflickL = jmf.findphotodiff(x.licksLSnips, x.licksLSnipsUV, x.licksLnoise)
-        difflickR = jmf.findphotodiff(x.licksRSnips, x.licksRSnipsUV, x.licksRnoise)
-
-        ax = plt.subplot(gs1[5, 1])
-        jmfig.trialsMultShadedFig(ax, [difflickL, difflickR], x.pps,
-                                  linecolor=[x.Lcol, x.Rcol], eventText = 'Lick')
-        
-#    plt.savefig(userhome + '/Dropbox/Python/photometry/output-thph1-lp/' + x.rat + '.eps', format='eps', dpi=1000)
-    pdf_pages.savefig(photoFig)
-    
-def photoFigsCol(gs1, col, pps, cues, cuesUV, cuesnoise, licks, licksUV, licksnoise):
-    ax = plt.subplot(gs1[1, col])
-    jmfig.trialsFig(ax, cues, pps, noiseindex = cuesnoise,
-                    eventText = 'Sipper',
-                    ylabel = 'Delta F / F0')
-    
-    ax = plt.subplot(gs1[2, col])
-    jmfig.trialsMultShadedFig(ax, [cuesUV, cues], pps, noiseindex = cuesnoise,
-                              eventText = 'Sipper')
-    
-    ax = plt.subplot(gs1[3, col])
-    jmfig.trialsFig(ax, licks, pps, noiseindex = licksnoise,
-                    eventText = 'First Lick',
-                    ylabel = 'Delta F / F0')
-    
-    ax = plt.subplot(gs1[4, col])
-    jmfig.trialsMultShadedFig(ax, [licksUV, licks], pps, noiseindex = licksnoise,
-                              eventText = 'First Lick')
-    
 metafile = 'R:/DA_and_Reward/es334/PPP1/PPP1_metafile.txt'
 metafileData, metafileHeader = jmf.metafilereader(metafile)
 
@@ -310,7 +253,7 @@ for i in ['PPP1.1']:
             x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
         makeBehavFigs(x)
-#        makePhotoFigs(x)
+        makePhotoFigs(x)
         
     pdf_pages.close()
     plt.close('all')
