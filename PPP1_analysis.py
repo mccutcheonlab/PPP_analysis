@@ -212,7 +212,7 @@ for i in metafileData:
 #for i in rats:
 #    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
 #    for j in rats[i].sessions:        
-for i in ['PPP1.1']:
+for i in rats:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
     for j in ['s10']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
@@ -243,17 +243,18 @@ for i in ['PPP1.1']:
         
         if x.left['exist'] == True:
             x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
-            x.left['snips_licks'] = jmf.mastersnipper(x, x.left['licks'])
+            x.left['snips_licks'] = jmf.mastersnipper(x, x.left['lickdata']['rStart'])
             x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
             
         
         if x.right['exist'] == True:
             x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
-            x.right['snips_licks'] = jmf.mastersnipper(x, x.right['licks'])
+            x.right['snips_licks'] = jmf.mastersnipper(x, x.right['lickdata']['rStart'])
             x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
         makeBehavFigs(x)
         makePhotoFigs(x)
+            
         
     pdf_pages.close()
     plt.close('all')
