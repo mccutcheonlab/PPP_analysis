@@ -59,6 +59,7 @@ class Session(object):
 
         self.left = {}
         self.right = {}
+        self.both = {}
         self.left['subs'] = self.hrow['bottleL']
         self.right['subs'] = self.hrow['bottleR']
 
@@ -85,41 +86,39 @@ class Session(object):
     
     def check4events(self):        
         if hasattr(self.output.trialsL, 'onset'):
-            self.leftTrials = True
-            self.trialsL = self.output.trialsL.onset
-            self.trialsL_off = self.output.trialsL.offset
-            self.licksL = np.array([i for i in self.output.licksL.onset if i<max(self.trialsL_off)])
-            self.licksL_off = self.output.licksL.offset[:len(self.licksL)]
+            self.left['exist'] = True
+            self.left['sipper'] = self.output.trialsL.onset
+            self.left['sipper_off'] = self.output.trialsL.offset
+            self.left['licks'] = np.array([i for i in self.output.licksL.onset if i<max(self.left['sipper_off'])])
+            self.left['licks_off'] = self.output.licksL.offset[:len(self.left['licks'])]
         else:
-            self.leftTrials = False
-            self.trialsL = []
-            self.trialsL_off = []
-            self.licksL = []
-            self.licksL_off = []
-            
+            self.left['exist'] = False
+            self.left['sipper'] = []
+            self.left['sipper_off'] = []
+            self.left['licks'] = []
+            self.left['licks_off'] = []
+           
         if hasattr(self.output.trialsR, 'onset'):
-            self.rightTrials = True
-            self.trialsR = self.output.trialsR.onset
-            self.trialsR_off = self.output.trialsR.offset
-            self.licksR = np.array([i for i in self.output.licksR.onset if i<max(self.trialsR_off)])
-            self.licksR_off = self.output.licksR.offset[:len(self.licksR)]
+            self.right['exist'] = True
+            self.right['sipper'] = self.output.trialsR.onset
+            self.right['sipper_off'] = self.output.trialsR.offset
+            self.right['licks'] = np.array([i for i in self.output.licksR.onset if i<max(self.right['sipper_off'])])
+            self.right['licks_off'] = self.output.licksR.offset[:len(self.right['licks'])]
         else:
-            self.rightTrials = False
-            self.trialsR = []
-            self.trialsR_off = []
-            self.licksR = []
-            self.licksR_off = []
+            self.right['exist'] = False
+            self.right['sipper'] = []
+            self.right['sipper_off'] = []
+            self.right['licks'] = []
+            self.right['licks_off'] = []
             
-        if self.leftTrials == True and self.rightTrials == True:
-            print(len(self.trialsL))
-            first = [idx for idx, x in enumerate(self.trialsL) if x in self.trialsR][0]
-            print(first)
-            self.trialsboth = self.trialsL[first:]
-            self.trialsboth_off = self.trialsL_off[first:]
-            self.trialsL = self.trialsL[:first-1]
-            self.trialsL_off = self.trialsL_off[:first-1]
-            self.trialsR = self.trialsR[:first-1]
-            self.trialsR_off = self.trialsR_off[:first-1]
+        if self.left['exist'] == True and self.right['exist'] == True:
+            first = [idx for idx, x in enumerate(self.left['sipper']) if x in self.right['sipper']][0]
+            self.both['sipper'] = self.left['sipper'][first:]
+            self.both['sipper_off'] = self.left['sipper_off'][first:]
+            self.left['sipper'] = self.left['sipper'][:first-1]
+            self.left['sipper_off'] = self.left['sipper'][:first-1]
+            self.right['sipper'] = self.right['sipper'][:first-1]
+            self.right['sipper_off'] = self.right['sipper_off'][:first-1]
 
                         
     def removephantomlicks(self):
@@ -299,7 +298,7 @@ for i in metafileData:
 #for i in rats:
 #    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
 #    for j in rats[i].sessions:        
-for i in rats:
+for i in ['PPP1.1']:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
     for j in ['s10']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
@@ -311,7 +310,7 @@ for i in rats:
         x.time2samples()       
         # Find out which bottles have TTLs/Licks associated with them     
         x.check4events()
-        x.removephantomlicks()
+#        x.removephantomlicks()
         x.setbottlecolors()
         
         x.lickDataL = jmf.lickCalc(x.licksL,
