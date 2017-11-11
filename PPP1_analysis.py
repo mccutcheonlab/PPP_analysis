@@ -57,6 +57,11 @@ class Session(object):
         
         self.bottles = {}
 
+        self.left = {}
+        self.right = {}
+        self.left['subs'] = self.hrow['bottleL']
+        self.right['subs'] = self.hrow['bottleR']
+
     def loadmatfile(self):
         a = sio.loadmat(self.matlabfile, squeeze_me=True, struct_as_record=False) 
         self.output = a['output']
