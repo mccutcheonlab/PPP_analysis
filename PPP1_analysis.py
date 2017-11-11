@@ -158,14 +158,16 @@ class Session(object):
     
     def sessionlicksFig(self, ax):
         if x.left['exist'] == True:
-            ax.hist(self.lickDataL['licks'], range(0, 3600, 60), color=self.Lcol, alpha=0.4)          
-            yraster = [ax.get_ylim()[1]] * len(self.lickDataL['licks'])
-            ax.scatter(self.lickDataL['licks'], yraster, s=50, facecolors='none', edgecolors=self.Lcol)
+            licks = self.left['lickdata']['licks']
+            ax.hist(licks, range(0, 3600, 60), color=self.left['color'], alpha=0.4)          
+            yraster = [ax.get_ylim()[1]] * len(licks)
+            ax.scatter(licks, yraster, s=50, facecolors='none', edgecolors=self.left['color'])
 
         if x.right['exist'] == True:
-            ax.hist(self.lickDataR['licks'], range(0, 3600, 60), color=self.Rcol, alpha=0.4)          
-            yraster = [ax.get_ylim()[1]] * len(self.lickDataR['licks'])
-            ax.scatter(self.lickDataR['licks'], yraster, s=50, facecolors='none', edgecolors=self.Rcol)           
+            licks = self.right['lickdata']['licks']
+            ax.hist(licks, range(0, 3600, 60), color=self.right['color'], alpha=0.4)          
+            yraster = [ax.get_ylim()[1]] * len(licks)
+            ax.scatter(licks, yraster, s=50, facecolors='none', edgecolors=self.right['color'])           
         
         ax.set_xticks(np.multiply([0, 10, 20, 30, 40, 50, 60],60))
         ax.set_xticklabels(['0', '10', '20', '30', '40', '50', '60'])
@@ -181,45 +183,15 @@ class Session(object):
         self.Rcol = 'xkcd:greyish blue'
            
         if 'cas' in self.bottleL:
-            self.Lcol = casein_color
+            self.left['color'] = casein_color
         if 'malt' in self.bottleL:
-            self.Lcol = malt_color
+            self.left['color'] = malt_color
         
         if 'cas' in self.bottleR:
-            self.Rcol = casein_color
+            self.right['color'] = casein_color
         if 'malt' in self.bottleR:
-            self.Rcol = malt_color
+            self.right['color'] = malt_color
 
-def makeBehavFigs(x):
-    # Initialize figure
-    behavFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
-    gs1 = gridspec.GridSpec(5, 2)
-    gs1.update(left=0.10, right= 0.9, wspace=0.5, hspace = 0.7)
-    plt.suptitle('Rat ' + x.rat + ': Session ' + x.session)
-    
-    ax = plt.subplot(gs1[0, :])
-    x.sessionlicksFig(ax)
-
-    if x.left['exist'] == True:
-        behavFigsCol(gs1, 0, x.lickDataL, x.trialsL, x.Lcol)
-        
-    if x.right['exist'] == True:
-        behavFigsCol(gs1, 1, x.lickDataR, x.trialsR, x.Rcol)
-        
-    ax = plt.subplot(gs1[4, 0])
-    jmfig.latencyFig(ax, x)
-
-    pdf_pages.savefig(behavFig)
-
-def behavFigsCol(gs1, col, lickdata, cues, sidecol):
-    ax = plt.subplot(gs1[1, col])
-    jmfig.licklengthFig(ax, lickdata, color=sidecol)
-    
-    ax = plt.subplot(gs1[2, col])
-    jmfig.iliFig(ax, lickdata, color=sidecol)
-    
-    ax = plt.subplot(gs1[3, col])
-    jmfig.cuerasterFig(ax, cues, lickdata['licks'])
     
 def makePhotoFigs(x):
     # Initialize photometry figure
@@ -337,7 +309,7 @@ for i in ['PPP1.1']:
             x.right['snips_licks'] = jmf.mastersnipper(x, x.right['licks'])
             x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
-#        makeBehavFigs(x)
+        makeBehavFigs(x)
 #        makePhotoFigs(x)
         
     pdf_pages.close()
