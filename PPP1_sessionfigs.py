@@ -7,6 +7,15 @@ PPP1 session figs, for individual rats when assembling data
 @author: jaimeHP
 """
 
+#import numpy as np
+#import scipy.io as sio
+#import matplotlib.pyplot as plt
+#import JM_general_functions as jmf
+#import JM_custom_figs as jmfig
+#
+#from matplotlib.backends.backend_pdf import PdfPages
+#import matplotlib.gridspec as gridspec
+
 def makeBehavFigs(x):
     # Initialize figure
     behavFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
