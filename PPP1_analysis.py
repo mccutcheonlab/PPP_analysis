@@ -19,6 +19,9 @@ plt.style.use('seaborn-muted')
 import os
 import timeit
 
+import warnings
+warnings.simplefilter('error')
+
 tic = timeit.default_timer()
 
 datafolder = 'R:/DA_and_Reward/es334/PPP1/Matlab Files/'
@@ -116,7 +119,7 @@ class Session(object):
             self.both['sipper'] = self.left['sipper'][first:]
             self.both['sipper_off'] = self.left['sipper_off'][first:]
             self.left['sipper'] = self.left['sipper'][:first-1]
-            self.left['sipper_off'] = self.left['sipper'][:first-1]
+            self.left['sipper_off'] = self.left['sipper_off'][:first-1]
             self.right['sipper'] = self.right['sipper'][:first-1]
             self.right['sipper_off'] = self.right['sipper_off'][:first-1]
                         
@@ -222,7 +225,7 @@ for i in metafileData:
 #for i in rats:
 #    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
 #    for j in rats[i].sessions:        
-for i in rats:
+for i in ['PPP1.2']:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
     for j in ['s10']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
@@ -255,8 +258,7 @@ for i in rats:
             x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
             x.left['snips_licks'] = jmf.mastersnipper(x, x.left['lickdata']['rStart'])
             x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
-            
-        
+     
         if x.right['exist'] == True:
             x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
             x.right['snips_licks'] = jmf.mastersnipper(x, x.right['lickdata']['rStart'])
@@ -266,7 +268,6 @@ for i in rats:
         makePhotoFigs(x)
         
         x.side2subs()
-            
-        
+  
     pdf_pages.close()
     plt.close('all')
