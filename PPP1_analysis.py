@@ -264,6 +264,8 @@ for i in rats:
             
         makeBehavFigs(x)
         makePhotoFigs(x)
+        
+        x.side2subs()
             
         
     pdf_pages.close()
