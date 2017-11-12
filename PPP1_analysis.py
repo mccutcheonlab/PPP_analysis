@@ -179,8 +179,9 @@ class Session(object):
         casein_color = 'xkcd:pale purple'
         malt_color = 'xkcd:sky blue'
         
-        self.Lcol = 'xkcd:grey'
-        self.Rcol = 'xkcd:greyish blue'
+        # sets default colors, e.g. to be used on saccharin or water days
+        self.left['color'] = 'xkcd:grey'
+        self.right['color'] = 'xkcd:greyish blue'
            
         if 'cas' in self.bottleL:
             self.left['color'] = casein_color
@@ -192,6 +193,15 @@ class Session(object):
         if 'malt' in self.bottleR:
             self.right['color'] = malt_color
 
+    def side2subs(self):
+        if 'cas' in self.left['subs']:
+            self.cas = self.left
+        if 'cas' in self.right['subs']:
+            self.cas = self.right
+        if 'malt' in self.left['subs']:
+            self.malt = self.left
+        if 'malt' in self.right['subs']:
+            self.malt = self.right
 
 metafile = 'R:/DA_and_Reward/es334/PPP1/PPP1_metafile.txt'
 metafileData, metafileHeader = jmf.metafilereader(metafile)
