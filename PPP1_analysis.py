@@ -19,9 +19,6 @@ plt.style.use('seaborn-muted')
 import os
 import timeit
 
-import warnings
-warnings.simplefilter('error')
-
 tic = timeit.default_timer()
 
 datafolder = 'R:/DA_and_Reward/es334/PPP1/Matlab Files/'
