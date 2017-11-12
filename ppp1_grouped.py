@@ -19,9 +19,9 @@ import dill
 
 def choicetest(x):
     choices = []
-    for trial, trial_off in zip(x.trialsboth, x.trialsboth_off):
-        leftlick = [x for x in x.licksL if (x > trial) and (x < trial_off)]
-        rightlick = [x for x in x.licksR if (x > trial) and (x < trial_off)]
+    for trial, trial_off in zip(x.both['sipper'], x.both['sipper_off']):
+        leftlick = [L for L in x.left['licks'] if (L > trial) and (L < trial_off)]
+        rightlick = [L for L in x.right['licks'] if (L > trial) and (L < trial_off)]
         if len(leftlick) > 0:
             if len(rightlick) > 0:
                 if leftlick < rightlick:
