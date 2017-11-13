@@ -218,7 +218,7 @@ for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1_licks', 'cas2_licks
 
 
 # Figure to show malt vs cas in PR vs NR
-mpl.rcParams['figure.subplot.hspace'] = 0.0
+mpl.rcParams['figure.subplot.hspace'] = 0.15
 mpl.rcParams['figure.subplot.left'] = 0.05
 mpl.rcParams['figure.subplot.right'] = 0.95
 mpl.rcParams['figure.subplot.top'] = 0.95
@@ -231,16 +231,16 @@ fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6
 doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1', 'malt1')
 
 
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
 doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1_licks', 'malt1_licks')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
 
 
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
 doublesnipFig(ax[0], ax[1], df, 'NR', 'cas2_licks', 'malt2_licks')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref2photo_licks.eps')
 
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
 doublesnipFig(ax[0], ax[1], df, 'NR', 'cas3_licks', 'malt3_licks')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
 
