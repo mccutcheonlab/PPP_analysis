@@ -15,7 +15,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-mpl.style.use('classic')
+#mpl.style.use('classic')
 
 mpl.rcParams['figure.figsize'] = (4.8, 3.2)
 mpl.rcParams['figure.dpi'] = 100
