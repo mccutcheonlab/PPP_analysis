@@ -109,6 +109,12 @@ def data2obj2D(data):
             obj[i][j] = np.array(y)
     return obj
 
+def data2obj1D(data):
+    obj = np.empty(len(data), dtype=np.object)
+    for i,x in enumerate(data):
+        obj[i] = np.array(x)  
+    return obj
+
 def choicefig(df, keys, ax):
     dietmsk = df.diet == 'NR'
     
@@ -127,6 +133,22 @@ def choicefig(df, keys, ax):
                  grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
                  scattersize = 60,
                  ax=ax)
+    
+def onedaypreffig(df, key, ax):
+    dietmsk = df.diet == 'NR'
+    a = data2obj1D([df[key][dietmsk], df[key][~dietmsk]])
+        
+    jmfig.barscatter(a, barfacecoloroption = 'between', barfacecolor = ['xkcd:silver', 'xkcd:kelly green'],
+                         scatteredgecolor = ['black'],
+                         scatterlinecolor = 'black',
+                         grouplabel=['NR', 'PR'],
+                         barwidth = 0.8,
+                         scattersize = 40,
+                         ylabel = 'Casein preference',
+                         ax=ax)
+    ax.set_yticks([0, 0.5, 1.0])
+    ax.set_xlim([0.25,2.75])
+    ax.set_ylim([0, 1.1])
 
 # Looks for existing data and if not there loads pickled file
 try:
@@ -158,13 +180,22 @@ for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices
     df.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in ratsX])
     df.insert(n+1, pr, [rats[x].sessions[j].pref for x in ratsX])
 
+# Figure
+fig = plt.figure(figsize=(1.8, 2.4))
+ax = plt.subplot(1,1,1)
+onedaypreffig(df, 'pref1', ax)
+
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/onedaypref.eps')
+plt.title('Casein preference')
+
+# Figure showing casein preference across all three test sessions
 fig = plt.figure(figsize=(2.4, 2.4))
 ax = plt.subplot(1,1,1)                
  
 choicefig(df, ['pref1', 'pref2', 'pref3'], ax)
 ax.set_ylabel('Casein preference')
 plt.yticks([0, 0.5, 1.0])
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/prefbargraph.eps')
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/alldayspref.eps')
 
 
 
