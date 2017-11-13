@@ -15,10 +15,12 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-mpl.rcParams['figure.figsize'] = (3.2, 2.4)
+mpl.style.use('classic')
+
+mpl.rcParams['figure.figsize'] = (4.8, 3.2)
 mpl.rcParams['figure.dpi'] = 100
 
-mpl.rcParams['font.size'] = 8.0
+mpl.rcParams['font.size'] = 12.0
 mpl.rcParams['axes.labelsize'] = 'medium'
 mpl.rcParams['ytick.labelsize'] = 'small'
 
@@ -61,30 +63,9 @@ def prefcalc(x):
     
     return pref
 
-#def side2subs(x):
-#    
-#    x.forcedtrials = {}
-#    x.lickruns = {}
-#    x.forcedtrialsx = {}
-#    x.lickrunsx = {}
-#    
-#    for subs in ['cas', 'malt']:
-#        if subs in x.bottleL and subs in x.bottleR:
-#            print('Same substance in both bottles!')
-#        if subs in x.bottleL:
-#            x.forcedtrials[subs] = x.trialsLSnips
-#            x.lickruns[subs] = x.licksLSnips            
-#            x.forcedtrialsx[subs] = makemeansnips(x.trialsLSnips, x.trialsLnoise)
-#            x.lickrunsx[subs] = makemeansnips(x.licksLSnips, x.licksLnoise)
-#
-#        if subs in x.bottleR:
-#            x.forcedtrials[subs] = x.trialsRSnips
-#            x.lickruns[subs] = x.licksRSnips
-#            x.forcedtrialsx[subs] = makemeansnips(x.trialsRSnips, x.trialsRnoise)
-#            x.lickrunsx[subs] = makemeansnips(x.licksRSnips, x.licksRnoise)
 
-def doublesnipFig(ax1, ax2, df, factor1, factor2):
-    dietmsk = df.diet == 'NR'    
+def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
+    dietmsk = df.diet == diet    
     ax1.axis('off')
     ax2.axis('off')
 
@@ -151,7 +132,7 @@ def choicefig(df, keys, ax):
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
                  grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
-                 scattersize = 60,
+                 scattersize = 100,
                  ax=ax)
     
 def onedaypreffig(df, key, ax):
@@ -164,7 +145,7 @@ def onedaypreffig(df, key, ax):
                          scatterlinecolor = 'black',
                          grouplabel=['NR', 'PR'],
                          barwidth = 0.8,
-                         scattersize = 40,
+                         scattersize = 80,
                          ylabel = 'Casein preference',
                          ax=ax)
     ax.set_yticks([0, 0.5, 1.0])
@@ -204,16 +185,15 @@ for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices
 # Figure showing one day preference data
     
 mpl.rcParams['figure.subplot.left'] = 0.30
-width = 1.8
-fig = plt.figure(figsize=(width, width*(4/3)))
+fig = plt.figure(figsize=(3.2, 4.0))
 ax = plt.subplot(1,1,1)
 onedaypreffig(df, 'pref1', ax)
 
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/onedaypref.eps')
-plt.title('Casein preference')
 
 # Figure showing casein preference across all three test sessions
-fig = plt.figure(figsize=(2.4, 2.4))
+mpl.rcParams['figure.subplot.left'] = 0.15
+fig = plt.figure(figsize=(4.4, 4.0))
 ax = plt.subplot(1,1,1)                
  
 choicefig(df, ['pref1', 'pref2', 'pref3'], ax)
@@ -232,25 +212,41 @@ for j, n, cas, malt in zip(testsessions, [2,4,6], ['cas1', 'cas2', 'cas3'], ['ma
     df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_sipper']['diff'], axis=0) for x in ratsX])
     df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_sipper']['diff'], axis=0) for x in ratsX])
 
-# Figure to show malt vs cas in PR vs NR
-mpl.rcParams['figure.subplot.wspace'] = 0.1
-mpl.rcParams['figure.subplot.left'] = 0.15
-
-#mpl.rcParams['axes.spines.bottom']=False
-#mpl.rcParams['axes.spines.left']=False
-
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
-doublesnipFig(ax[0], ax[1], df, 'cas1', 'malt1')
-
 for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1_licks', 'cas2_licks', 'cas3_licks'], ['malt1_licks', 'malt2_licks', 'malt3_licks']):
     df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks']['diff'], axis=0) for x in ratsX])
     df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks']['diff'], axis=0) for x in ratsX])
 
+
+# Figure to show malt vs cas in PR vs NR
+mpl.rcParams['figure.subplot.hspace'] = 0.0
+mpl.rcParams['figure.subplot.left'] = 0.05
+mpl.rcParams['figure.subplot.right'] = 0.95
+mpl.rcParams['figure.subplot.top'] = 0.95
+mpl.rcParams['figure.subplot.bottom'] = 0.05
+
+#mpl.rcParams['axes.spines.bottom']=False
+#mpl.rcParams['axes.spines.left']=False
+
+fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
+doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1', 'malt1')
+
+
 fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
-doublesnipFig(ax[0], ax[1], df, 'cas1_licks', 'malt1_licks')
+doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1_licks', 'malt1_licks')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
 
 
+fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+doublesnipFig(ax[0], ax[1], df, 'NR', 'cas2_licks', 'malt2_licks')
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref2photo_licks.eps')
+
+fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+doublesnipFig(ax[0], ax[1], df, 'NR', 'cas3_licks', 'malt3_licks')
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
+
+
+# For saving dataframe
+df.to_hdf('R:/DA_and_Reward/es334/PPP1/df', 'w')
 #
 #
 #np.shape(df.forcedtrialsCas[1])
