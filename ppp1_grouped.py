@@ -15,6 +15,23 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
+mpl.rcParams['figure.figsize'] = (3.2, 2.4)
+mpl.rcParams['figure.dpi'] = 100
+
+mpl.rcParams['font.size'] = 8.0
+mpl.rcParams['axes.labelsize'] = 'medium'
+mpl.rcParams['ytick.labelsize'] = 'small'
+
+mpl.rcParams['figure.subplot.left'] = 0.15
+mpl.rcParams['figure.subplot.bottom'] = 0.20
+
+mpl.rcParams['errorbar.capsize'] = 5
+
+mpl.rcParams['savefig.transparent'] = True
+
+mpl.rcParams['axes.spines.top']=False
+mpl.rcParams['axes.spines.right']=False
+
 import dill
 
 def choicetest(x):
@@ -66,18 +83,21 @@ def prefcalc(x):
 #            x.forcedtrialsx[subs] = makemeansnips(x.trialsRSnips, x.trialsRnoise)
 #            x.lickrunsx[subs] = makemeansnips(x.licksRSnips, x.licksRnoise)
 
-def prefhistFig(ax1, ax2, df, factor1, factor2):
-    dietmsk = df.diet == 'NR'
+def doublesnipFig(ax1, ax2, df, factor1, factor2):
+    dietmsk = df.diet == 'NR'    
+    ax1.axis('off')
+    ax2.axis('off')
 
     shadedError(ax1, df[factor1][dietmsk], linecolor='black')
     ax1 = shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
-#    ax1.set_xticks([0,10,20,30])
-#    ax1.set_xticklabels(['0', '20', '40', '60'])
+    ax1.plot([50,50], [0.02, 0.04], c='k')
+    ax1.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
     
     shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
     ax2 = shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
-#    ax2.set_xticks([0,10,20,30])
-#    ax2.set_xticklabels(['0', '20', '40', '60'])
+    ax2.plot([250,300], [-0.03, -0.03], c='k')
+    ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
+
 
 def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
     yarray = np.array(yarray)
@@ -201,38 +221,36 @@ ax.set_ylabel('Casein preference')
 plt.yticks([0, 0.5, 1.0])
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/alldayspref.eps')
 
+## Creating new dataframe for photometry data so I can exclude rats
 
-for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1', 'cas2', 'cas3'], ['malt1', 'malt2', 'malt3']):
+ratsX = excluderats(rats, ['PPP1.8'])
+
+df = pd.DataFrame([x for x in ratsX])
+df.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
+
+for j, n, cas, malt in zip(testsessions, [2,4,6], ['cas1', 'cas2', 'cas3'], ['malt1', 'malt2', 'malt3']):
     df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_sipper']['diff'], axis=0) for x in ratsX])
     df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_sipper']['diff'], axis=0) for x in ratsX])
 
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.wspace'] = 0.1
 mpl.rcParams['figure.subplot.left'] = 0.15
+
+#mpl.rcParams['axes.spines.bottom']=False
+#mpl.rcParams['axes.spines.left']=False
+
 fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+doublesnipFig(ax[0], ax[1], df, 'cas1', 'malt1')
 
-prefhistFig(ax[0], ax[1], df, 'cas1', 'malt1')
+for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1_licks', 'cas2_licks', 'cas3_licks'], ['malt1_licks', 'malt2_licks', 'malt3_licks']):
+    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks']['diff'], axis=0) for x in ratsX])
+    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks']['diff'], axis=0) for x in ratsX])
+
+fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+doublesnipFig(ax[0], ax[1], df, 'cas1_licks', 'malt1_licks')
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
 
 
-
-#for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1', 'cas2', 'cas3'], ['malt1', 'malt2', 'malt3']):
-#    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_sipper']['diff'], axis=0) for x in ratsX])
-#    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_sipper']['diff'], axis=0) for x in ratsX])
-
-#df.insert(4,'forcedtrialsCas', [rats[x].sessions[j].forcedtrialsx['cas'] for x in ratsX])
-#df.insert(5,'forcedtrialsMalt', [rats[x].sessions[j].forcedtrialsx['malt'] for x in ratsX])
-#
-#df.insert(6,'lickrunsCas', [rats[x].sessions[j].lickrunsx['cas'] for x in ratsX])
-#df.insert(7,'lickrunsMalt', [rats[x].sessions[j].lickrunsx['malt'] for x in ratsX])
-#
-#
-
-#fig.text(0.55, 0.04, 'Time (min)', ha='center')
-#ax[0].set_ylabel('Licks per 2 min')
-
-#fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
-#
-#prefhistFig(ax[0], ax[1], df, 'lickrunsCas', 'lickrunsMalt')
 #
 #
 #np.shape(df.forcedtrialsCas[1])
