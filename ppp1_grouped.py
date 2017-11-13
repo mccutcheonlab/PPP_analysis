@@ -44,27 +44,27 @@ def prefcalc(x):
     
     return pref
 
-def side2subs(x):
-    
-    x.forcedtrials = {}
-    x.lickruns = {}
-    x.forcedtrialsx = {}
-    x.lickrunsx = {}
-    
-    for subs in ['cas', 'malt']:
-        if subs in x.bottleL and subs in x.bottleR:
-            print('Same substance in both bottles!')
-        if subs in x.bottleL:
-            x.forcedtrials[subs] = x.trialsLSnips
-            x.lickruns[subs] = x.licksLSnips            
-            x.forcedtrialsx[subs] = makemeansnips(x.trialsLSnips, x.trialsLnoise)
-            x.lickrunsx[subs] = makemeansnips(x.licksLSnips, x.licksLnoise)
-
-        if subs in x.bottleR:
-            x.forcedtrials[subs] = x.trialsRSnips
-            x.lickruns[subs] = x.licksRSnips
-            x.forcedtrialsx[subs] = makemeansnips(x.trialsRSnips, x.trialsRnoise)
-            x.lickrunsx[subs] = makemeansnips(x.licksRSnips, x.licksRnoise)
+#def side2subs(x):
+#    
+#    x.forcedtrials = {}
+#    x.lickruns = {}
+#    x.forcedtrialsx = {}
+#    x.lickrunsx = {}
+#    
+#    for subs in ['cas', 'malt']:
+#        if subs in x.bottleL and subs in x.bottleR:
+#            print('Same substance in both bottles!')
+#        if subs in x.bottleL:
+#            x.forcedtrials[subs] = x.trialsLSnips
+#            x.lickruns[subs] = x.licksLSnips            
+#            x.forcedtrialsx[subs] = makemeansnips(x.trialsLSnips, x.trialsLnoise)
+#            x.lickrunsx[subs] = makemeansnips(x.licksLSnips, x.licksLnoise)
+#
+#        if subs in x.bottleR:
+#            x.forcedtrials[subs] = x.trialsRSnips
+#            x.lickruns[subs] = x.licksRSnips
+#            x.forcedtrialsx[subs] = makemeansnips(x.trialsRSnips, x.trialsRnoise)
+#            x.lickrunsx[subs] = makemeansnips(x.licksRSnips, x.licksRnoise)
 
 def prefhistFig(ax1, ax2, df, factor1, factor2):
     dietmsk = df.diet == 'NR'
@@ -112,46 +112,52 @@ except NameError:
     rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])
+ratsX = rats
+
+testsessions = ['s10', 's11', 's16']
 
 for i in rats:
-    for j in ['s10']:
+    for j in testsessions:
         x = rats[i].sessions[j]
         ratkey = i
               
         x.choices = choicetest(x)
         x.pref = prefcalc(x)
-        side2subs(x)
+        print(x.pref)
+#        side2subs(x)
 
 df = pd.DataFrame([x for x in ratsX])
 df.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
-df.insert(2,'choices',[[(rats[x].sessions[j].choices)] for x in ratsX])
-df.insert(3,'pref', [rats[x].sessions[j].pref for x in ratsX])
 
-df.insert(4,'forcedtrialsCas', [rats[x].sessions[j].forcedtrialsx['cas'] for x in ratsX])
-df.insert(5,'forcedtrialsMalt', [rats[x].sessions[j].forcedtrialsx['malt'] for x in ratsX])
+for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
+    df.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in ratsX])
+    df.insert(n+1, pr, [rats[x].sessions[j].pref for x in ratsX])
 
-df.insert(6,'lickrunsCas', [rats[x].sessions[j].lickrunsx['cas'] for x in ratsX])
-df.insert(7,'lickrunsMalt', [rats[x].sessions[j].lickrunsx['malt'] for x in ratsX])
-
-
-# Figure to show malt vs cas in PR vs NR
-mpl.rcParams['figure.subplot.wspace'] = 0.1
-mpl.rcParams['figure.subplot.left'] = 0.15
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
-
-prefhistFig(ax[0], ax[1], df, 'forcedtrialsCas', 'forcedtrialsMalt')
-#fig.text(0.55, 0.04, 'Time (min)', ha='center')
-#ax[0].set_ylabel('Licks per 2 min')
-
-fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
-
-prefhistFig(ax[0], ax[1], df, 'lickrunsCas', 'lickrunsMalt')
-
-
-np.shape(df.forcedtrialsCas[1])
-#df.columns = ['choices']
-
-# TO DO!!!
-# remove noise trials from grouped data
-# figure out a way of excluding certain rats (e.g. PPP1.8) maybe just a line that removes at beginning of this code
-
+#df.insert(4,'forcedtrialsCas', [rats[x].sessions[j].forcedtrialsx['cas'] for x in ratsX])
+#df.insert(5,'forcedtrialsMalt', [rats[x].sessions[j].forcedtrialsx['malt'] for x in ratsX])
+#
+#df.insert(6,'lickrunsCas', [rats[x].sessions[j].lickrunsx['cas'] for x in ratsX])
+#df.insert(7,'lickrunsMalt', [rats[x].sessions[j].lickrunsx['malt'] for x in ratsX])
+#
+#
+## Figure to show malt vs cas in PR vs NR
+#mpl.rcParams['figure.subplot.wspace'] = 0.1
+#mpl.rcParams['figure.subplot.left'] = 0.15
+#fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+#
+#prefhistFig(ax[0], ax[1], df, 'forcedtrialsCas', 'forcedtrialsMalt')
+##fig.text(0.55, 0.04, 'Time (min)', ha='center')
+##ax[0].set_ylabel('Licks per 2 min')
+#
+#fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(6, 4))
+#
+#prefhistFig(ax[0], ax[1], df, 'lickrunsCas', 'lickrunsMalt')
+#
+#
+#np.shape(df.forcedtrialsCas[1])
+##df.columns = ['choices']
+#
+## TO DO!!!
+## remove noise trials from grouped data
+## figure out a way of excluding certain rats (e.g. PPP1.8) maybe just a line that removes at beginning of this code
+#
