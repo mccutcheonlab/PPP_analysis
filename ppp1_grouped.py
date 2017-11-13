@@ -102,6 +102,32 @@ def makemeansnips(snips, noiseindex):
         
     return meansnip
 
+def data2obj2D(data):
+    obj = np.empty((np.shape(data)[0], np.shape(data)[1]), dtype=np.object)
+    for i,x in enumerate(data):
+        for j,y in enumerate(x):
+            obj[i][j] = np.array(y)
+    return obj
+
+def choicefig(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
+
+    x = data2obj2D(a)
+    
+    cols = ['xkcd:silver', 'xkcd:kelly green']
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 60,
+                 ax=ax)
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(rats)
@@ -123,7 +149,6 @@ for i in rats:
               
         x.choices = choicetest(x)
         x.pref = prefcalc(x)
-        print(x.pref)
 #        side2subs(x)
 
 df = pd.DataFrame([x for x in ratsX])
@@ -132,6 +157,16 @@ df.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
 for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
     df.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in ratsX])
     df.insert(n+1, pr, [rats[x].sessions[j].pref for x in ratsX])
+
+fig = plt.figure(figsize=(2.4, 2.4))
+ax = plt.subplot(1,1,1)                
+ 
+choicefig(df, ['pref1', 'pref2', 'pref3'], ax)
+ax.set_ylabel('Casein preference')
+plt.yticks([0, 0.5, 1.0])
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/prefbargraph.eps')
+
+
 
 #df.insert(4,'forcedtrialsCas', [rats[x].sessions[j].forcedtrialsx['cas'] for x in ratsX])
 #df.insert(5,'forcedtrialsMalt', [rats[x].sessions[j].forcedtrialsx['malt'] for x in ratsX])
