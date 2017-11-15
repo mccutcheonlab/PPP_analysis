@@ -160,7 +160,7 @@ def peakresponsebargraph(df, keys, ax):
 
     x = data2obj2D(a)
     
-    cols = ['xkcd:charcoal', 'xkcd:silver', 'xkcd:kelly green', 'xkcd:light green']
+    cols = ['xkcd:silver', 'w', 'xkcd:kelly green', 'xkcd:light green']
     
     ax, x, _, _ = jmfig.barscatter(x, paired=True,
                  barfacecoloroption = 'individual',
@@ -172,7 +172,7 @@ def peakresponsebargraph(df, keys, ax):
                  ax=ax)
     ax.set_ylim([-.02, 0.15])
     ax.set_yticks([0, 0.05, 0.1, 0.15])
-    ax.set_ylabel('\u0394F')
+#    ax.set_ylabel('\u0394F')
 
 # Looks for existing data and if not there loads pickled file
 try:
@@ -278,18 +278,18 @@ doublesnipFig(ax[0], ax[1], df, 'NR', 'cas3_licks', 'malt3_licks')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
 
 # Figure for peak responses to casein and malto licks
-mpl.rcParams['figure.subplot.left'] = 0.30
-fig = plt.figure(figsize=(8, 4))
-ax = plt.subplot(1,3,1)
-peakresponsebargraph(df, ['cas1_licks_peak', 'malt1_licks_peak'], ax)
+#mpl.rcParams['figure.subplot.left'] = 0.30
+#fig = plt.figure(figsize=(8, 4))
+fig, ax = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True, figsize=(8, 4))
+peakresponsebargraph(df, ['cas1_licks_peak', 'malt1_licks_peak'], ax[0])
 #plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
 
-ax = plt.subplot(1,3,2)
-peakresponsebargraph(df, ['cas2_licks_peak', 'malt2_licks_peak'], ax)
+peakresponsebargraph(df, ['cas2_licks_peak', 'malt2_licks_peak'], ax[1])
 #plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
 
-ax = plt.subplot(1,3,3)
-peakresponsebargraph(df, ['cas3_licks_peak', 'malt3_licks_peak'], ax)
+peakresponsebargraph(df, ['cas3_licks_peak', 'malt3_licks_peak'], ax[2])
+
+ax[0].set_ylabel('\u0394F')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/allpeaks_licks.eps')
 
 # For saving dataframe
