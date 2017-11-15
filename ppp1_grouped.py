@@ -152,6 +152,28 @@ def onedaypreffig(df, key, ax):
     ax.set_xlim([0.25,2.75])
     ax.set_ylim([0, 1.1])
 
+def peakresponsebargraph(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
+
+    x = data2obj2D(a)
+    
+    cols = ['xkcd:charcoal', 'xkcd:silver', 'xkcd:kelly green', 'xkcd:light green']
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR', 'PR'],
+                 scattersize = 100,
+                 ax=ax)
+    ax.set_ylim([-.02, 0.15])
+    ax.set_yticks([0, 0.05, 0.1, 0.15])
+    ax.set_ylabel('\u0394F')
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(rats)
@@ -220,6 +242,13 @@ for j, n, cas, malt in zip(testsessions, [14, 16, 18],
                            ['malt1_licks_forced', 'malt2_licks_forced', 'malt3_licks_forced']):
     df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['diff'], axis=0) for x in ratsX])
     df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['diff'], axis=0) for x in ratsX])
+
+for j, n, cas, malt in zip(testsessions, [20, 22, 24],
+                           ['cas1_licks_peak', 'cas2_licks_peak', 'cas3_licks_peak'],
+                           ['malt1_licks_peak', 'malt2_licks_peak', 'malt3_licks_peak']):
+    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['peak'], axis=0) for x in ratsX])
+    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['peak'], axis=0) for x in ratsX])
+
     
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.hspace'] = 0.15
@@ -248,13 +277,26 @@ fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6
 doublesnipFig(ax[0], ax[1], df, 'NR', 'cas3_licks', 'malt3_licks')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
 
+# Figure for peak responses to casein and malto licks
+mpl.rcParams['figure.subplot.left'] = 0.30
+fig = plt.figure(figsize=(8, 4))
+ax = plt.subplot(1,3,1)
+peakresponsebargraph(df, ['cas1_licks_peak', 'malt1_licks_peak'], ax)
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
+
+ax = plt.subplot(1,3,2)
+peakresponsebargraph(df, ['cas2_licks_peak', 'malt2_licks_peak'], ax)
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
+
+ax = plt.subplot(1,3,3)
+peakresponsebargraph(df, ['cas3_licks_peak', 'malt3_licks_peak'], ax)
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/allpeaks_licks.eps')
 
 # For saving dataframe
-df.to_hdf('R:/DA_and_Reward/es334/PPP1/df', 'w')
+#df.to_hdf('R:/DA_and_Reward/es334/PPP1/df', 'w')
 #
 #
-#np.shape(df.forcedtrialsCas[1])
-##df.columns = ['choices']
+
 #
 ## TO DO!!!
 ## remove noise trials from grouped data
