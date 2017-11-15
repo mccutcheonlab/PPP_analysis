@@ -222,9 +222,9 @@ for i in metafileData:
 #for i in rats:
 #    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
 #    for j in rats[i].sessions:        
-for i in ['PPP1.1']:
+for i in rats:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
-    for j in ['s10']:
+    for j in ['s10', 's11', 's16']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
         
         # Load in data from .mat file (convert from Tank first using Matlab script)
@@ -260,6 +260,7 @@ for i in ['PPP1.1']:
         if x.right['exist'] == True:
             x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
             x.right['snips_licks'] = jmf.mastersnipper(x, x.right['lickdata']['rStart'])
+            x.right['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.right['lickdata']['rStart'] if licks < x.both['sipper'][0]])
             x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
 #        makeBehavFigs(x)

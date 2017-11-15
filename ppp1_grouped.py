@@ -173,7 +173,6 @@ for i in rats:
               
         x.choices = choicetest(x)
         x.pref = prefcalc(x)
-#        side2subs(x)
 
 df = pd.DataFrame([x for x in ratsX])
 df.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
@@ -216,7 +215,12 @@ for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1_licks', 'cas2_licks
     df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks']['diff'], axis=0) for x in ratsX])
     df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks']['diff'], axis=0) for x in ratsX])
 
-
+for j, n, cas, malt in zip(testsessions, [14, 16, 18],
+                           ['cas1_licks_forced', 'cas2_licks_forced', 'cas3_licks_forced'],
+                           ['malt1_licks_forced', 'malt2_licks_forced', 'malt3_licks_forced']):
+    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['diff'], axis=0) for x in ratsX])
+    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['diff'], axis=0) for x in ratsX])
+    
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.hspace'] = 0.15
 mpl.rcParams['figure.subplot.left'] = 0.05
@@ -232,7 +236,7 @@ doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1', 'malt1')
 
 
 fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1_licks', 'malt1_licks')
+doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1_licks_forced', 'malt1_licks_forced')
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
 
 
