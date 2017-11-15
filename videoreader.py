@@ -9,7 +9,7 @@ import moviepy.editor as mv
 from moviepy.video.io.bindings import mplfig_to_npimage
 import matplotlib.pyplot as plt
 
-x = rats['PPP1.7'].sessions['s10']
+
 
 
 def makevideoclip(videofile, event, data, pre=10, length=30, savefile='output.mp4'):
@@ -50,53 +50,60 @@ def setfiglims(data):
       
     return axislimits, rasterlimits
 
-events = x.left['sipper']
+#Code to choose parameters for video
+bins = 600
+preTrial=10
+trialLength=35
+
+
+# Code to choose rat/session and events
+x = rats['PPP1.7'].sessions['s10']
+all_events = x.left['sipper']
 videofile = 'R:\\DA_and_Reward\\es334\\PPP1\\Tanks\\Eelke-171027-111329\\PPP1-171017-081744_Eelke-171027-111329_Cam2.avi'
+all_data = jmf.mastersnipper(x, x.left['sipper'], preTrial=preTrial, trialLength=trialLength, bins=bins)
+all_licks = np.concatenate((x.left['lickdata']['licks'], x.right['lickdata']['licks']), axis=0)
 
+event_number=1
+event = all_events[event_number]
+data = all_data['blue'][event_number][:]
+dataUV = all_data['uv'][event_number][:]
 
-for trial in range(0, len(events)):
-    print(trial)
-    
-    event = x.trialsL[trial]
-    data = x.trialsLSnips[trial][:]
-    dataUV = x.trialsLSnipsUV[trial]
-    
-    # Extracts lick data
-    lickdatabytrial = jmf.nearestevents(x.trialsL, np.concatenate((x.lickDataL['licks'], x.lickDataR['licks']), axis=0))
-    lickdata = lickdatabytrial[trial]
-    lickdata = (lickdata+10)*10 # scales to match bin number
-    
-    savefile = 'R:\\DA_and_Reward\\es334\\PPP1\\video\\combined-' + str(trial) + '.mp4'
-    
+lickdatabytrial = jmf.nearestevents(all_events, all_licks)
+lickdata = lickdatabytrial[event_number]
+lickdata = (lickdata+preTrial)*bins/trialLength # scales to match bin number
+
+savefile = 'R:\\DA_and_Reward\\es334\\PPP1\\video\\newcombined-' + str(event_number) + '.mp4'
+clip = mv.VideoFileClip(videofile)   
     #makevideoclip(videofile, event, data, savefile=savefile)
-    
-    clip = mv.VideoFileClip(videofile).subclip(event-10,event+20)
-    print(clip.size)
-    c2 = clip.crop(x1=220,y1=0, x2=640, y2=320)
-    print(c2.size)
+#clip = mv.VideoFileClip(videofile).subclip(event-10,event+20)
+   
+#clip = mv.VideoFileClip(videofile).subclip(event-preTrial,event-preTrial+trialLength)
+#print(clip.size)
+#c2 = clip.crop(x1=220,y1=0, x2=640, y2=320)
+#print(c2.size)
     #c2.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame1.png', t=15)
     
-    c3 = c2.on_color(size=(420,480), pos='bottom')
-    #c3.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame2.png', t=15)
-    
-    duration = 30
-    #
-    fig, ax = plt.subplots(figsize=(4.2,1.6))
-    fig.patch.set_facecolor('k')
-    ax.set_facecolor('k')
-    
-    animation = mv.VideoClip(make_frame, duration=duration)
-    #animation.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame.png', t=30)
-    
-    a2 = animation.resize((420,160))
-    
-    #original_clip = mv.clips_array([[clip, animation]])
-    #original_clip.write_videofile('R:\\DA_and_Reward\\es334\\PPP1\\video\\combined.mp4', fps=10)
-    
-    final_clip =  mv.CompositeVideoClip([c3,
-                                a2.set_pos(('center', 'top'))])
-    #final_clip.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame2.png', t=15)
-    final_clip.write_videofile(savefile, fps=10)
-    
-    #final_clip.ipython_display(width=280)
-    #final_clip.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame.png', t=10)
+#    c3 = c2.on_color(size=(420,480), pos='bottom')
+#    #c3.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame2.png', t=15)
+#    
+#    duration = 30
+#    #
+#    fig, ax = plt.subplots(figsize=(4.2,1.6))
+#    fig.patch.set_facecolor('k')
+#    ax.set_facecolor('k')
+#    
+#    animation = mv.VideoClip(make_frame, duration=duration)
+#    #animation.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame.png', t=30)
+#    
+#    a2 = animation.resize((420,160))
+#    
+#    #original_clip = mv.clips_array([[clip, animation]])
+#    #original_clip.write_videofile('R:\\DA_and_Reward\\es334\\PPP1\\video\\combined.mp4', fps=10)
+#    
+#    final_clip =  mv.CompositeVideoClip([c3,
+#                                a2.set_pos(('center', 'top'))])
+#    #final_clip.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame2.png', t=15)
+#    final_clip.write_videofile(savefile, fps=10)
+#    
+#    #final_clip.ipython_display(width=280)
+#    #final_clip.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame.png', t=10)
