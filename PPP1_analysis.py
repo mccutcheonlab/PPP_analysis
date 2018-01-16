@@ -264,7 +264,7 @@ for i in ['PPP1.7']:
             x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
 #        makeBehavFigs(x)
-#        makePhotoFigs(x)
+        makePhotoFigs(x)
         
         x.side2subs()
   
