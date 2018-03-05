@@ -54,18 +54,18 @@ def singletrialFig(ax, blue, uv, licks, color='k'):
     
     return ax
 
-def averagetrace(ax, diet, color='k'):
+def averagetrace(ax, diet, color=['black', 'xkcd:bluish grey']):
     dietmsk = df.diet == diet
 
-    shadedError(ax, df['cas1_licks_forced'][dietmsk], linecolor='black')
-    ax = shadedError(ax, df['malt1_licks_forced'][dietmsk], linecolor='xkcd:bluish grey')
+    shadedError(ax, df['cas1_licks_forced'][dietmsk], linecolor=color[0])
+    ax = shadedError(ax, df['malt1_licks_forced'][dietmsk], linecolor=color[1])
     
     ax.axis('off')
     
     ax.plot([50,50], [0.02, 0.04], c='k')
     ax.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
 
-def repFig(ax, data, sub):
+def repFig(ax, data, sub, color='k'):
     x = rats[data[0]].sessions[s]
     n = data[1]
     
@@ -79,8 +79,7 @@ def repFig(ax, data, sub):
         all_licks = x.malt['licks']
  
     licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
-    print(licks)
-    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks)
+    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks, color=color)
 
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
 
@@ -97,28 +96,30 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
     # rep trace NR casein
     ax1 = f.add_subplot(256)    
-    repFig(ax1, rep_pr_cas, sub='cas')
+    repFig(ax1, rep_pr_cas, sub='cas', color='xkcd:kelly green')
     # rep trace NR maltodextrin
     ax2 = f.add_subplot(257)
-    repFig(ax2, rep_pr_malt, sub='malt')
+    repFig(ax2, rep_pr_malt, sub='malt', color='xkcd:kelly green')
     # average traces NR cas v malt
     ax3 = f.add_subplot(258)
-    averagetrace(ax3, 'PR')
-    
-
+    averagetrace(ax3, 'PR', color=['xkcd:kelly green', 'xkcd:light green'])
 
     f.show()
+    
+    plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
+
 
 # Data, choices for preference session 1 ['s10']
 s = 's10'
-rep_nr_cas = ('PPP1.4', 4)
-rep_nr_malt = ('PPP1.5', 5)
+rep_nr_cas = ('PPP1.7', 4)
+rep_nr_malt = ('PPP1.7', 5)
 rep_pr_cas = ('PPP1.4', 6)
 rep_pr_malt = ('PPP1.4', 7)
 
 event = 'snips_licks_forced'
 
 mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 
 
 
