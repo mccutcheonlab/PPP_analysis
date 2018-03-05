@@ -112,13 +112,16 @@ class Session(object):
             self.right['licks_off'] = []
             
         if self.left['exist'] == True and self.right['exist'] == True:
-            first = [idx for idx, x in enumerate(self.left['sipper']) if x in self.right['sipper']][0]
-            self.both['sipper'] = self.left['sipper'][first:]
-            self.both['sipper_off'] = self.left['sipper_off'][first:]
-            self.left['sipper'] = self.left['sipper'][:first-1]
-            self.left['sipper_off'] = self.left['sipper_off'][:first-1]
-            self.right['sipper'] = self.right['sipper'][:first-1]
-            self.right['sipper_off'] = self.right['sipper_off'][:first-1]
+            try:
+                first = findfreechoice(self.left['sipper'], self.right['sipper'])
+                self.both['sipper'] = self.left['sipper'][first:]
+                self.both['sipper_off'] = self.left['sipper_off'][first:]
+                self.left['sipper'] = self.left['sipper'][:first-1]
+                self.left['sipper_off'] = self.left['sipper_off'][:first-1]
+                self.right['sipper'] = self.right['sipper'][:first-1]
+                self.right['sipper_off'] = self.right['sipper_off'][:first-1]
+            except:
+                print('Problem separating out free choice trials')
                         
     def removephantomlicks(self):
         if self.left['exist'] == True:
@@ -203,6 +206,11 @@ class Session(object):
         if 'malt' in self.right['subs']:
             self.malt = self.right
 
+def findfreechoice(left, right):
+    first = [idx for idx, x in enumerate(left) if x in right][0]
+    return first
+            
+
 metafile = 'R:/DA_and_Reward/es334/PPP1/PPP1_metafile.txt'
 metafileData, metafileHeader = jmf.metafilereader(metafile)
 
@@ -219,12 +227,12 @@ for i in metafileData:
             rats[rowrat] = Rat(rowrat, dietgroup)
         rats[rowrat].loadsession(i, metafileHeader)
               
-#for i in rats:
-#    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
-#    for j in rats[i].sessions:        
-for i in ['PPP1.7']:
+for i in rats:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
-    for j in ['s10']:
+    for j in ['s10']:        
+#for i in ['PPP1.7']:
+#    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
+#    for j in ['s10']:
         print('\nAnalysing rat ' + i + ' in session ' + j)
         
         # Load in data from .mat file (convert from Tank first using Matlab script)
