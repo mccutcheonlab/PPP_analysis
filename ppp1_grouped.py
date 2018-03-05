@@ -222,6 +222,17 @@ ax.set_ylabel('Casein preference')
 plt.yticks([0, 0.5, 1.0])
 plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/alldayspref.eps')
 
+# Figure showing licks divide into free choice and forced choice
+df = pd.DataFrame([x for x in rats])
+df.insert(1,'diet', [rats[x].dietgroup for x in rats])
+
+for j, n, cas, malt in zip(testsessions, [2,4,6],
+                        ['forced1-cas', 'forced2-cas', 'forced3-cas'],
+                        ['forced1-malt', 'forced2-malt', 'forced3-malt']):
+    df.insert(n, cas, [[(rats[x].sessions[j].cas['nlicks-forced'])] for x in rats])
+    df.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-forced'] for x in rats])
+
+df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
 ## Creating new dataframe for photometry data so I can exclude rats
 
 ratsX = excluderats(rats, ['PPP1.8'])

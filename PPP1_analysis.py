@@ -120,6 +120,13 @@ class Session(object):
                 self.left['sipper_off'] = self.left['sipper_off'][:first-1]
                 self.right['sipper'] = self.right['sipper'][:first-1]
                 self.right['sipper_off'] = self.right['sipper_off'][:first-1]
+                self.left['licks-forced'], self.left['licks-free'] = dividelicks(self.left['licks'], self.both['sipper'][0])
+                self.right['licks-forced'], self.right['licks-free'] = dividelicks(self.right['licks'], self.both['sipper'][0])
+                self.left['nlicks-forced'] = len(self.left['licks-forced'])
+                self.right['nlicks-forced'] = len(self.right['licks-forced'])
+                self.left['nlicks-free'] = len(self.left['licks-free'])
+                self.right['nlicks-free'] = len(self.right['licks-free'])
+
             except:
                 print('Problem separating out free choice trials')
                         
@@ -209,7 +216,12 @@ class Session(object):
 def findfreechoice(left, right):
     first = [idx for idx, x in enumerate(left) if x in right][0]
     return first
-            
+        
+def dividelicks(licks, time):
+    before = [x for x in licks if x < time]
+    after = [x for x in licks if x > time]
+    
+    return before, after    
 
 metafile = 'R:/DA_and_Reward/es334/PPP1/PPP1_metafile.txt'
 metafileData, metafileHeader = jmf.metafilereader(metafile)
@@ -229,7 +241,7 @@ for i in metafileData:
               
 for i in rats:
     pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
-    for j in ['s10']:        
+    for j in ['s10', 's11', 's16']:        
 #for i in ['PPP1.7']:
 #    pdf_pages = PdfPages('R:/DA_and_Reward/es334/PPP1/output/' + i + exptsuffix + '.pdf')
 #    for j in ['s10']:
