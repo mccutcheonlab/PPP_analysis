@@ -54,29 +54,69 @@ def singletrialFig(ax, blue, uv, licks, color='k'):
     
     return ax
 
+def averagetrace(ax, diet, color='k'):
+    dietmsk = df.diet == diet
+
+    shadedError(ax, df['cas1_licks_forced'][dietmsk], linecolor='black')
+    ax = shadedError(ax, df['malt1_licks_forced'][dietmsk], linecolor='xkcd:bluish grey')
+    
+    ax.axis('off')
+    
+    ax.plot([50,50], [0.02, 0.04], c='k')
+    ax.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
+
+def repFig(ax, data, sub):
+    x = rats[data[0]].sessions[s]
+    n = data[1]
+    
+    if sub == 'cas':
+        trial = x.cas[event]    
+        run = x.cas['lickdata']['rStart'][n]
+        all_licks = x.cas['licks']
+    else:
+        trial = x.malt[event]    
+        run = x.malt['lickdata']['rStart'][n]
+        all_licks = x.malt['licks']
+ 
+    licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
+    print(licks)
+    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks)
+
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
 
     f = plt.figure(figsize=(inch(520), inch(120)))
-    ax = f.add_subplot(151)
+    # rep trace NR casein
+    ax1 = f.add_subplot(251)    
+    repFig(ax1, rep_nr_cas, sub='cas')
+    # rep trace NR maltodextrin
+    ax2 = f.add_subplot(252)
+    repFig(ax2, rep_nr_malt, sub='malt')
+    # average traces NR cas v malt
+    ax3 = f.add_subplot(253)
+    averagetrace(ax3, 'NR')
     
     # rep trace NR casein
-    x = rats[rep_nr_cas[0]].sessions[s]    
-    trial = x.cas['snips_licks_forced']
-    n = rep_nr_cas[1]
-    run = x.cas['lickdata']['rStart'][n]
-    licks = [l-run for l in x.cas['licks'] if (l>run-10) and (l<run+20)]
-    print(licks)
-    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks)
-    f.show()
+    ax1 = f.add_subplot(256)    
+    repFig(ax1, rep_pr_cas, sub='cas')
+    # rep trace NR maltodextrin
+    ax2 = f.add_subplot(257)
+    repFig(ax2, rep_pr_malt, sub='malt')
+    # average traces NR cas v malt
+    ax3 = f.add_subplot(258)
+    averagetrace(ax3, 'PR')
     
-    print(srt)
+
+
+    f.show()
 
 # Data, choices for preference session 1 ['s10']
 s = 's10'
 rep_nr_cas = ('PPP1.4', 4)
-rep_nr_malt = ('PPP1.4', 5)
+rep_nr_malt = ('PPP1.5', 5)
 rep_pr_cas = ('PPP1.4', 6)
 rep_pr_malt = ('PPP1.4', 7)
+
+event = 'snips_licks_forced'
 
 mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
