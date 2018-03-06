@@ -124,7 +124,7 @@ def peakbargraph(ax, diet, keys):
                  barfacecolor = [cols[0], cols[1]],
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR', 'PR'],
+                 grouplabel=[],
                  scattersize = 100,
                  ax=ax)
 #    ax.set_ylim([-.02, 0.15])
@@ -161,10 +161,12 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     ax7 = f.add_subplot(gs[0,3])
     keys = ['cas1_licks_peak', 'malt1_licks_peak']
     peakbargraph(ax7, 'NR', keys)
+    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
     
     ax8 = f.add_subplot(gs[1,3])
     peakbargraph(ax8, 'PR', keys)
     ax8.set_ylim([-0.03, 0.12])
+    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
     f.show()
 
 # Data, choices for preference session 1 ['s10']
@@ -177,7 +179,7 @@ rep_pr_malt = ('PPP1.4', 7)
 event = 'snips_licks_forced'
 
 mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 
 
 
