@@ -130,10 +130,25 @@ def peakbargraph(ax, diet, keys):
 #    ax.set_ylim([-.02, 0.15])
 #    ax.set_yticks([0, 0.05, 0.1, 0.15])
     ax.set_ylabel('\u0394F')
-       
+
+def heatmapFig(ax, rat):
+    x = rats[rat[0]].sessions[s]
+    data = x.malt['snips_licks_forced']['blue']
+    data = x.cas['snips_licks_forced']['blue']
+        
+    ntrials = np.shape(data)[0]
+    xvals = np.linspace(-9.9,20,300)
+    yvals = np.arange(1, ntrials+2)
+    xx, yy = np.meshgrid(xvals, yvals)
+
+    ax.pcolormesh(xx, yy, data, shading = 'flat')
+    ax.set_ylabel('Trials')
+    ax.set_yticks([1, ntrials])
+    ax.invert_yaxis()
+
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
-    gs = gridspec.GridSpec(2, 4, width_ratios=[1,1,1,0.5])
+    gs = gridspec.GridSpec(2, 5, width_ratios=[1,1,1,0.5])
     f = plt.figure(figsize=(inch(520), inch(120)))
      #rep trace NR casein
     ax1 = f.add_subplot(gs[0,0])
@@ -143,8 +158,11 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     # rep trace NR maltodextrin
     ax2 = f.add_subplot(gs[0,1], sharey=ax1)
     repFig(ax2, rep_nr_malt, sub='malt', yscale=False)
+    
+    ax9 = f.add_subplot(gs[0,2])
+    heatmapFig(ax9, rep_nr_malt)
     # average traces NR cas v malt
-    ax3 = f.add_subplot(gs[0,2])
+    ax3 = f.add_subplot(gs[0,3])
     averagetrace(ax3, 'NR')
     
     # rep trace NR casein
@@ -158,7 +176,7 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     averagetrace(ax6, 'PR', color=['xkcd:kelly green', 'xkcd:light green'])
     
     #bar graphs
-    ax7 = f.add_subplot(gs[0,3])
+    ax7 = f.add_subplot(gs[0,4])
     keys = ['cas1_licks_peak', 'malt1_licks_peak']
     peakbargraph(ax7, 'NR', keys)
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
@@ -179,7 +197,7 @@ rep_pr_malt = ('PPP1.4', 4)
 event = 'snips_licks_forced'
 
 mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 
 
 
