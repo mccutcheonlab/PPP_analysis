@@ -171,15 +171,15 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
 
 # Data, choices for preference session 1 ['s10']
 s = 's10'
-rep_nr_cas = ('PPP1.7', 4)
-rep_nr_malt = ('PPP1.7', 5)
+rep_nr_cas = ('PPP1.7', 16)
+rep_nr_malt = ('PPP1.7', 19)
 rep_pr_cas = ('PPP1.4', 6)
-rep_pr_malt = ('PPP1.4', 7)
+rep_pr_malt = ('PPP1.4', 4)
 
 event = 'snips_licks_forced'
 
 mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 
 
 
