@@ -91,9 +91,7 @@ def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
     return ax
 
 def excluderats(rats, ratstoexclude):  
-    ratsX = [x for x in rats if x not in ratstoexclude]
-    print(ratsX) 
-        
+    ratsX = [x for x in rats if x not in ratstoexclude]        
     return ratsX
 
 def makemeansnips(snips, noiseindex):
