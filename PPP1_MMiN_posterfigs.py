@@ -131,24 +131,45 @@ def peakbargraph(ax, diet, keys):
 #    ax.set_yticks([0, 0.05, 0.1, 0.15])
     ax.set_ylabel('\u0394F')
 
-def heatmapFig(ax, rat):
-    x = rats[rat[0]].sessions[s]
-    data = x.malt['snips_licks_forced']['blue']
-    data = x.cas['snips_licks_forced']['blue']
-        
+def makeheatmap(ax, data, ylabel='Trials'):
     ntrials = np.shape(data)[0]
     xvals = np.linspace(-9.9,20,300)
     yvals = np.arange(1, ntrials+2)
     xx, yy = np.meshgrid(xvals, yvals)
-
-    ax.pcolormesh(xx, yy, data, shading = 'flat')
-    ax.set_ylabel('Trials')
+    
+    mesh = ax.pcolormesh(xx, yy, data, cmap='YlGnBu', vmin = -0.15, vmax=0.22, shading = 'flat')
+    ax.set_ylabel(ylabel)
     ax.set_yticks([1, ntrials])
     ax.invert_yaxis()
+    
+    return ax, mesh
 
+def removenoise(snipdata):
+    # returns blue snips with noisey ones removed
+    new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
+    return new_snips
+
+def heatmapFig(f, gs, gsx, gsy, session, rat):
+    x = rats[rat].sessions[s]
+    data_cas = removenoise(x.cas['snips_licks_forced'])
+    data_malt = removenoise(x.malt['snips_licks_forced'])
+    print(gs)
+
+    inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[gsx,gsy])
+    ax1 = f.add_subplot(inner[0])
+    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein')
+    
+    ax2 = f.add_subplot(inner[1], sharex=ax1)
+    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt')
+    
+    f.subplots_adjust(right=0.8)
+    cbar_ax = f.add_axes([0.85, 0.15, 0.05, 0.7])
+    
+    f.colorbar(mesh, cax=cbar_ax)
+    
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
-    gs = gridspec.GridSpec(2, 5, width_ratios=[1,1,1,0.5])
+    gs = gridspec.GridSpec(2, 5, width_ratios=[1,1,1,1,0.5])
     f = plt.figure(figsize=(inch(520), inch(120)))
      #rep trace NR casein
     ax1 = f.add_subplot(gs[0,0])
@@ -158,9 +179,8 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     # rep trace NR maltodextrin
     ax2 = f.add_subplot(gs[0,1], sharey=ax1)
     repFig(ax2, rep_nr_malt, sub='malt', yscale=False)
-    
-    ax9 = f.add_subplot(gs[0,2])
-    heatmapFig(ax9, rep_nr_malt)
+
+    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7')
     # average traces NR cas v malt
     ax3 = f.add_subplot(gs[0,3])
     averagetrace(ax3, 'NR')
@@ -171,8 +191,10 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     # rep trace NR maltodextrin
     ax5 = f.add_subplot(gs[1,1], sharey=ax4)
     repFig(ax5, rep_pr_malt, sub='malt', color='xkcd:kelly green', yscale=False)
+    
+    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3')
     # average traces NR cas v malt
-    ax6 = f.add_subplot(gs[1,2])
+    ax6 = f.add_subplot(gs[1,3])
     averagetrace(ax6, 'PR', color=['xkcd:kelly green', 'xkcd:light green'])
     
     #bar graphs
@@ -181,7 +203,7 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     peakbargraph(ax7, 'NR', keys)
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
     
-    ax8 = f.add_subplot(gs[1,3])
+    ax8 = f.add_subplot(gs[1,4])
     peakbargraph(ax8, 'PR', keys)
     ax8.set_ylim([-0.03, 0.12])
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
