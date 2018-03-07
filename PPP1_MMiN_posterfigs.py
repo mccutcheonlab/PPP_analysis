@@ -85,7 +85,7 @@ def averagetrace(ax, diet, color=['black', 'xkcd:bluish grey']):
                 xytext=(0,-5), textcoords='offset points',
                 ha='center',va='top')
     
-def repFig(ax, data, sub, color='k', yscale=True):
+def repFig(ax, data, sub, color='k', yscale=True, legend=False):
     x = rats[data[0]].sessions[s]
     n = data[1]
     
@@ -107,6 +107,10 @@ def repFig(ax, data, sub, color='k', yscale=True):
         scale_label = '{0:.0f}% \u0394F'.format(l*100)
         ax.plot([50,50], [y[0], y[1]], c='k')
         ax.text(45, y[0]+(l/2), scale_label, verticalalignment='center', horizontalalignment='right')
+
+    if legend == True:
+        ax.annotate('470 nm', xy=(300,trial['blue'][n][299]), color=color, va='center')
+        ax.annotate('405 nm', xy=(300,trial['uv'][n][299]), color=color, alpha=0.3, va='center')
 
 def peakbargraph(ax, diet, keys):
     dietmsk = df.diet == diet
@@ -168,48 +172,50 @@ def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
    
     cbar_ax = f.add_subplot(inner[:,1])   
     f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
+
+def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=False):
+    
+    inner = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[gsx,gsy],
+                                             wspace=0.05)    
+    ax1 = f.add_subplot(inner[0])
+    repFig(ax1, casdata, sub='cas', color=color)
+    ax2 = f.add_subplot(inner[1], sharey=ax1)
+    repFig(ax2, maltdata, sub='malt', color=color, yscale=False, legend=True)
+#    ax2.annotate('470 nm\n405 nm', xy=(300,0))
+    
+    if title == True:
+        ax1.set_title('Casein')
+        ax2.set_title('Maltodextrin')
     
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
-    gs = gridspec.GridSpec(2, 5, width_ratios=[1,1,1,1,0.5])
+    gs = gridspec.GridSpec(2, 4, width_ratios=[1.5,1,1,0.5], wspace=0.3)
     f = plt.figure(figsize=(inch(520), inch(120)))
-     #rep trace NR casein
-    ax1 = f.add_subplot(gs[0,0])
-#    ax1 = f.subplot
-    repFig(ax1, rep_nr_cas, sub='cas')
-
-    # rep trace NR maltodextrin
-    ax2 = f.add_subplot(gs[0,1], sharey=ax1)
-    repFig(ax2, rep_nr_malt, sub='malt', yscale=False)
-
-    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7', clims=[-0.15,0.22])
+    
+    # Non-restricted figures, row 0
+    reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True)
+    heatmapFig(f, gs, 0, 1, 's10', 'PPP1.7', clims=[-0.15,0.22])
     # average traces NR cas v malt
-    ax3 = f.add_subplot(gs[0,3])
+    ax3 = f.add_subplot(gs[0,2])
     averagetrace(ax3, 'NR')
     
-    # rep trace NR casein
-    ax4 = f.add_subplot(gs[1,0])    
-    repFig(ax4, rep_pr_cas, sub='cas', color='xkcd:kelly green')
-    # rep trace NR maltodextrin
-    ax5 = f.add_subplot(gs[1,1], sharey=ax4)
-    repFig(ax5, rep_pr_malt, sub='malt', color='xkcd:kelly green', yscale=False)
-    
-    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=[-0.11,0.17])
-    # average traces NR cas v malt
-    ax6 = f.add_subplot(gs[1,3])
-    averagetrace(ax6, 'PR', color=['xkcd:kelly green', 'xkcd:light green'])
-    
-    #bar graphs
-    ax7 = f.add_subplot(gs[0,4])
+    ax7 = f.add_subplot(gs[0,3])
     keys = ['cas1_licks_peak', 'malt1_licks_peak']
     peakbargraph(ax7, 'NR', keys)
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
-    
-    ax8 = f.add_subplot(gs[1,4])
+   
+    # Protein-restricted figures, row 1
+    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color='xkcd:kelly green')    
+    heatmapFig(f, gs, 1, 1, 's10', 'PPP1.3', clims=[-0.11,0.17])
+    # average traces NR cas v malt
+    ax6 = f.add_subplot(gs[1,2])
+    averagetrace(ax6, 'PR', color=['xkcd:kelly green', 'xkcd:light green'])
+
+    ax8 = f.add_subplot(gs[1,3])
     peakbargraph(ax8, 'PR', keys)
     ax8.set_ylim([-0.03, 0.12])
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
-    f.show()
+    
 
 # Data, choices for preference session 1 ['s10']
 s = 's10'
@@ -223,7 +229,7 @@ event = 'snips_licks_forced'
 almost_black = '#262626'
 
 mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
+plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 
 
 

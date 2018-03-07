@@ -8,6 +8,10 @@ Created on Wed Nov  8 08:47:56 2017
 # Analysis of PPP1 grouped data
 # Need to run PPP1_analysis first to load sessions into
 # Choice data
+import scipy.io as sio
+import JM_general_functions as jmf
+import JM_custom_figs as jmfig
+
 import os
 import string
 import pandas as pd
