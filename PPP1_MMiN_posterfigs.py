@@ -5,7 +5,6 @@ Created on Mon Mar  5 13:16:41 2018
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
-import mimic_alpha as ma
 
 import timeit
 tic = timeit.default_timer()
@@ -52,10 +51,10 @@ def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot
     return ax
 
 def averagetrace(ax, diet, keys, color=[almost_black, 'xkcd:bluish grey']):
-    dietmsk = df.diet == diet
+    dietmsk = df4.diet == diet
 #    keys = ['cas1_licks_forced', 'malt1_licks_forced']
-    shadedError(ax, df[keys[0]][dietmsk], linecolor=color[0])
-    ax = shadedError(ax, df[keys[1]][dietmsk], linecolor=color[1])
+    shadedError(ax, df4[keys[0]][dietmsk], linecolor=color[0])
+    ax = shadedError(ax, df4[keys[1]][dietmsk], linecolor=color[1])
     
     ax.axis('off')
 
@@ -85,7 +84,8 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
         all_licks = x.malt['licks']
  
     licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
-    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks=licks, color=color)
+    singletrialFig(ax, trial['blue'][n], trial['uv'][n],
+                   licks=licks, color=color, plot_licks=False)
     
     if yscale == True:
         y = [y for y in ax.get_yticks() if y>0][:2]
@@ -101,8 +101,8 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
     return ax
 
 def peakbargraph(ax, diet, keys):
-    dietmsk = df.diet == diet
-    a = [df[keys[0]][dietmsk], df[keys[1]][dietmsk]]
+    dietmsk = df4.diet == diet
+    a = [df4[keys[0]][dietmsk], df4[keys[1]][dietmsk]]
     x = data2obj1D(a)
 
     if diet == 'PR':
@@ -167,17 +167,61 @@ def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
 
 def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=False):
     
-    inner = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[gsx,gsy],
-                                             wspace=0.05)    
-    ax1 = f.add_subplot(inner[0])
+    inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
+                                             wspace=0.05, hspace=0.00,
+                                             height_ratios=[1,8])    
+    ax1 = f.add_subplot(inner[1,0])
     repFig(ax1, casdata, sub='cas', color=color)
-    ax2 = f.add_subplot(inner[1], sharey=ax1)
+    ax2 = f.add_subplot(inner[1,1], sharey=ax1)
     repFig(ax2, maltdata, sub='malt', color=color, yscale=False, legend=True)
-#    ax2.annotate('470 nm\n405 nm', xy=(300,0))
+
+    ax3 = f.add_subplot(inner[0,0], sharex=ax1)
+    lickplot(ax3, casdata, sub='cas')
+    ax4 = f.add_subplot(inner[0,1], sharey=ax3, sharex=ax2)
+    lickplot(ax4, maltdata, sub='malt', ylabel=False)
     
     if title == True:
-        ax1.set_title('Casein')
-        ax2.set_title('Maltodextrin')
+        ax3.set_title('Casein')
+        ax4.set_title('Maltodextrin')
+
+def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):        
+    # Removes axes and spines
+    for sp in ['left', 'right', 'top', 'bottom']:
+        ax.spines[sp].set_visible(False)
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+
+    x = rats[data[0]].sessions[s]
+    n = data[1]
+    
+    if sub == 'cas':
+        trial = x.cas[event]    
+        run = x.cas['lickdata']['rStart'][n]
+        all_licks = x.cas['licks']
+    else:
+        trial = x.malt[event]    
+        run = x.malt['lickdata']['rStart'][n]
+        all_licks = x.malt['licks']
+ 
+    licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
+    licks_x = [(x+10)*10 for x in licks]
+    if style == 'histo':
+        hist, bins = np.histogram(licks_x, bins=30, range=(0,300))
+        center = (bins[:-1] + bins[1:]) / 2
+        width = 1 * (bins[1] - bins[0])   
+        ax.bar(center, hist, align='center', width=width, color='xkcd:silver')
+    
+    if style == 'raster':
+        yvals = [1]*len(licks)
+        ax.plot(licks_x,yvals,linestyle='None',marker='|',markersize=5, color='xkcd:silver')
+        
+    else:
+        print('Not a valid style for plotting licks')
+
+    if ylabel == True:
+        ax.annotate('Licks', xy=(95,1), va='center', ha='right')
+#        ax.annotate('470 nm', xy=(300,trial['blue'][n][299]), color=color, va='center')
+
 
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
@@ -194,7 +238,6 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     ax7 = f.add_subplot(gs[0,3])
     
     peakbargraph(ax7, 'NR', keys_bars)
-#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
    
     # Protein-restricted figures, row 1
     reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=green)    
@@ -225,7 +268,7 @@ event = 'snips_licks_forced'
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
 
-pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s11']
 s = 's11'
@@ -237,7 +280,7 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -249,7 +292,7 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
@@ -260,4 +303,34 @@ pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
 #pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.eps')
 
+# To make summary figure
+def summaryFig():
+    gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
+    f = plt.figure(figsize=(inch(520), inch(120)))
+    
+    adjust = gridspec.GridSpecFromSubplotSpec(1,1,subplot_spec=gs[0],
+                                             wspace=0.05)
+#    gs.update(left=0.8)
+    
+    ax0 = f.add_subplot(adjust[0])
+    choicefig(df1, ['pref1', 'pref2', 'pref3'], ax0)
+    ax0.set_ylabel('Casein preference')
+    plt.yticks([0, 0.5, 1.0])
+    
+    inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
+                                             wspace=0.05)
+    ax1 = f.add_subplot(inner[0])
+    ax2 = f.add_subplot(inner[1], sharey=ax1)
+    ax3 = f.add_subplot(inner[2], sharey=ax1)
+    peakresponsebargraph(df4, ['cas1_licks_peak', 'malt1_licks_peak'], ax1)
+    peakresponsebargraph(df4, ['cas2_licks_peak', 'malt2_licks_peak'], ax2)
+    peakresponsebargraph(df4, ['cas3_licks_peak', 'malt3_licks_peak'], ax3)
 
+    ax1.set_ylabel('\u0394F')
+    
+
+
+    
+summaryFig()
+    
+    
