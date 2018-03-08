@@ -260,7 +260,7 @@ event = 'snips_licks_forced'
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
 
-#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s11']
 s = 's11'
@@ -272,7 +272,7 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -284,11 +284,11 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
-#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
+pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
 
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
@@ -296,7 +296,56 @@ keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 #pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.eps')
 
 # To make summary figure
-def summaryFig():
+
+def choicefig(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
+    x = data2obj2D(a)
+    
+    cols = ['xkcd:silver', green]
+    
+    jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 100,
+                 ax=ax)
+
+def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
+
+    x = data2obj2D(a)
+    if dietswitch == True:
+        cols = [green, light_green, 'xkcd:silver', 'w']
+    else:        
+        cols = ['xkcd:silver', 'w', green, light_green]
+    
+    jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 100,
+                 ax=ax)
+#    ax.set_xticks([])
+    
+    if ylabels == True:
+        ax.set_ylim([-.02, 0.15])
+        yticks = [0, 0.05, 0.1, 0.15]
+        ax.set_yticks(yticks)
+        yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
+        ax.set_yticklabels(yticklabels)
+        ax.set_ylabel('\u0394F')
+
+def makesummaryFig():
     gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
     f = plt.figure(figsize=(inch(520), inch(120)))
     
@@ -316,40 +365,20 @@ def summaryFig():
     ax1 = f.add_subplot(inner[0])
     ax2 = f.add_subplot(inner[1], sharey=ax1)
     ax3 = f.add_subplot(inner[2], sharey=ax1)
-    peakresponsebargraph(df4, ['cas1_licks_peak', 'malt1_licks_peak'], ax1)
-    peakresponsebargraph(df4, ['cas2_licks_peak', 'malt2_licks_peak'], ax2, ylabels=False)
-    peakresponsebargraph(df4, ['cas3_licks_peak', 'malt3_licks_peak'], ax3, ylabels=False)
+    
+    peakresponsebargraph(ax1, df4, ['cas1_licks_peak', 'malt1_licks_peak'])
+    peakresponsebargraph(ax2, df4, ['cas2_licks_peak', 'malt2_licks_peak'],
+                         ylabels=False, dietswitch=True)
+    peakresponsebargraph(ax3, df4, ['cas3_licks_peak', 'malt3_licks_peak'],
+                         ylabels=False, dietswitch=True)
+    
+    titles = ['Preference test 1', 'Preference test 2', 'Preference test 3']
+    for ax, title in zip([ax1, ax2, ax3], titles):
+        ax.set_title(title)
+        
+    return f
 
-
-    
-def peakresponsebargraph(df, keys, ax, ylabels=True):
-    dietmsk = df.diet == 'NR'
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
-
-    x = data2obj2D(a)
-    
-    cols = ['xkcd:silver', 'w', green, light_green]
-    
-    jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 grouplabel=['NR', 'PR'],
-                 scattersize = 100,
-                 ax=ax)
-    ax.set_xticks([])
-    
-    if ylabels == True:
-        ax.set_ylim([-.02, 0.15])
-        yticks = [0, 0.05, 0.1, 0.15]
-        ax.set_yticks(yticks)
-        yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
-        ax.set_yticklabels(yticklabels)
-        ax.set_ylabel('\u0394F')
- 
-summaryFig()
+summaryFig = makesummaryFig()
+summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
     
     
