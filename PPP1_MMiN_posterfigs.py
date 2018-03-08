@@ -5,13 +5,15 @@ Created on Mon Mar  5 13:16:41 2018
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
+import mimic_alpha as ma
 
 import timeit
 tic = timeit.default_timer()
 
 #Colors
-almost_black = '#262626'
-green = 'xkcd:kelly green'
+green = mpl.colors.to_rgb('xkcd:kelly green')
+almost_black = mpl.colors.to_rgb('#262626')
+light_green = mpl.colors.to_rgb('xkcd:light green')
 
 def toc():
     tc = timeit.default_timer()
@@ -32,11 +34,10 @@ def singletrialFig(ax, blue, uv, licks, color=almost_black, xscale=True):
     #Makes lick scatters
     xvals = [(x+10)*10 for x in licks]
     yvals = [ax.get_ylim()[1]]*len(licks)
-    ax.plot(xvals,yvals,marker='|')        
+    ax.plot(xvals,yvals,linestyle='None',marker='|',markersize=5)        
     if xscale == True:
         y = ax.get_ylim()[0]
         ax.plot([251,300], [y, y], c='k', linewidth=2)
-#        ax.text(276, y-0.01, '5 s', ha='center',va='top')
         ax.annotate('5 s', xy=(276,y), xycoords='data',
                     xytext=(0,-5), textcoords='offset points',
                     ha='center',va='top')
@@ -44,10 +45,6 @@ def singletrialFig(ax, blue, uv, licks, color=almost_black, xscale=True):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
-    
-#    xevent = pps * preTrial  
-#    ax.plot([xevent, xevent],[ax.get_ylim()[0], ax.get_ylim()[1] - yrange/20],'--')
-#    ax.text(xevent, ax.get_ylim()[1], eventText, ha='center',va='bottom')
     
     return ax
 
@@ -105,15 +102,15 @@ def peakbargraph(ax, diet, keys):
     x = data2obj1D(a)
 
     if diet == 'PR':
-        cols = ['xkcd:kelly green', 'xkcd:light green']
+        cols = [green, light_green]
     else:
         cols = ['xkcd:silver', 'w']
     
     ax, x, _, _ = jmfig.barscatter(x, paired=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = [cols[0], cols[1]],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
                  grouplabel=[],
                  scattersize = 100,
                  ax=ax)
@@ -173,7 +170,7 @@ def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=F
     if title == True:
         ax1.set_title('Casein')
         ax2.set_title('Maltodextrin')
-    
+
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
     gs = gridspec.GridSpec(2, 4, width_ratios=[1.5,1,1,0.5], wspace=0.3)
@@ -192,11 +189,11 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
 #    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
    
     # Protein-restricted figures, row 1
-    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color='xkcd:kelly green')    
+    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=green)    
     heatmapFig(f, gs, 1, 1, 's10', 'PPP1.3', clims=[-0.11,0.17])
     # average traces NR cas v malt
     ax6 = f.add_subplot(gs[1,2])
-    averagetrace(ax6, 'PR', keys_traces, color=['xkcd:kelly green', 'xkcd:light green'])
+    averagetrace(ax6, 'PR', keys_traces, color=[green, light_green])
 
     ax8 = f.add_subplot(gs[1,3])
     peakbargraph(ax8, 'PR', keys_bars)
@@ -230,8 +227,7 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
+#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -243,8 +239,15 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+
+#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
+
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
+#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
+#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.eps')
 
 
