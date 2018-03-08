@@ -5,6 +5,7 @@ Created on Mon Mar  5 13:16:41 2018
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
+import JM_custom_figs as jmfig
 
 
 import timeit
@@ -44,10 +45,7 @@ def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot
                     ha='center',va='top')
     
     # Removes axes and spines
-    for sp in ['left', 'right', 'top', 'bottom']:
-        ax.spines[sp].set_visible(False)
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
+    jmfig.invisible_axes(ax)
     
     return ax
 
@@ -187,10 +185,7 @@ def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=F
 
 def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):        
     # Removes axes and spines
-    for sp in ['left', 'right', 'top', 'bottom']:
-        ax.spines[sp].set_visible(False)
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
+    jmfig.invisible_axes(ax)
 
     x = rats[data[0]].sessions[s]
     n = data[1]
@@ -221,8 +216,6 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
 
     if ylabel == True:
         ax.annotate('Licks', xy=(95,1), va='center', ha='right')
-#        ax.annotate('470 nm', xy=(300,trial['blue'][n][299]), color=color, va='center')
-
 
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
@@ -249,8 +242,6 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
 
     ax8 = f.add_subplot(gs[1,3])
     peakbargraph(ax8, 'PR', keys_bars)
-#    ax8.set_ylim([-0.03, 0.12])
-#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
     
     return f
 
@@ -321,19 +312,44 @@ def summaryFig():
     jmfig.invisible_axes(ax_)
     
     inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
-                                             wspace=0.05)
+                                             wspace=0.15)
     ax1 = f.add_subplot(inner[0])
     ax2 = f.add_subplot(inner[1], sharey=ax1)
     ax3 = f.add_subplot(inner[2], sharey=ax1)
     peakresponsebargraph(df4, ['cas1_licks_peak', 'malt1_licks_peak'], ax1)
-    peakresponsebargraph(df4, ['cas2_licks_peak', 'malt2_licks_peak'], ax2)
-    peakresponsebargraph(df4, ['cas3_licks_peak', 'malt3_licks_peak'], ax3)
-
-    ax1.set_ylabel('\u0394F')
-    
+    peakresponsebargraph(df4, ['cas2_licks_peak', 'malt2_licks_peak'], ax2, ylabels=False)
+    peakresponsebargraph(df4, ['cas3_licks_peak', 'malt3_licks_peak'], ax3, ylabels=False)
 
 
     
+def peakresponsebargraph(df, keys, ax, ylabels=True):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
+
+    x = data2obj2D(a)
+    
+    cols = ['xkcd:silver', 'w', green, light_green]
+    
+    jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 grouplabel=['NR', 'PR'],
+                 scattersize = 100,
+                 ax=ax)
+    ax.set_xticks([])
+    
+    if ylabels == True:
+        ax.set_ylim([-.02, 0.15])
+        yticks = [0, 0.05, 0.1, 0.15]
+        ax.set_yticks(yticks)
+        yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
+        ax.set_yticklabels(yticklabels)
+        ax.set_ylabel('\u0394F')
+ 
 summaryFig()
     
     
