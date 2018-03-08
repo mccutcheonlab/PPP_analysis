@@ -23,28 +23,31 @@ def inch(mm):
     result = mm*0.0393701
     return result
 
-def singletrialFig(ax, blue, uv, licks, color=almost_black, xscale=True):
- 
+def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot_licks=True):
+    
+    # Plots data
     ax.plot(uv, c=color, alpha=0.3)    
     ax.plot(blue, c=color)
-
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
-    
+   
     #Makes lick scatters
-    xvals = [(x+10)*10 for x in licks]
-    yvals = [ax.get_ylim()[1]]*len(licks)
-    ax.plot(xvals,yvals,linestyle='None',marker='|',markersize=5)        
+    if plot_licks == True:
+        xvals = [(x+10)*10 for x in licks]
+        yvals = [ax.get_ylim()[1]]*len(licks)
+        ax.plot(xvals,yvals,linestyle='None',marker='|',markersize=5)        
+    
+    # Adds x scale bar
     if xscale == True:
         y = ax.get_ylim()[0]
         ax.plot([251,300], [y, y], c='k', linewidth=2)
         ax.annotate('5 s', xy=(276,y), xycoords='data',
                     xytext=(0,-5), textcoords='offset points',
                     ha='center',va='top')
-    ax.spines['left'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
+    
+    # Removes axes and spines
+    for sp in ['left', 'right', 'top', 'bottom']:
+        ax.spines[sp].set_visible(False)
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
     
     return ax
 
@@ -82,7 +85,7 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
         all_licks = x.malt['licks']
  
     licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
-    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks, color=color)
+    singletrialFig(ax, trial['blue'][n], trial['uv'][n], licks=licks, color=color)
     
     if yscale == True:
         y = [y for y in ax.get_yticks() if y>0][:2]
@@ -94,11 +97,12 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
     if legend == True:
         ax.annotate('470 nm', xy=(300,trial['blue'][n][299]), color=color, va='center')
         ax.annotate('405 nm', xy=(300,trial['uv'][n][299]), color=color, alpha=0.3, va='center')
+    
+    return ax
 
 def peakbargraph(ax, diet, keys):
     dietmsk = df.diet == diet
     a = [df[keys[0]][dietmsk], df[keys[1]][dietmsk]]
-
     x = data2obj1D(a)
 
     if diet == 'PR':
@@ -155,7 +159,11 @@ def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
     mesh.set_clim(clims)
    
     cbar_ax = f.add_subplot(inner[:,1])   
-    f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
+    cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
+    cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
+                   '0% \u0394F',
+                   '{0:.0f}%'.format(clims[1]*100)]
+    cbar.ax.set_yticklabels(cbar_labels)
 
 def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=False):
     
@@ -178,7 +186,7 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
     # Non-restricted figures, row 0
     reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True)
-    heatmapFig(f, gs, 0, 1, 's10', 'PPP1.7', clims=[-0.15,0.22])
+    heatmapFig(f, gs, 0, 1, 's10', 'PPP1.7', clims=clim_nr)
     # average traces NR cas v malt
     ax3 = f.add_subplot(gs[0,2])
     averagetrace(ax3, 'NR', keys_traces)
@@ -190,7 +198,7 @@ def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
    
     # Protein-restricted figures, row 1
     reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=green)    
-    heatmapFig(f, gs, 1, 1, 's10', 'PPP1.3', clims=[-0.11,0.17])
+    heatmapFig(f, gs, 1, 1, 's10', 'PPP1.3', clims=clim_pr)
     # average traces NR cas v malt
     ax6 = f.add_subplot(gs[1,2])
     averagetrace(ax6, 'PR', keys_traces, color=[green, light_green])
@@ -210,12 +218,14 @@ rep_nr_malt = ('PPP1.7', 19)
 rep_pr_cas = ('PPP1.4', 6)
 rep_pr_malt = ('PPP1.4', 4)
 
+clim_nr = [-0.15,0.20]
+clim_pr = [-0.11,0.17]
+
 event = 'snips_licks_forced'
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
 
 pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-
 
 # Data, choices for preference session 1 ['s11']
 s = 's11'
@@ -227,7 +237,7 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -239,7 +249,7 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
