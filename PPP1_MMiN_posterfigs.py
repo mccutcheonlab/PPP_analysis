@@ -6,6 +6,7 @@ Created on Mon Mar  5 13:16:41 2018
 """
 import matplotlib.gridspec as gridspec
 
+
 import timeit
 tic = timeit.default_timer()
 
@@ -308,14 +309,16 @@ def summaryFig():
     gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
     f = plt.figure(figsize=(inch(520), inch(120)))
     
-    adjust = gridspec.GridSpecFromSubplotSpec(1,1,subplot_spec=gs[0],
-                                             wspace=0.05)
-#    gs.update(left=0.8)
+    adjust = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0],
+                                             wspace=0.05,
+                                             height_ratios=[18,1])
     
     ax0 = f.add_subplot(adjust[0])
     choicefig(df1, ['pref1', 'pref2', 'pref3'], ax0)
     ax0.set_ylabel('Casein preference')
     plt.yticks([0, 0.5, 1.0])
+    ax_ = f.add_subplot(adjust[1])
+    jmfig.invisible_axes(ax_)
     
     inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
                                              wspace=0.05)
