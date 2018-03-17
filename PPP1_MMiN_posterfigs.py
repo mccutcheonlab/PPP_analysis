@@ -16,6 +16,13 @@ green = mpl.colors.to_rgb('xkcd:kelly green')
 almost_black = mpl.colors.to_rgb('#262626')
 light_green = mpl.colors.to_rgb('xkcd:light green')
 
+#Set general rcparams
+mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize='medium', labelpad=10)
+mpl.rc('patch', linewidth=1, edgecolor=almost_black)
+for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
+    mpl.rc(tick, color=almost_black, labelsize='medium')
+    mpl.rc(subtick, width=1)
+
 def toc():
     tc = timeit.default_timer()
     print(tc-tic)
@@ -260,7 +267,7 @@ event = 'snips_licks_forced'
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
 
-pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s11']
 s = 's11'
@@ -272,7 +279,7 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -284,12 +291,11 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
-pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
-
+#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
@@ -314,8 +320,10 @@ def choicefig(df, keys, ax):
                  grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
                  scattersize = 100,
                  ax=ax)
+    
+    ax.set_yticklabels(['0', '0.5', '1'])
 
-def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False):
+def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
     dietmsk = df.diet == 'NR'
     
     a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
@@ -332,18 +340,23 @@ def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False):
                  barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
                  scatteredgecolor = [almost_black],
                  scatterlinecolor = almost_black,
-                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
                  scattersize = 100,
                  ax=ax)
-#    ax.set_xticks([])
+    ax.set_xticks([])
+    
+    for x,label in enumerate(xlabels):
+        ax.text(x+1, -0.0175, label, ha='center')
+    
+    ax.set_ylim([-.02, 0.135])
+    yticks = [0, 0.05, 0.1]
+    ax.set_yticks(yticks)
     
     if ylabels == True:
-        ax.set_ylim([-.02, 0.15])
-        yticks = [0, 0.05, 0.1, 0.15]
-        ax.set_yticks(yticks)
         yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
         ax.set_yticklabels(yticklabels)
-        ax.set_ylabel('\u0394F')
+        ax.set_ylabel('\u0394F', rotation=0)
+    else:
+        ax.set_yticklabels([])
 
 def makesummaryFig():
     gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
@@ -363,13 +376,16 @@ def makesummaryFig():
     inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
                                              wspace=0.15)
     ax1 = f.add_subplot(inner[0])
-    ax2 = f.add_subplot(inner[1], sharey=ax1)
-    ax3 = f.add_subplot(inner[2], sharey=ax1)
+    ax2 = f.add_subplot(inner[1])
+    ax3 = f.add_subplot(inner[2])
     
-    peakresponsebargraph(ax1, df4, ['cas1_licks_peak', 'malt1_licks_peak'])
+    peakresponsebargraph(ax1, df4, ['cas1_licks_peak', 'malt1_licks_peak'],
+                         xlabels=['NR', 'PR'])
     peakresponsebargraph(ax2, df4, ['cas2_licks_peak', 'malt2_licks_peak'],
+                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
                          ylabels=False, dietswitch=True)
     peakresponsebargraph(ax3, df4, ['cas3_licks_peak', 'malt3_licks_peak'],
+                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
                          ylabels=False, dietswitch=True)
     
     titles = ['Preference test 1', 'Preference test 2', 'Preference test 3']
