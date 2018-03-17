@@ -347,7 +347,7 @@ def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False):
 
 def makesummaryFig():
     gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
-    f = plt.figure(figsize=(inch(520), inch(120)))
+    f = plt.figure(figsize=(inch(300), inch(120)))
     
     adjust = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0],
                                              wspace=0.05,

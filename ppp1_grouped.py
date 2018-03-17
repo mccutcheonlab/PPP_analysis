@@ -205,7 +205,7 @@ for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices
     df1.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in rats])
     df1.insert(n+1, pr, [rats[x].sessions[j].pref for x in rats])
 
-df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
+df1.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
 
 # Figure showing one day preference data
     
@@ -236,7 +236,7 @@ for j, n, cas, malt in zip(testsessions, [2,4,6],
     df2.insert(n, cas, [rats[x].sessions[j].cas['nlicks-forced'] for x in rats])
     df2.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-forced'] for x in rats])
 
-df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
+df2.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
 
 df3 = pd.DataFrame([x for x in rats])
 df3.insert(1,'diet', [rats[x].dietgroup for x in rats])
@@ -247,7 +247,7 @@ for j, n, cas, malt in zip(testsessions, [2,4,6],
     df3.insert(n, cas, [rats[x].sessions[j].cas['nlicks-free'] for x in rats])
     df3.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-free'] for x in rats])
 
-df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-free.csv')
+df3.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-free.csv')
 
 
 ## Creating new dataframe for photometry data so I can exclude rats
