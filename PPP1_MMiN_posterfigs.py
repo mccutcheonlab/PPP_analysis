@@ -48,7 +48,7 @@ def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot
     # Adds x scale bar
     if xscale == True:
         y = ax.get_ylim()[0]
-        ax.plot([251,300], [y, y], c='k', linewidth=2)
+        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
         ax.annotate('5 s', xy=(276,y), xycoords='data',
                     xytext=(0,-5), textcoords='offset points',
                     ha='center',va='top')
@@ -64,9 +64,13 @@ def averagetrace(ax, diet, keys, color=[almost_black, 'xkcd:bluish grey']):
     shadedError(ax, df4[keys[0]][dietmsk], linecolor=color[0])
     ax = shadedError(ax, df4[keys[1]][dietmsk], linecolor=color[1])
     
-    ax.legend(['Casein', 'Maltodextrin'], fancybox=True)
-    
+    ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
     ax.axis('off')
+    
+    arrow_y = ax.get_ylim()[1]
+    ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
+    ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+                ha='center', va='bottom')
 
     y = [y for y in ax.get_yticks() if y>0][:2]
     l = y[1] - y[0]
@@ -232,7 +236,7 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt, dietswitch=False):
     
     gs = gridspec.GridSpec(2, 4, width_ratios=[1.5,1,1,0.5], wspace=0.3)
-    f = plt.figure(figsize=(inch(320), inch(120))) # 520
+    f = plt.figure(figsize=(inch(520), inch(120)))
     
     # Non-restricted figures, row 0
     reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True)
