@@ -17,7 +17,7 @@ almost_black = mpl.colors.to_rgb('#262626')
 light_green = mpl.colors.to_rgb('xkcd:light green')
 
 #Set general rcparams
-mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize='large', labelpad=10)
+mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize='large', labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
 mpl.rc('font', family='Arial')
 for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
@@ -63,6 +63,8 @@ def averagetrace(ax, diet, keys, color=[almost_black, 'xkcd:bluish grey']):
 #    keys = ['cas1_licks_forced', 'malt1_licks_forced']
     shadedError(ax, df4[keys[0]][dietmsk], linecolor=color[0])
     ax = shadedError(ax, df4[keys[1]][dietmsk], linecolor=color[1])
+    
+    ax.legend(['Casein', 'Maltodextrin'], fancybox=True)
     
     ax.axis('off')
 
@@ -281,7 +283,7 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -293,11 +295,11 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
-pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
+#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
@@ -363,6 +365,7 @@ def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[
 def makesummaryFig():
     gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
     mpl.rcParams['figure.subplot.left'] = 0.10
+    mpl.rcParams['axes.labelpad'] = 4
     f = plt.figure(figsize=(inch(300), inch(120)))
     
     adjust = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0],
@@ -398,6 +401,6 @@ def makesummaryFig():
     return f
 
 summaryFig = makesummaryFig()
-summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
+#summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
     
     
