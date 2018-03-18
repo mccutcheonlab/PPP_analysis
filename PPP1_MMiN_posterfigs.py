@@ -302,9 +302,9 @@ keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
 pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt, dietswitch=True)
 
-#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
+pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
@@ -405,7 +405,7 @@ def makesummaryFig():
     
     return f
 
-#summaryFig = makesummaryFig()
-#summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
+summaryFig = makesummaryFig()
+summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
     
     
