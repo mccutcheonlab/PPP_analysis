@@ -7,7 +7,6 @@ Created on Mon Mar  5 13:16:41 2018
 import matplotlib.gridspec as gridspec
 import JM_custom_figs as jmfig
 
-
 import timeit
 tic = timeit.default_timer()
 
@@ -17,13 +16,22 @@ almost_black = mpl.colors.to_rgb('#262626')
 light_green = mpl.colors.to_rgb('xkcd:light green')
 
 #Set general rcparams
-mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize='large', labelpad=4)
+mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=15, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
-mpl.rc('font', family='Arial')
+mpl.rc('font', family='Arial', size=15)
 for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
-    mpl.rc(tick, color=almost_black, labelsize='medium')
+    mpl.rc(tick, color=almost_black, labelsize=15)
     mpl.rc(subtick, width=1)
+mpl.rc('legend', fontsize=12)
 mpl.rcParams['figure.subplot.left'] = 0.05
+
+#plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+#plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+#plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+#plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+#plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+#plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+#plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 def toc():
     tc = timeit.default_timer()
@@ -110,26 +118,22 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
         ax.text(45, y1 + (l/2), scale_label, va='center', ha='right')
 
     if legend == True:
-        ax.annotate('470 nm', xy=(300,trial['blue'][n][299]), color=color, va='center')
-        ax.annotate('405 nm', xy=(300,trial['uv'][n][299]), color=color, alpha=0.3, va='center')
+        ax.annotate('470 nm', xy=(310,trial['blue'][n][299]), color=color, va='center')
+        ax.annotate('405 nm', xy=(310,trial['uv'][n][299]), color=color, alpha=0.3, va='center')
     
     return ax
 
-def peakbargraph(ax, diet, keys):
+def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
     dietmsk = df4.diet == diet
     a = [df4[keys[0]][dietmsk], df4[keys[1]][dietmsk]]
     x = data2obj1D(a)
-
-    if diet == 'PR':
-        cols = [green, light_green]
-    else:
-        cols = ['xkcd:silver', 'w']
     
     ax, x, _, _ = jmfig.barscatter(x, paired=True,
                  barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1]],
+                 barfacecolor = bar_colors,
                  scatteredgecolor = [almost_black],
                  scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
                  grouplabel=[],
                  scattersize = 100,
                  ax=ax)
@@ -235,39 +239,39 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
 
 def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
-    gs = gridspec.GridSpec(2, 4, width_ratios=[1.5,1,1,0.5], wspace=0.3)
+    gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3)
     f = plt.figure(figsize=(inch(520), inch(120)))
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+    rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
     
     if dietswitch == True:
         rowcolors.reverse()
+        rowcolors_bar.reverse()
 
     # Non-restricted figures, row 0
     reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
-    heatmapFig(f, gs, 0, 1, 's10', 'PPP1.7', clims=clim_nr)
+    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
     # average traces NR cas v malt
-    ax3 = f.add_subplot(gs[0,2])
+    ax3 = f.add_subplot(gs[0,3])
     averagetrace(ax3, 'NR', keys_traces, color=rowcolors[0])
 
-    ax7 = f.add_subplot(gs[0,3]) 
-    peakbargraph(ax7, 'NR', keys_bars)
+    ax7 = f.add_subplot(gs[0,4]) 
+    peakbargraph(ax7, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
    
     # Protein-restricted figures, row 1
     reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
-    heatmapFig(f, gs, 1, 1, 's10', 'PPP1.3', clims=clim_pr)
+    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
     # average traces NR cas v malt
-    ax6 = f.add_subplot(gs[1,2])
+    ax6 = f.add_subplot(gs[1,3])
     averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
 
-    
-    ax8 = f.add_subplot(gs[1,3])
-    peakbargraph(ax8, 'PR', keys_bars)
-        
+    ax8 = f.add_subplot(gs[1,4])
+    peakbargraph(ax8, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+     
     return f
 
 # Data, choices for preference session 1 ['s10']
-
 s = 's10'
 rep_nr_cas = ('PPP1.7', 16)
 rep_nr_malt = ('PPP1.7', 19)
@@ -281,7 +285,9 @@ event = 'snips_licks_forced'
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
 
-#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+dietswitch=False
+
+pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s11']
 s = 's11'
@@ -295,7 +301,7 @@ keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
 dietswitch=True
 
-#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -309,15 +315,11 @@ keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
 dietswitch=True
 
-#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
 #pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
-
-#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
-#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
-#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.eps')
 
 # To make summary figure
 
@@ -335,10 +337,14 @@ def choicefig(df, keys, ax):
                  barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
                  scatteredgecolor = [almost_black],
                  scatterlinecolor = almost_black,
-                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
                  scattersize = 100,
                  ax=ax)
-
+    
+    ax.set_xticks([])
+    yval = ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])/20
+    xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
+    for x,label in enumerate(xlabels):
+        ax.text(x+1, yval, label, ha='center')
 
 def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
     dietmsk = df.diet == 'NR'
@@ -433,10 +439,22 @@ def makesummaryFig2():
     ax1.set_yticks([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
     ax1.set_yticklabels([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
     ax1.set_title('Photometry')
-    
+
     return f
 
 summaryFig = makesummaryFig2()
 summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
+
+#SMALL_SIZE = 8
+#MEDIUM_SIZE = 10
+#BIGGER_SIZE = 12
+#
+#plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+#plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+#plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+#plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+#plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+#plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+#plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
     
     
