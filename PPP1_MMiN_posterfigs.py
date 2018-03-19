@@ -233,27 +233,32 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
     if ylabel == True:
         ax.annotate('Licks', xy=(95,1), va='center', ha='right')
 
-def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt, dietswitch=False):
+def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
     
     gs = gridspec.GridSpec(2, 4, width_ratios=[1.5,1,1,0.5], wspace=0.3)
     f = plt.figure(figsize=(inch(520), inch(120)))
     
+    rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+    
+    if dietswitch == True:
+        rowcolors.reverse()
+
     # Non-restricted figures, row 0
-    reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True)
+    reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
     heatmapFig(f, gs, 0, 1, 's10', 'PPP1.7', clims=clim_nr)
     # average traces NR cas v malt
     ax3 = f.add_subplot(gs[0,2])
-    averagetrace(ax3, 'NR', keys_traces)
-    
+    averagetrace(ax3, 'NR', keys_traces, color=rowcolors[0])
+
     ax7 = f.add_subplot(gs[0,3]) 
     peakbargraph(ax7, 'NR', keys_bars)
    
     # Protein-restricted figures, row 1
-    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=green)    
+    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
     heatmapFig(f, gs, 1, 1, 's10', 'PPP1.3', clims=clim_pr)
     # average traces NR cas v malt
     ax6 = f.add_subplot(gs[1,2])
-    averagetrace(ax6, 'PR', keys_traces, color=[green, light_green])
+    averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
 
     
     ax8 = f.add_subplot(gs[1,3])
@@ -276,7 +281,7 @@ event = 'snips_licks_forced'
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
 
-pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s11']
 s = 's11'
@@ -288,7 +293,9 @@ rep_pr_malt = ('PPP1.4', 15)
 keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
 
-pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt, dietswitch=True)
+dietswitch=True
+
+#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 # Data, choices for preference session 1 ['s16']
 s = 's16'
@@ -300,11 +307,13 @@ rep_pr_malt = ('PPP1.4', 10)
 keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
 
-pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt, dietswitch=True)
+dietswitch=True
 
-pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
+#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+
+#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.eps')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.eps')
@@ -329,8 +338,7 @@ def choicefig(df, keys, ax):
                  grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
                  scattersize = 100,
                  ax=ax)
-    
-    ax.set_yticklabels(['0', '0.5', '1'])
+
 
 def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
     dietmsk = df.diet == 'NR'
@@ -405,7 +413,30 @@ def makesummaryFig():
     
     return f
 
-summaryFig = makesummaryFig()
+def makesummaryFig2():
+    gs = gridspec.GridSpec(1, 2, wspace=0.5)
+    mpl.rcParams['figure.subplot.left'] = 0.10
+    mpl.rcParams['axes.labelpad'] = 4
+    f = plt.figure(figsize=(inch(270), inch(120)))
+    
+    ax0 = f.add_subplot(gs[0])
+    choicefig(df1, ['pref1', 'pref2', 'pref3'], ax0)
+    ax0.set_ylabel('Casein preference')
+    ax0.set_yticks([0, 0.5, 1.0]) 
+    ax0.set_yticklabels(['0', '0.5', '1'])
+    ax0.set_title('Behaviour')
+    
+    ax1 = f.add_subplot(gs[1])
+    choicefig(df4, ['pref1_peak_delta', 'pref2_peak_delta', 'pref3_peak_delta'], ax1)
+    ax1.set_ylabel('\u0394F (Casein - Malt.)')
+    ax1.set_ylim([-0.035, 0.09])
+    ax1.set_yticks([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
+    ax1.set_yticklabels([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
+    ax1.set_title('Photometry')
+    
+    return f
+
+summaryFig = makesummaryFig2()
 summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
     
     

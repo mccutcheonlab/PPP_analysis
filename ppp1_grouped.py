@@ -182,7 +182,10 @@ try:
     print('Using existing data')
 except NameError:
     print('Loading in data from pickled file')
-    pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
+    try:
+        pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
+    except:
+        pickle_in = open('C:\\Users\\James Rig\\Documents\\rats.pickle', 'rb')
     rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])
@@ -276,7 +279,10 @@ for j, n, cas, malt in zip(testsessions, [20, 22, 24],
                            ['malt1_licks_peak', 'malt2_licks_peak', 'malt3_licks_peak']):
     df4.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['peak'], axis=0) for x in ratsX])
     df4.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['peak'], axis=0) for x in ratsX])
-
+    
+df4['pref1_peak_delta'] = df4['cas1_licks_peak'] - df4['malt1_licks_peak']
+df4['pref2_peak_delta'] = df4['cas2_licks_peak'] - df4['malt2_licks_peak']
+df4['pref3_peak_delta'] = df4['cas3_licks_peak'] - df4['malt3_licks_peak']
     
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.hspace'] = 0.15
