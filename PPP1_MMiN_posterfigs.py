@@ -24,6 +24,7 @@ for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
     mpl.rc(subtick, width=1)
 mpl.rc('legend', fontsize=12)
 mpl.rcParams['figure.subplot.left'] = 0.05
+mpl.rcParams['figure.subplot.top'] = 0.95
 
 #plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
 #plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
@@ -317,9 +318,9 @@ dietswitch=True
 
 pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
-pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
+#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
+#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
+#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
 
 # To make summary figure
 
@@ -384,6 +385,7 @@ def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[
 def makesummaryFig():
     gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
     mpl.rcParams['figure.subplot.left'] = 0.10
+    mpl.rcParams['figure.subplot.top'] = 0.90
     mpl.rcParams['axes.labelpad'] = 4
     f = plt.figure(figsize=(inch(300), inch(120)))
     
@@ -422,6 +424,7 @@ def makesummaryFig():
 def makesummaryFig2():
     gs = gridspec.GridSpec(1, 2, wspace=0.5)
     mpl.rcParams['figure.subplot.left'] = 0.10
+    mpl.rcParams['figure.subplot.top'] = 0.85
     mpl.rcParams['axes.labelpad'] = 4
     f = plt.figure(figsize=(inch(270), inch(120)))
     
@@ -431,10 +434,10 @@ def makesummaryFig2():
     ax0.set_yticks([0, 0.5, 1.0]) 
     ax0.set_yticklabels(['0', '0.5', '1'])
     ax0.set_title('Behaviour')
-    
     ax1 = f.add_subplot(gs[1])
     choicefig(df4, ['pref1_peak_delta', 'pref2_peak_delta', 'pref3_peak_delta'], ax1)
     ax1.set_ylabel('\u0394F (Casein - Malt.)')
+    
     ax1.set_ylim([-0.035, 0.09])
     ax1.set_yticks([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
     ax1.set_yticklabels([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
