@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 import JM_general_functions as jmf
 import numpy as np
 
+import dill
+
+
 
 
 def makevideoclip(videofile, event, data, pre=10, length=30, savefile='output.mp4'):
@@ -51,6 +54,19 @@ def setfiglims(data):
     rasterlimits = [np.max(data)+datarange*0.05, np.max(data)+datarange*0.15]
       
     return axislimits, rasterlimits
+
+# Looks for existing data and if not there loads pickled file
+try:
+    type(rats)
+    print('Using existing data')
+except NameError:
+    print('Loading in data from pickled file')
+    try:
+        pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
+    except:
+        pickle_in = open('C:\\Users\\James Rig\\Documents\\rats.pickle', 'rb')
+    rats = dill.load(pickle_in)
+
 
 #Code to choose parameters for video
 bins = 600
