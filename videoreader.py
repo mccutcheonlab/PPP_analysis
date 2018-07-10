@@ -14,9 +14,6 @@ import numpy as np
 
 import dill
 
-
-
-
 def makevideoclip(videofile, event, data, pre=10, length=30, savefile='output.mp4'):
     vidclip = mv.VideoFileClip(videofile).subclip(event-pre,event-pre+length)
     
@@ -34,11 +31,13 @@ def makevideoclip(videofile, event, data, pre=10, length=30, savefile='output.mp
 def make_frame(t):
     axislimits, rasterlimits = setfiglims(data)
     
-    ax.clear()        
-    ax.plot(dataUV[:t*(len(dataUV)/duration)], lw=2, color='grey')
-    ax.plot(data[:t*(len(data)/duration)], lw=2, color='white')
+    ax.clear()
     
-    ax.vlines([val for val in lickdata if val < t*(len(data)/duration)], rasterlimits[0], rasterlimits[1], color='white', lw=1)
+    timestep = int(t*len(data)/duration)  
+    ax.plot(dataUV[:timestep], lw=2, color='grey')
+    ax.plot(data[:timestep], lw=2, color='white')
+    
+    ax.vlines([val for val in lickdata if val < timestep], rasterlimits[0], rasterlimits[1], color='white', lw=1)
     
     ax.set_xlim(0, len(data))
     ax.set_ylim(axislimits[0], axislimits[1])
@@ -77,7 +76,7 @@ trialLength=35
 # Code to choose rat/session and events
 x = rats['PPP1.7'].sessions['s10']
 all_events = x.left['sipper']
-videofile = 'R:\\DA_and_Reward\\es334\PPP1\\Tanks\\PPP1-171017-081744_Eelke-171027-111329_Cam2.avi'
+videofile = 'R:\\DA_and_Reward\\es334\PPP1\\Tanks\\Eelke-171027-111329\\PPP1-171017-081744_Eelke-171027-111329_Cam2.avi'
 all_data = jmf.mastersnipper(x, x.left['sipper'], preTrial=preTrial, trialLength=trialLength, bins=bins)
 all_licks = np.concatenate((x.left['lickdata']['licks'], x.right['lickdata']['licks']), axis=0)
 
@@ -86,7 +85,7 @@ event = all_events[event_number]
 data = all_data['blue'][event_number][:]
 dataUV = all_data['uv'][event_number][:]
 
-lickdatabytrial = jmf.nearestevents(all_events, all_licks)
+lickdatabytrial = jmf.nearestevents(all_events, all_licks, trialLength=trialLength)
 lickdata = lickdatabytrial[event_number]
 lickdata = (lickdata+preTrial)*bins/trialLength # scales to match bin number
 
@@ -120,7 +119,7 @@ a2 = animation.resize((420,160))
 final_clip =  mv.CompositeVideoClip([c3,
                                 a2.set_pos(('center', 'top'))])
     #final_clip.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame2.png', t=15)
-final_clip.write_videofile(savefile, fps=10)
+final_clip.write_videofile(savefile, fps=10, verbose=False)
     
     #final_clip.ipython_display(width=280)
     #final_clip.save_frame('R:\\DA_and_Reward\\es334\\PPP1\\video\\frame.png', t=10)
