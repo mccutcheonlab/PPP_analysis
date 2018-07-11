@@ -8,6 +8,10 @@ Created on Wed Nov  8 08:47:56 2017
 # Analysis of PPP1 grouped data
 # Need to run PPP1_analysis first to load sessions into
 # Choice data
+import scipy.io as sio
+import JM_general_functions as jmf
+import JM_custom_figs as jmfig
+
 import os
 import string
 import pandas as pd
@@ -91,9 +95,7 @@ def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
     return ax
 
 def excluderats(rats, ratstoexclude):  
-    ratsX = [x for x in rats if x not in ratstoexclude]
-    print(ratsX) 
-        
+    ratsX = [x for x in rats if x not in ratstoexclude]        
     return ratsX
 
 def makemeansnips(snips, noiseindex):
@@ -180,7 +182,10 @@ try:
     print('Using existing data')
 except NameError:
     print('Loading in data from pickled file')
-    pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
+    try:
+        pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
+    except:
+        pickle_in = open('C:\\Users\\James Rig\\Documents\\rats.pickle', 'rb')
     rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])
@@ -196,85 +201,88 @@ for i in rats:
         x.choices = choicetest(x)
         x.pref = prefcalc(x)
 
-df = pd.DataFrame([x for x in rats])
-df.insert(1,'diet', [rats[x].dietgroup for x in rats])
+df1 = pd.DataFrame([x for x in rats])
+df1.insert(1,'diet', [rats[x].dietgroup for x in rats])
 
 for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
-    df.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in rats])
-    df.insert(n+1, pr, [rats[x].sessions[j].pref for x in rats])
+    df1.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in rats])
+    df1.insert(n+1, pr, [rats[x].sessions[j].pref for x in rats])
 
-df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
+df1.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
 
 # Figure showing one day preference data
     
 mpl.rcParams['figure.subplot.left'] = 0.30
 fig = plt.figure(figsize=(3.2, 4.0))
 ax = plt.subplot(1,1,1)
-onedaypreffig(df, 'pref1', ax)
+onedaypreffig(df1, 'pref1', ax)
 
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/onedaypref.eps')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/onedaypref.eps')
 
 # Figure showing casein preference across all three test sessions
 mpl.rcParams['figure.subplot.left'] = 0.15
 fig = plt.figure(figsize=(4.4, 4.0))
 ax = plt.subplot(1,1,1)                
  
-choicefig(df, ['pref1', 'pref2', 'pref3'], ax)
+choicefig(df1, ['pref1', 'pref2', 'pref3'], ax)
 ax.set_ylabel('Casein preference')
 plt.yticks([0, 0.5, 1.0])
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/alldayspref.eps')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/alldayspref.eps')
 
 # Figure showing licks divide into free choice and forced choice
-df = pd.DataFrame([x for x in rats])
-df.insert(1,'diet', [rats[x].dietgroup for x in rats])
+df2 = pd.DataFrame([x for x in rats])
+df2.insert(1,'diet', [rats[x].dietgroup for x in rats])
 
 for j, n, cas, malt in zip(testsessions, [2,4,6],
                         ['forced1-cas', 'forced2-cas', 'forced3-cas'],
                         ['forced1-malt', 'forced2-malt', 'forced3-malt']):
-    df.insert(n, cas, [rats[x].sessions[j].cas['nlicks-forced'] for x in rats])
-    df.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-forced'] for x in rats])
+    df2.insert(n, cas, [rats[x].sessions[j].cas['nlicks-forced'] for x in rats])
+    df2.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-forced'] for x in rats])
 
-df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
+df2.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
 
-df = pd.DataFrame([x for x in rats])
-df.insert(1,'diet', [rats[x].dietgroup for x in rats])
+df3 = pd.DataFrame([x for x in rats])
+df3.insert(1,'diet', [rats[x].dietgroup for x in rats])
 
 for j, n, cas, malt in zip(testsessions, [2,4,6],
                         ['free1-cas', 'free2-cas', 'free3-cas'],
                         ['free1-malt', 'free2-malt', 'free3-malt']):
-    df.insert(n, cas, [rats[x].sessions[j].cas['nlicks-free'] for x in rats])
-    df.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-free'] for x in rats])
+    df3.insert(n, cas, [rats[x].sessions[j].cas['nlicks-free'] for x in rats])
+    df3.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-free'] for x in rats])
 
-df.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-free.csv')
+df3.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-free.csv')
 
 
 ## Creating new dataframe for photometry data so I can exclude rats
 
 ratsX = excluderats(rats, ['PPP1.8'])
 
-df = pd.DataFrame([x for x in ratsX])
-df.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
+df4 = pd.DataFrame([x for x in ratsX])
+df4.insert(1,'diet', [rats[x].dietgroup for x in ratsX])
 
 for j, n, cas, malt in zip(testsessions, [2,4,6], ['cas1', 'cas2', 'cas3'], ['malt1', 'malt2', 'malt3']):
-    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_sipper']['diff'], axis=0) for x in ratsX])
-    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_sipper']['diff'], axis=0) for x in ratsX])
+    df4.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_sipper']['diff'], axis=0) for x in ratsX])
+    df4.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_sipper']['diff'], axis=0) for x in ratsX])
 
 for j, n, cas, malt in zip(testsessions, [8, 10, 12], ['cas1_licks', 'cas2_licks', 'cas3_licks'], ['malt1_licks', 'malt2_licks', 'malt3_licks']):
-    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks']['diff'], axis=0) for x in ratsX])
-    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks']['diff'], axis=0) for x in ratsX])
+    df4.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks']['diff'], axis=0) for x in ratsX])
+    df4.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks']['diff'], axis=0) for x in ratsX])
 
 for j, n, cas, malt in zip(testsessions, [14, 16, 18],
                            ['cas1_licks_forced', 'cas2_licks_forced', 'cas3_licks_forced'],
                            ['malt1_licks_forced', 'malt2_licks_forced', 'malt3_licks_forced']):
-    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['diff'], axis=0) for x in ratsX])
-    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['diff'], axis=0) for x in ratsX])
+    df4.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['diff'], axis=0) for x in ratsX])
+    df4.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['diff'], axis=0) for x in ratsX])
 
 for j, n, cas, malt in zip(testsessions, [20, 22, 24],
                            ['cas1_licks_peak', 'cas2_licks_peak', 'cas3_licks_peak'],
                            ['malt1_licks_peak', 'malt2_licks_peak', 'malt3_licks_peak']):
-    df.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['peak'], axis=0) for x in ratsX])
-    df.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['peak'], axis=0) for x in ratsX])
-
+    df4.insert(n, cas, [np.mean(rats[x].sessions[j].cas['snips_licks_forced']['peak'], axis=0) for x in ratsX])
+    df4.insert(n+1, malt, [np.mean(rats[x].sessions[j].malt['snips_licks_forced']['peak'], axis=0) for x in ratsX])
+    
+df4['pref1_peak_delta'] = df4['cas1_licks_peak'] - df4['malt1_licks_peak']
+df4['pref2_peak_delta'] = df4['cas2_licks_peak'] - df4['malt2_licks_peak']
+df4['pref3_peak_delta'] = df4['cas3_licks_peak'] - df4['malt3_licks_peak']
     
 # Figure to show malt vs cas in PR vs NR
 mpl.rcParams['figure.subplot.hspace'] = 0.15
@@ -287,36 +295,36 @@ mpl.rcParams['figure.subplot.bottom'] = 0.05
 #mpl.rcParams['axes.spines.left']=False
 
 fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1', 'malt1')
+doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas1', 'malt1')
 
 
 fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df, 'NR', 'cas1_licks_forced', 'malt1_licks_forced')
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
+doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas1_licks_forced', 'malt1_licks_forced')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
 
 
 fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df, 'NR', 'cas2_licks', 'malt2_licks')
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref2photo_licks.eps')
+doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas2_licks', 'malt2_licks')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref2photo_licks.eps')
 
 fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df, 'NR', 'cas3_licks', 'malt3_licks')
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
+doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas3_licks', 'malt3_licks')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
 
 # Figure for peak responses to casein and malto licks
 #mpl.rcParams['figure.subplot.left'] = 0.30
 #fig = plt.figure(figsize=(8, 4))
 fig, ax = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True, figsize=(8, 4))
-peakresponsebargraph(df, ['cas1_licks_peak', 'malt1_licks_peak'], ax[0])
+peakresponsebargraph(df4, ['cas1_licks_peak', 'malt1_licks_peak'], ax[0])
 #plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
 
-peakresponsebargraph(df, ['cas2_licks_peak', 'malt2_licks_peak'], ax[1])
+peakresponsebargraph(df4, ['cas2_licks_peak', 'malt2_licks_peak'], ax[1])
 #plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
 
-peakresponsebargraph(df, ['cas3_licks_peak', 'malt3_licks_peak'], ax[2])
+peakresponsebargraph(df4, ['cas3_licks_peak', 'malt3_licks_peak'], ax[2])
 
 ax[0].set_ylabel('\u0394F')
-plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/allpeaks_licks.eps')
+#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/allpeaks_licks.eps')
 
 # For saving dataframe
 #df.to_hdf('R:/DA_and_Reward/es334/PPP1/df', 'w')
