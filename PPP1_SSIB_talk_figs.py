@@ -2,16 +2,17 @@
 """
 Created on Mon Mar  5 13:16:41 2018
 
-NEED TO RUN ppp1_grouped.py first to load data and certain functions into memory
+NEED TO RUN ppp1_grouped.py first to load data and certain functions into memory.
+Trying to do this using import statement - but at the moment not importing modules.
 
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
 import JM_custom_figs as jmfig
-import ppp1_grouped
 
 import timeit
 tic = timeit.default_timer()
+
 
 
 #Colors
@@ -70,7 +71,6 @@ def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot
     jmfig.invisible_axes(ax)
     
     return ax
-
 
 def averagetrace(ax, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
                  errorcolors=['xkcd:silver', 'xkcd:silver']):
@@ -149,47 +149,11 @@ def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
     ax.set_ylim([-0.04, 0.14])
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
-def makeheatmap(ax, data, ylabel='Trials'):
-    ntrials = np.shape(data)[0]
-    xvals = np.linspace(-9.9,20,300)
-    yvals = np.arange(1, ntrials+2)
-    xx, yy = np.meshgrid(xvals, yvals)
-    
-    mesh = ax.pcolormesh(xx, yy, data, cmap='YlGnBu', shading = 'flat')
-    ax.set_ylabel(ylabel)
-    ax.set_yticks([1, ntrials])
-    ax.set_xticks([])
-    ax.invert_yaxis()
-    
-    return ax, mesh
 
 def removenoise(snipdata):
     # returns blue snips with noisey ones removed
     new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
     return new_snips
-
-def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
-    x = rats[rat].sessions[s]
-    data_cas = removenoise(x.cas['snips_licks_forced'])
-    data_malt = removenoise(x.malt['snips_licks_forced'])
-
-    inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
-                                             width_ratios=[12,1],
-                                             wspace=0.05)
-    ax1 = f.add_subplot(inner[0,0])
-    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein')
-    mesh.set_clim(clims)
-    
-    ax2 = f.add_subplot(inner[1,0], sharex=ax1)
-    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt')
-    mesh.set_clim(clims)
-   
-    cbar_ax = f.add_subplot(inner[:,1])   
-    cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
-    cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
-                   '0% \u0394F',
-                   '{0:.0f}%'.format(clims[1]*100)]
-    cbar.ax.set_yticklabels(cbar_labels)
 
 def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=False):
     
@@ -289,40 +253,40 @@ clim_nr = [-0.15,0.20]
 clim_pr = [-0.11,0.17]
 
 event = 'snips_licks_forced'
-keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
-
-dietswitch=False
-
-pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-
-# Data, choices for preference session 1 ['s11']
-s = 's11'
-rep_nr_cas = ('PPP1.7', 7)
-rep_nr_malt = ('PPP1.7', 4) #19 OK
-rep_pr_cas = ('PPP1.4', 20)
-rep_pr_malt = ('PPP1.4', 15)
-
-keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
-keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
-
-dietswitch=True
-
-pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-
-# Data, choices for preference session 1 ['s16']
-s = 's16'
-rep_nr_cas = ('PPP1.7', 14)
-rep_nr_malt = ('PPP1.7', 14)
-rep_pr_cas = ('PPP1.4', 14)
-rep_pr_malt = ('PPP1.4', 10)
-
-keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
-keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
-
-dietswitch=True
-
-pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+#keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
+#
+#dietswitch=False
+#
+#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#
+## Data, choices for preference session 1 ['s11']
+#s = 's11'
+#rep_nr_cas = ('PPP1.7', 7)
+#rep_nr_malt = ('PPP1.7', 4) #19 OK
+#rep_pr_cas = ('PPP1.4', 20)
+#rep_pr_malt = ('PPP1.4', 15)
+#
+#keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
+#keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
+#
+#dietswitch=True
+#
+#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
+#
+## Data, choices for preference session 1 ['s16']
+#s = 's16'
+#rep_nr_cas = ('PPP1.7', 14)
+#rep_nr_malt = ('PPP1.7', 14)
+#rep_pr_cas = ('PPP1.4', 14)
+#rep_pr_malt = ('PPP1.4', 10)
+#
+#keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
+#keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
+#
+#dietswitch=True
+#
+#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
 
 #pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
 #pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
@@ -500,13 +464,13 @@ summaryFig = makesummaryFig2()
 #ax.set_ylabel('Licks')
 
 # Representative figure - preference test 1
-gs = gridspec.GridSpec(2, 2)
-f = plt.figure(figsize=(9,3))
+
 
 rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
 rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-    
-figreptraces= plt.figure()
+
+gs = gridspec.GridSpec(2, 2) 
+figreptraces= plt.figure(figsize=(12,5))
 
 reptracesFig(figreptraces, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
 reptracesFig(figreptraces, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
