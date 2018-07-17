@@ -6,7 +6,7 @@ Created on Wed Nov  8 08:47:56 2017
 """
 
 # Analysis of PPP1 grouped data
-# Need to run PPP1_analysis first to load sessions into
+
 # Choice data
 import scipy.io as sio
 import JM_general_functions as jmf
@@ -74,25 +74,26 @@ def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
     ax2.axis('off')
 
     shadedError(ax1, df[factor1][dietmsk], linecolor='black')
-    ax1 = shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
+    shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
     ax1.plot([50,50], [0.02, 0.04], c='k')
     ax1.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
     
     shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
-    ax2 = shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
+    shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
     ax2.plot([250,300], [-0.03, -0.03], c='k')
     ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
 
 
 def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
+    print(np.shape(yarray))
     yarray = np.array(yarray)
     y = np.mean(yarray)
     yerror = np.std(yarray)/np.sqrt(len(yarray))
     x = np.arange(0, len(y))
-    ax.plot(x, y, color=linecolor)
-    ax.fill_between(x, y-yerror, y+yerror, color=errorcolor, alpha=0.4)
+    line = ax.plot(x, y, color=linecolor)
+    patch = ax.fill_between(x, y-yerror, y+yerror, color=errorcolor, alpha=0.4)
     
-    return ax
+    return ax, line, patch
 
 def excluderats(rats, ratstoexclude):  
     ratsX = [x for x in rats if x not in ratstoexclude]        

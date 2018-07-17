@@ -13,21 +13,26 @@ import JM_custom_figs as jmfig
 import timeit
 tic = timeit.default_timer()
 
-
-
 #Colors
 green = mpl.colors.to_rgb('xkcd:kelly green')
-almost_black = mpl.colors.to_rgb('#262626')
 light_green = mpl.colors.to_rgb('xkcd:light green')
+almost_black = mpl.colors.to_rgb('#262626')
+
+## Colour scheme
+col={}
+col['np_cas'] = 'xkcd:silver'
+col['np_malt'] = 'white'
+col['lp_cas'] = 'xkcd:kelly green'
+col['lp_malt'] = 'xkcd:light green'
 
 #Set general rcparams
-mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=15, labelpad=4)
+mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=10, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
-mpl.rc('font', family='Arial', size=15)
+mpl.rc('font', family='Arial', size=10)
 for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
-    mpl.rc(tick, color=almost_black, labelsize=15)
+    mpl.rc(tick, color=almost_black, labelsize=10)
     mpl.rc(subtick, width=1)
-mpl.rc('legend', fontsize=12)
+mpl.rc('legend', fontsize=9)
 mpl.rcParams['figure.subplot.left'] = 0.05
 mpl.rcParams['figure.subplot.top'] = 0.95
 
@@ -98,7 +103,62 @@ def averagetrace(ax, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
     ax.annotate('5 s', xy=(276,y), xycoords='data',
                 xytext=(0,-5), textcoords='offset points',
                 ha='center',va='top')
+
+def averagetracesx4(fig, keys, color=[almost_black, 'xkcd:bluish grey'],
+                 errorcolor=['xkcd:silver', 'xkcd:silver']):
     
+    fig.subplots_adjust(wspace=0.01, hspace=0.2, top=0.95)
+    dietmsk = df4.diet == 'NR'
+    
+    ax1 = fig.add_subplot(221)
+    shadedError(ax1, df4[keys[0]][dietmsk], linecolor=color[0][0], errorcolor=errorcolors[0][0])
+    
+    ax2 = fig.add_subplot(222, sharey=ax1)
+    shadedError(ax2, df4[keys[1]][dietmsk], linecolor=color[0][1], errorcolor=errorcolors[0][1])
+
+    dietmsk = df4.diet == 'PR'
+    
+    ax3 = fig.add_subplot(223)
+    shadedError(ax3, df4[keys[0]][dietmsk], linecolor=color[1][0], errorcolor=errorcolors[1][0])
+    
+    ax4 = fig.add_subplot(224, sharey=ax3)
+    shadedError(ax4, df4[keys[1]][dietmsk], linecolor=color[1][1], errorcolor=errorcolors[1][1])
+
+
+    for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
+        ax.title.set_position([0.5, 1.1])
+        ax.set_title(title)
+    
+    for ax in [ax2, ax4]:
+        ax.legend(['Casein', 'Maltodextrin'], fancybox=True)
+        
+    for ax in [ax1, ax2, ax3, ax4]:
+        print(ax.legend())
+     
+    for ax in [ax1, ax2, ax3, ax4]:
+        ax.axis('off')
+        
+        arrow_y = ax.get_ylim()[1]
+        ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
+        ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+                    ha='center', va='bottom')
+    
+    for ax in [ax1, ax3]:
+        y = [y for y in ax.get_yticks() if y>0][:2]
+        l = y[1] - y[0]
+        scale_label = '{0:.0f}% \u0394F'.format(l*100)
+        ax.plot([50,50], [y[0], y[1]], c=almost_black)
+        ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
+        
+    for ax in [ax2, ax4]:
+        y = ax.get_ylim()[0]
+        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
+        ax.annotate('5 s', xy=(276,y), xycoords='data',
+                    xytext=(0,-5), textcoords='offset points',
+                    ha='center',va='top')
+        
+  
+
 def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
     x = rats[data[0]].sessions[s]
     n = data[1]
@@ -286,12 +346,6 @@ event = 'snips_licks_forced'
 #
 #dietswitch=True
 #
-#pref3Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-
-#pref1Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref1.pdf')
-#pref2Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref2.pdf')
-#pref3Fig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/pref3.pdf')
-
 # To make summary figure
 
 def choicefig(df, keys, ax):
@@ -415,27 +469,16 @@ def makesummaryFig2():
 
     return f
 
-summaryFig = makesummaryFig2()
+#summaryFig = makesummaryFig2()
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
-
-#SMALL_SIZE = 8
-#MEDIUM_SIZE = 10
-#BIGGER_SIZE = 12
-#
-#plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
-#plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
-#plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
-#plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-#plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-#plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
-#plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
     
+savepath = 'C:\\Users\\jaimeHP\\Dropbox\\AbstractsAndTalks\\180718_SSIB_Florida\\figs\\'
 
-
+#forcedandfreelicksfig, ax = plt.subplots(figsize=(8, 3), ncols=2, sharey=True, sharex=True)
+#
 #dietmsk = df2.diet == 'NR'
 #x = [[df2['forced1-cas'][dietmsk], df2['forced1-malt'][dietmsk]],
 #     [df2['forced1-cas'][~dietmsk], df2['forced1-malt'][~dietmsk]]]
-#figforcedlicks, ax = plt.subplots()
 #jmfig.barscatter(x, paired=True,
 #             barfacecoloroption = 'individual',
 #             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
@@ -443,15 +486,12 @@ summaryFig = makesummaryFig2()
 #             scatterlinecolor = 'xkcd:charcoal',
 #             grouplabel=['NR', 'PR'],
 #             scattersize = 100,
-#             ax=ax)
-#ax.set_ylim([-50, 850])
-#ax.set_ylabel('Licks')
+#             ax=ax[0])
 #
 ## Fig for free choice licks
 #dietmsk = df3.diet == 'NR'
 #x = [[df3['free1-cas'][dietmsk], df3['free1-malt'][dietmsk]],
 #     [df3['free1-cas'][~dietmsk], df3['free1-malt'][~dietmsk]]]
-#figfreelicks, ax = plt.subplots()
 #jmfig.barscatter(x, paired=True,
 #             barfacecoloroption = 'individual',
 #             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
@@ -459,26 +499,63 @@ summaryFig = makesummaryFig2()
 #             scatterlinecolor = 'xkcd:charcoal',
 #             grouplabel=['NR', 'PR'],
 #             scattersize = 100,
-#             ax=ax)
-#ax.set_ylim([-50, 850])
-#ax.set_ylabel('Licks')
+#             ax=ax[1])
+#
+#ax[0].set_ylabel('Licks')
+#ax[0].set_ylim([-50, 1050])
+#    
+#forcedandfreelicksfig.savefig(savepath + 'forcedandfree.eps')
 
 # Representative figure - preference test 1
 
-
-rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
-rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-
-gs = gridspec.GridSpec(2, 2) 
-figreptraces= plt.figure(figsize=(12,5))
-
-reptracesFig(figreptraces, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
-reptracesFig(figreptraces, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
+#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+#
+#gs = gridspec.GridSpec(2, 2) 
+#figreptraces= plt.figure(figsize=(12,6))
+#
+#reptracesFig(figreptraces, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
+#reptracesFig(figreptraces, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
 
 # Average traces - pref test 1
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-colors = [almost_black, 'xkcd:bluish grey']
-errorcolors = ['xkcd:light grey', 'xkcd:silver']
 
-figavgtrace1, ax = plt.subplots()
-averagetrace(ax, 'NR', keys_traces, color=colors, errorcolors=errorcolors)
+rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, 'xkcd:neon green']]
+errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:pale green', 'xkcd:pale green']]
+rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+
+figavgtrace1 = plt.figure(figsize=(8, 6))
+
+averagetracesx4(figavgtrace1, keys_traces, color=rowcolors, errorcolor=errorcolors)
+
+figavgtrace1.savefig(savepath + 'avgtrace1.eps')
+
+# Average traces - pref test 2
+#
+#keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
+#
+#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+#errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:blue', 'xkcd:red']]
+#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+#
+#figavgtrace2, ax = plt.subplots(figsize=(3, 6), nrows=2)
+#
+#averagetrace(ax[0], 'NR', keys_traces, color=rowcolors[0], errorcolors=errorcolors[0])
+#averagetrace(ax[1], 'PR', keys_traces, color=rowcolors[1], errorcolors=errorcolors[1])
+#
+#figavgtrace2.savefig(savepath + 'avgtrace1.eps')
+#
+## Average traces - pref test 3
+#
+#keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
+#
+#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+#errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:blue', 'xkcd:red']]
+#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+#
+#figavgtrace3, ax = plt.subplots(figsize=(3, 6), nrows=2)
+#
+#averagetrace(ax[0], 'NR', keys_traces, color=rowcolors[0], errorcolors=errorcolors[0])
+#averagetrace(ax[1], 'PR', keys_traces, color=rowcolors[1], errorcolors=errorcolors[1])
+#
+#figavgtrace3.savefig(savepath + 'avgtrace1.eps')
