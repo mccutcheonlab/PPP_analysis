@@ -83,9 +83,7 @@ def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
     ax2.plot([250,300], [-0.03, -0.03], c='k')
     ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
 
-
 def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
-    print(np.shape(yarray))
     yarray = np.array(yarray)
     y = np.mean(yarray)
     yerror = np.std(yarray)/np.sqrt(len(yarray))

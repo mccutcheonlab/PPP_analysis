@@ -8,6 +8,7 @@ Trying to do this using import statement - but at the moment not importing modul
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
+import matplotlib.lines as mlines
 import JM_custom_figs as jmfig
 
 import timeit
@@ -124,13 +125,18 @@ def averagetracesx4(fig, keys, color=[almost_black, 'xkcd:bluish grey'],
     ax4 = fig.add_subplot(224, sharey=ax3)
     shadedError(ax4, df4[keys[1]][dietmsk], linecolor=color[1][1], errorcolor=errorcolors[1][1])
 
-
+    NRcas_line = mlines.Line2D([], [], color=color[0][0], label='Casein')
+    NRmalt_line = mlines.Line2D([], [], color=color[0][1], label='Maltodextrin')
+    
+    PRcas_line = mlines.Line2D([], [], color=color[1][0], label='Casein')
+    PRmalt_line = mlines.Line2D([], [], color=color[1][1], label='Maltodextrin')
+    
     for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
         ax.title.set_position([0.5, 1.1])
         ax.set_title(title)
     
-    for ax in [ax2, ax4]:
-        ax.legend(['Casein', 'Maltodextrin'], fancybox=True)
+    for ax, lines in zip([ax2, ax4], [[NRcas_line, NRmalt_line], [PRcas_line, PRmalt_line]]):
+        ax.legend(handles=lines, fancybox=True)
         
     for ax in [ax1, ax2, ax3, ax4]:
         print(ax.legend())
