@@ -314,8 +314,8 @@ def averagetracesx2(f, gs, gsx, gsy, keys, diet,
         y = [y for y in ax.get_yticks() if y>0][:2]
         l = y[1] - y[0]
         scale_label = '{0:.0f}% \u0394F'.format(l*100)
-        ax.plot([50,50], [y[0], y[1]], c=almost_black)
-        ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
+        ax.plot([10,10], [y[0], y[1]], c=almost_black)
+        ax.text(0, y[0]+(l/2), scale_label, va='center', ha='right')
         
     for ax in [ax2]:
         y = ax.get_ylim()[0]
@@ -336,7 +336,7 @@ def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
                  scatterlinecolor = almost_black,
                  scatterfacecolor = [sc_color],
                  grouplabel=[],
-                 scattersize = 100,
+                 scattersize = 80,
                  ax=ax)
 
     ax.set_ylabel('\u0394F')
@@ -345,22 +345,22 @@ def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
 
 def mainPhotoFig():
     
-    gs = gridspec.GridSpec(2, 3, width_ratios=[1,3,1], wspace=0.3)
-    f = plt.figure(figsize=(8,3))
+    gs = gridspec.GridSpec(2, 3, width_ratios=[1,4,1], wspace=0.5)
+    f = plt.figure(figsize=(7,3))
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
     rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
     
-#    if dietswitch == True:
-#        rowcolors.reverse()
-#        rowcolors_bar.reverse()
+    if dietswitch == True:
+        rowcolors.reverse()
+        rowcolors_bar.reverse()
 
     # Non-restricted figures, row 0
     ax1 = f.add_subplot(gs[0,0])
     freechoicegraph(ax1, 'NR', keys_choicebars, bar_colors=rowcolors_bar[0], sc_color='w')
     
     # average traces NR cas v malt
-    averagetracesx2(f, gs, 0, 1, keys_traces, 'NR')
+    averagetracesx2(f, gs, 0, 1, keys_traces, 'NR', color=rowcolors[0], title=True)
 
     ax3 = f.add_subplot(gs[0,2]) 
     peakbargraph(ax3, 'NR', keys_photobars, bar_colors=rowcolors_bar[0], sc_color='w')
@@ -370,67 +370,13 @@ def mainPhotoFig():
     freechoicegraph(ax4, 'PR', keys_choicebars, bar_colors=rowcolors_bar[1], sc_color='w')
     
     # average traces NR cas v malt
-    averagetracesx2(f, gs, 1, 1, keys_traces, 'PR')
+    averagetracesx2(f, gs, 1, 1, keys_traces, 'PR', color=rowcolors[1])
 
     ax6 = f.add_subplot(gs[1,2]) 
     peakbargraph(ax6, 'PR', keys_photobars, bar_colors=rowcolors_bar[1], sc_color='w')
-#   
-#    # Protein-restricted figures, row 1
-#    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
-#
-#    # average traces NR cas v malt
-#    ax6 = f.add_subplot(gs[1,3])
-#    averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
-#
-#    ax8 = f.add_subplot(gs[1,4])
-#    peakbargraph(ax8, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
-     
+
     return f
 
-# Data, choices for preference session 1 ['s10']
-s = 's10'
-rep_nr_cas = ('PPP1.7', 16)
-rep_nr_malt = ('PPP1.7', 19)
-rep_pr_cas = ('PPP1.4', 6)
-rep_pr_malt = ('PPP1.4', 4)
-
-clim_nr = [-0.15,0.20]
-clim_pr = [-0.11,0.17]
-
-event = 'snips_licks_forced'
-#keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-#keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
-#
-#dietswitch=False
-#
-#pref1Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-#
-## Data, choices for preference session 1 ['s11']
-#s = 's11'
-#rep_nr_cas = ('PPP1.7', 7)
-#rep_nr_malt = ('PPP1.7', 4) #19 OK
-#rep_pr_cas = ('PPP1.4', 20)
-#rep_pr_malt = ('PPP1.4', 15)
-#
-#keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
-#keys_bars = ['cas2_licks_peak', 'malt2_licks_peak']
-#
-#dietswitch=True
-#
-#pref2Fig = mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt)
-#
-## Data, choices for preference session 1 ['s16']
-#s = 's16'
-#rep_nr_cas = ('PPP1.7', 14)
-#rep_nr_malt = ('PPP1.7', 14)
-#rep_pr_cas = ('PPP1.4', 14)
-#rep_pr_malt = ('PPP1.4', 10)
-#
-#keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
-#keys_bars = ['cas3_licks_peak', 'malt3_licks_peak']
-#
-#dietswitch=True
-#
 # To make summary figure
 
 def choicefig(df, keys, ax):
@@ -591,62 +537,30 @@ savepath = 'C:\\Users\\jaimeHP\\Dropbox\\AbstractsAndTalks\\180718_SSIB_Florida\
 #    
 #forcedandfreelicksfig.savefig(savepath + 'forcedandfree.eps')
 
-# Representative figure - preference test 1
 
-#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
-#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-#
-#gs = gridspec.GridSpec(2, 2) 
-#figreptraces= plt.figure(figsize=(12,6))
-#
-#reptracesFig(figreptraces, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
-#reptracesFig(figreptraces, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
-
-# Average traces - pref test 1
-#keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-#
-#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, 'xkcd:neon green']]
-#errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:pale green', 'xkcd:pale green']]
-#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-#
-#figavgtrace1 = plt.figure(figsize=(8, 6))
-#
-#averagetracesx4(figavgtrace1, keys_traces, color=rowcolors, errorcolor=errorcolors)
-#
-#figavgtrace1.savefig(savepath + 'avgtrace1.eps')
-
-# Average traces - pref test 2
-#
-#keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
-#
-#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
-#errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:blue', 'xkcd:red']]
-#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-#
-#figavgtrace2, ax = plt.subplots(figsize=(3, 6), nrows=2)
-#
-#averagetrace(ax[0], 'NR', keys_traces, color=rowcolors[0], errorcolors=errorcolors[0])
-#averagetrace(ax[1], 'PR', keys_traces, color=rowcolors[1], errorcolors=errorcolors[1])
-#
-#figavgtrace2.savefig(savepath + 'avgtrace1.eps')
-#
-## Average traces - pref test 3
-#
-#keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
-#
-#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
-#errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:blue', 'xkcd:red']]
-#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-#
-#figavgtrace3, ax = plt.subplots(figsize=(3, 6), nrows=2)
-#
-#averagetrace(ax[0], 'NR', keys_traces, color=rowcolors[0], errorcolors=errorcolors[0])
-#averagetrace(ax[1], 'PR', keys_traces, color=rowcolors[1], errorcolors=errorcolors[1])
-#
-#figavgtrace3.savefig(savepath + 'avgtrace1.eps')
-
-
+# Fig for Preference Test 1
 keys_choicebars = ['ncas1', 'nmalt1']
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
-mainPhotoFig()
+dietswitch=False
+
+pref1_photofig = mainPhotoFig()
+pref1_photofig.savefig(savepath + 'pref1_photofig.eps')
+
+# Fig for Preference Test 2
+keys_choicebars = ['ncas2', 'nmalt2']
+keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
+keys_photobars = ['cas2_licks_peak', 'malt2_licks_peak']
+dietswitch=True
+
+pref1_photofig = mainPhotoFig()
+pref1_photofig.savefig(savepath + 'pref2_photofig.eps')
+
+# Fig for Preference Test 3
+keys_choicebars = ['ncas3', 'nmalt3']
+keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
+keys_photobars = ['cas3_licks_peak', 'malt3_licks_peak']
+dietswitch=True
+
+pref1_photofig = mainPhotoFig()
+pref1_photofig.savefig(savepath + 'pref3_photofig.eps')
