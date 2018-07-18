@@ -5,3 +5,5 @@
 
 *.pyc
 .output/
+*.csv
+output/choice-and-pref.csv

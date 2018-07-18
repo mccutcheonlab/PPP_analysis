@@ -196,24 +196,7 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
     
     return ax
 
-def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
-    dietmsk = df4.diet == diet
-    a = [df4[keys[0]][dietmsk], df4[keys[1]][dietmsk]]
-    x = data2obj1D(a)
-    
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = bar_colors,
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 scatterfacecolor = [sc_color],
-                 grouplabel=[],
-                 scattersize = 100,
-                 ax=ax)
 
-    ax.set_ylabel('\u0394F')
-    ax.set_ylim([-0.04, 0.14])
-    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
 
 def removenoise(snipdata):
@@ -274,37 +257,125 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
     if ylabel == True:
         ax.annotate('Licks', xy=(95,1), va='center', ha='right')
 
-def mainFig(rep_nr_cas, rep_nr_malt, rep_pr_cas, rep_pr_malt):
+def freechoicegraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+
+    dietmsk = df4.diet == diet
+    a = [df4[keys[0]][dietmsk], df4[keys[1]][dietmsk]]
+    x = data2obj1D(a)
     
-    gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3)
-    f = plt.figure(figsize=(inch(520), inch(120)))
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=[],
+                 scattersize = 100,
+                 ax=ax)
+
+    ax.set_ylabel('\u0394F')
+    ax.set_ylim([-0.04, 0.14])
+    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+
+def averagetracesx2(f, gs, gsx, gsy, keys, diet,
+                    color=[almost_black, 'xkcd:bluish grey'],
+                    errorcolor=['xkcd:silver', 'xkcd:silver'],
+                    title=False):
+    
+#    fig.subplots_adjust(wspace=0.01, hspace=0.2, top=0.95)
+    dietmsk = df4.diet == diet
+    inner = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[gsx,gsy],
+                                             wspace=0.15)
+    
+    ax1 = f.add_subplot(inner[0])
+    shadedError(ax1, df4[keys[0]][dietmsk], linecolor=color[0], errorcolor=errorcolor[0])
+    
+    ax2 = f.add_subplot(inner[1], sharey=ax1)
+    shadedError(ax2, df4[keys[1]][dietmsk], linecolor=color[1], errorcolor=errorcolor[1])
+
+    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
+    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')
+#    
+    if title == True:
+        for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
+            ax.title.set_position([0.5, 1.1])
+            ax.set_title(title)
+    
+    ax2.legend(handles=[cas_line, malt_line], fancybox=True)
+
+     
+    for ax in [ax1, ax2]:
+        ax.axis('off')
+        
+        arrow_y = ax.get_ylim()[1]
+        ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
+        ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+                    ha='center', va='bottom')
+    
+    for ax in [ax1]:
+        y = [y for y in ax.get_yticks() if y>0][:2]
+        l = y[1] - y[0]
+        scale_label = '{0:.0f}% \u0394F'.format(l*100)
+        ax.plot([50,50], [y[0], y[1]], c=almost_black)
+        ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
+        
+    for ax in [ax2]:
+        y = ax.get_ylim()[0]
+        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
+        ax.annotate('5 s', xy=(276,y), xycoords='data',
+                    xytext=(0,-5), textcoords='offset points',
+                    ha='center',va='top')
+
+def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+    dietmsk = df4.diet == diet
+    a = [df4[keys[0]][dietmsk], df4[keys[1]][dietmsk]]
+    x = data2obj1D(a)
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=[],
+                 scattersize = 100,
+                 ax=ax)
+
+    ax.set_ylabel('\u0394F')
+    ax.set_ylim([-0.04, 0.14])
+    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+
+def mainPhotoFig():
+    
+    gs = gridspec.GridSpec(2, 3, width_ratios=[1,3,1], wspace=0.3)
+    f = plt.figure(figsize=(8,3))
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
     rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
     
-    if dietswitch == True:
-        rowcolors.reverse()
-        rowcolors_bar.reverse()
+#    if dietswitch == True:
+#        rowcolors.reverse()
+#        rowcolors_bar.reverse()
 
     # Non-restricted figures, row 0
-    reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
-    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
+    ax1 = f.add_subplot(gs[0,0])
+    freechoicegraph(ax1, 'NR', keys_choicebars, bar_colors=rowcolors_bar[0], sc_color='w')
+    
     # average traces NR cas v malt
-    ax3 = f.add_subplot(gs[0,3])
-    averagetrace(ax3, 'NR', keys_traces, color=rowcolors[0])
+    averagetracesx2(f, gs, 0, 1, keys_traces, 'NR')
 
-    ax7 = f.add_subplot(gs[0,4]) 
-    peakbargraph(ax7, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
-   
-    # Protein-restricted figures, row 1
-    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
-    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
-    # average traces NR cas v malt
-    ax6 = f.add_subplot(gs[1,3])
-    averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
-
-    ax8 = f.add_subplot(gs[1,4])
-    peakbargraph(ax8, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+    ax3 = f.add_subplot(gs[0,2]) 
+    peakbargraph(ax3, 'NR', keys_photobars, bar_colors=rowcolors_bar[0], sc_color='w')
+#   
+#    # Protein-restricted figures, row 1
+#    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
+#
+#    # average traces NR cas v malt
+#    ax6 = f.add_subplot(gs[1,3])
+#    averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
+#
+#    ax8 = f.add_subplot(gs[1,4])
+#    peakbargraph(ax8, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
      
     return f
 
@@ -524,17 +595,17 @@ savepath = 'C:\\Users\\jaimeHP\\Dropbox\\AbstractsAndTalks\\180718_SSIB_Florida\
 #reptracesFig(figreptraces, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
 
 # Average traces - pref test 1
-keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-
-rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, 'xkcd:neon green']]
-errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:pale green', 'xkcd:pale green']]
-rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-
-figavgtrace1 = plt.figure(figsize=(8, 6))
-
-averagetracesx4(figavgtrace1, keys_traces, color=rowcolors, errorcolor=errorcolors)
-
-figavgtrace1.savefig(savepath + 'avgtrace1.eps')
+#keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+#
+#rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, 'xkcd:neon green']]
+#errorcolors = [['xkcd:light grey', 'xkcd:silver'], ['xkcd:pale green', 'xkcd:pale green']]
+#rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+#
+#figavgtrace1 = plt.figure(figsize=(8, 6))
+#
+#averagetracesx4(figavgtrace1, keys_traces, color=rowcolors, errorcolor=errorcolors)
+#
+#figavgtrace1.savefig(savepath + 'avgtrace1.eps')
 
 # Average traces - pref test 2
 #
@@ -565,3 +636,20 @@ figavgtrace1.savefig(savepath + 'avgtrace1.eps')
 #averagetrace(ax[1], 'PR', keys_traces, color=rowcolors[1], errorcolors=errorcolors[1])
 #
 #figavgtrace3.savefig(savepath + 'avgtrace1.eps')
+
+df1 = pd.DataFrame([x for x in rats])
+df1.insert(1,'diet', [rats[x].dietgroup for x in rats])
+
+for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
+    df1.insert(n, ch, [(rats[x].sessions[j].choices) for x in rats])
+    df1.insert(n+1, pr, [rats[x].sessions[j].pref for x in rats])
+
+
+
+for x in zzz:
+    print(x)
+
+keys_choicebars = ['pref1']
+keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
+#mainPhotoFig()
