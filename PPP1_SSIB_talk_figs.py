@@ -292,11 +292,10 @@ def averagetracesx2(f, gs, gsx, gsy, keys, diet,
     ax2 = f.add_subplot(inner[1], sharey=ax1)
     shadedError(ax2, df4[keys[1]][dietmsk], linecolor=color[1], errorcolor=errorcolor[1])
 
-
 #    
     if title == True:
         for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
-            ax.title.set_position([0.5, 1.1])
+            ax.title.set_position([0.5, 1.2])
             ax.set_title(title)
 #    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
 #    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')  
@@ -335,18 +334,19 @@ def peakbargraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
                  scatteredgecolor = [almost_black],
                  scatterlinecolor = almost_black,
                  scatterfacecolor = [sc_color],
-                 grouplabel=[],
+                 grouplabel=['Cas', 'Malt'],
                  scattersize = 80,
                  ax=ax)
 
     ax.set_ylabel('\u0394F')
-    ax.set_ylim([-0.04, 0.14])
+#    ax.set_ylim([-0.04, 0.14])
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
 def mainPhotoFig():
     
     gs = gridspec.GridSpec(2, 3, width_ratios=[1,4,1], wspace=0.5)
-    f = plt.figure(figsize=(7,3))
+    f = plt.figure(figsize=(7,4))
+    f.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, left=0.1)
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
     rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
@@ -553,8 +553,8 @@ keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
 keys_photobars = ['cas2_licks_peak', 'malt2_licks_peak']
 dietswitch=True
 
-pref1_photofig = mainPhotoFig()
-pref1_photofig.savefig(savepath + 'pref2_photofig.eps')
+pref2_photofig = mainPhotoFig()
+pref2_photofig.savefig(savepath + 'pref2_photofig.eps')
 
 # Fig for Preference Test 3
 keys_choicebars = ['ncas3', 'nmalt3']
@@ -562,5 +562,5 @@ keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
 keys_photobars = ['cas3_licks_peak', 'malt3_licks_peak']
 dietswitch=True
 
-pref1_photofig = mainPhotoFig()
-pref1_photofig.savefig(savepath + 'pref3_photofig.eps')
+pref3_photofig = mainPhotoFig()
+pref3_photofig.savefig(savepath + 'pref3_photofig.eps')
