@@ -204,15 +204,15 @@ df1 = pd.DataFrame([x for x in rats])
 df1.insert(1,'diet', [rats[x].dietgroup for x in rats])
 
 for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
-    df1.insert(n, ch, [[(rats[x].sessions[j].choices)] for x in rats])
+    df1.insert(n, ch, [(rats[x].sessions[j].choices) for x in rats])
     df1.insert(n+1, pr, [rats[x].sessions[j].pref for x in rats])
     
 for n, ch, cas, malt in zip([8,10,12],
                             ['choices1', 'choices2', 'choices3'],
                             ['ncas1', 'ncas2', 'ncas3'],
                             ['nmalt1', 'nmalt2', 'nmalt3']):
-    df1.insert(n, cas, [x.count('cas') for x in df1[ch]])
-    df1.insert(n+1, malt, [y.count('mal') for y in df1[ch]])
+    df1.insert(n, cas, [c.count('cas') for c in df1[ch]])
+    df1.insert(n+1, malt, [m.count('mal') for m in df1[ch]])
 
 #df1.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
 df1.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\choice-and-pref.csv')

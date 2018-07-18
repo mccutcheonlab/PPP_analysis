@@ -259,23 +259,22 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
 
 def freechoicegraph(ax, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
 
-    dietmsk = df4.diet == diet
-    a = [df4[keys[0]][dietmsk], df4[keys[1]][dietmsk]]
-    x = data2obj1D(a)
+    dietmsk = df1.diet == diet
+    a = [df1[keys[0]][dietmsk], df1[keys[1]][dietmsk]]
     
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+    jmfig.barscatter(a, paired=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = bar_colors,
                  scatteredgecolor = [almost_black],
                  scatterlinecolor = almost_black,
                  scatterfacecolor = [sc_color],
-                 grouplabel=[],
-                 scattersize = 100,
+                 grouplabel=['Cas', 'Malt'],
+                 scattersize = 80,
                  ax=ax)
 
-    ax.set_ylabel('\u0394F')
-    ax.set_ylim([-0.04, 0.14])
-    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+    ax.set_ylabel('Free choices')
+    ax.set_ylim([-2, 22])
+#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
 def averagetracesx2(f, gs, gsx, gsy, keys, diet,
                     color=[almost_black, 'xkcd:bluish grey'],
@@ -293,17 +292,16 @@ def averagetracesx2(f, gs, gsx, gsy, keys, diet,
     ax2 = f.add_subplot(inner[1], sharey=ax1)
     shadedError(ax2, df4[keys[1]][dietmsk], linecolor=color[1], errorcolor=errorcolor[1])
 
-    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
-    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')
+
 #    
     if title == True:
         for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
             ax.title.set_position([0.5, 1.1])
             ax.set_title(title)
-    
-    ax2.legend(handles=[cas_line, malt_line], fancybox=True)
+#    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
+#    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')  
+#    ax2.legend(handles=[cas_line, malt_line], fancybox=True)
 
-     
     for ax in [ax1, ax2]:
         ax.axis('off')
         
@@ -366,6 +364,16 @@ def mainPhotoFig():
 
     ax3 = f.add_subplot(gs[0,2]) 
     peakbargraph(ax3, 'NR', keys_photobars, bar_colors=rowcolors_bar[0], sc_color='w')
+    
+# Protein-restricted figures, row 0
+    ax4 = f.add_subplot(gs[1,0])
+    freechoicegraph(ax4, 'PR', keys_choicebars, bar_colors=rowcolors_bar[1], sc_color='w')
+    
+    # average traces NR cas v malt
+    averagetracesx2(f, gs, 1, 1, keys_traces, 'PR')
+
+    ax6 = f.add_subplot(gs[1,2]) 
+    peakbargraph(ax6, 'PR', keys_photobars, bar_colors=rowcolors_bar[1], sc_color='w')
 #   
 #    # Protein-restricted figures, row 1
 #    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
@@ -637,19 +645,8 @@ savepath = 'C:\\Users\\jaimeHP\\Dropbox\\AbstractsAndTalks\\180718_SSIB_Florida\
 #
 #figavgtrace3.savefig(savepath + 'avgtrace1.eps')
 
-df1 = pd.DataFrame([x for x in rats])
-df1.insert(1,'diet', [rats[x].dietgroup for x in rats])
 
-for j, n, ch, pr in zip(testsessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
-    df1.insert(n, ch, [(rats[x].sessions[j].choices) for x in rats])
-    df1.insert(n+1, pr, [rats[x].sessions[j].pref for x in rats])
-
-
-
-for x in zzz:
-    print(x)
-
-keys_choicebars = ['pref1']
+keys_choicebars = ['ncas1', 'nmalt1']
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
-#mainPhotoFig()
+mainPhotoFig()
