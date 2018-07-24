@@ -196,9 +196,6 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
     
     return ax
 
-
-
-
 def removenoise(snipdata):
     # returns blue snips with noisey ones removed
     new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
@@ -505,62 +502,71 @@ def makesummaryFig2():
     
 savepath = 'C:\\Users\\jaimeHP\\Dropbox\\AbstractsAndTalks\\180718_SSIB_Florida\\figs\\'
 
-#forcedandfreelicksfig, ax = plt.subplots(figsize=(8, 3), ncols=2, sharey=True, sharex=True)
-#
-#dietmsk = df2.diet == 'NR'
-#x = [[df2['forced1-cas'][dietmsk], df2['forced1-malt'][dietmsk]],
-#     [df2['forced1-cas'][~dietmsk], df2['forced1-malt'][~dietmsk]]]
-#jmfig.barscatter(x, paired=True,
-#             barfacecoloroption = 'individual',
-#             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
-#             scatteredgecolor = ['xkcd:charcoal'],
-#             scatterlinecolor = 'xkcd:charcoal',
-#             grouplabel=['NR', 'PR'],
-#             scattersize = 100,
-#             ax=ax[0])
-#
-## Fig for free choice licks
-#dietmsk = df3.diet == 'NR'
-#x = [[df3['free1-cas'][dietmsk], df3['free1-malt'][dietmsk]],
-#     [df3['free1-cas'][~dietmsk], df3['free1-malt'][~dietmsk]]]
-#jmfig.barscatter(x, paired=True,
-#             barfacecoloroption = 'individual',
-#             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
-#             scatteredgecolor = ['xkcd:charcoal'],
-#             scatterlinecolor = 'xkcd:charcoal',
-#             grouplabel=['NR', 'PR'],
-#             scattersize = 100,
-#             ax=ax[1])
-#
-#ax[0].set_ylabel('Licks')
-#ax[0].set_ylim([-50, 1050])
-#    
-#forcedandfreelicksfig.savefig(savepath + 'forcedandfree.eps')
+forcedandfreelicksfig, ax = plt.subplots(figsize=(8, 3), ncols=2, sharey=True, sharex=False)
+forcedandfreelicksfig.subplots_adjust(left=0.1, bottom=0.2)
+
+dietmsk = df2.diet == 'NR'
+x = [[df2['forced1-cas'][dietmsk], df2['forced1-malt'][dietmsk]],
+     [df2['forced1-cas'][~dietmsk], df2['forced1-malt'][~dietmsk]]]
+jmfig.barscatter(x, paired=True,
+             barfacecoloroption = 'individual',
+             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+             scatteredgecolor = ['xkcd:charcoal'],
+             scatterlinecolor = 'xkcd:charcoal',
+             grouplabel=['NR', 'PR'],
+             barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+             grouplabeloffset=0.1,
+             barlabeloffset=0.025,
+             scattersize = 80,
+             ax=ax[0])
+
+# Fig for free choice licks
+dietmsk = df3.diet == 'NR'
+x = [[df3['free1-cas'][dietmsk], df3['free1-malt'][dietmsk]],
+     [df3['free1-cas'][~dietmsk], df3['free1-malt'][~dietmsk]]]
+jmfig.barscatter(x, paired=True,
+             barfacecoloroption = 'individual',
+             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+             scatteredgecolor = ['xkcd:charcoal'],
+             scatterlinecolor = 'xkcd:charcoal',
+             grouplabel=['NR', 'PR'],
+             barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+             grouplabeloffset=0.1,
+             barlabeloffset=0.025,
+             scattersize = 80,
+             ax=ax[1])
+
+ax[0].set_ylabel('Licks')
+ax[0].set_ylim([-50, 1050])
+ax[0].set_yticks([0, 500, 1000])
+ax[0].set_xticks([])
+    
+forcedandfreelicksfig.savefig(savepath + 'forcedandfree.eps')
 
 
 # Fig for Preference Test 1
-keys_choicebars = ['ncas1', 'nmalt1']
-keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
-dietswitch=False
-
-pref1_photofig = mainPhotoFig()
-pref1_photofig.savefig(savepath + 'pref1_photofig.eps')
-
-# Fig for Preference Test 2
-keys_choicebars = ['ncas2', 'nmalt2']
-keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
-keys_photobars = ['cas2_licks_peak', 'malt2_licks_peak']
-dietswitch=True
-
-pref2_photofig = mainPhotoFig()
-pref2_photofig.savefig(savepath + 'pref2_photofig.eps')
-
-# Fig for Preference Test 3
-keys_choicebars = ['ncas3', 'nmalt3']
-keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
-keys_photobars = ['cas3_licks_peak', 'malt3_licks_peak']
-dietswitch=True
-
-pref3_photofig = mainPhotoFig()
-pref3_photofig.savefig(savepath + 'pref3_photofig.eps')
+#keys_choicebars = ['ncas1', 'nmalt1']
+#keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+#keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
+#dietswitch=False
+#
+#pref1_photofig = mainPhotoFig()
+#pref1_photofig.savefig(savepath + 'pref1_photofig.eps')
+#
+## Fig for Preference Test 2
+#keys_choicebars = ['ncas2', 'nmalt2']
+#keys_traces = ['cas2_licks_forced', 'malt2_licks_forced']
+#keys_photobars = ['cas2_licks_peak', 'malt2_licks_peak']
+#dietswitch=True
+#
+#pref2_photofig = mainPhotoFig()
+#pref2_photofig.savefig(savepath + 'pref2_photofig.eps')
+#
+## Fig for Preference Test 3
+#keys_choicebars = ['ncas3', 'nmalt3']
+#keys_traces = ['cas3_licks_forced', 'malt3_licks_forced']
+#keys_photobars = ['cas3_licks_peak', 'malt3_licks_peak']
+#dietswitch=True
+#
+#pref3_photofig = mainPhotoFig()
+#pref3_photofig.savefig(savepath + 'pref3_photofig.eps')
