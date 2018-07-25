@@ -32,6 +32,11 @@ class Session(object):
         self.bottleL = metafiledata[hrows['bottleL']]
         self.bottleR = metafiledata[hrows['bottleR']]
         
+        self.ttl_trialsL = metafiledata[hrows['ttl-trialL']]
+        self.ttl_trialsR = metafiledata[hrows['ttl-trialR']]
+        self.ttl_licksL = metafiledata[hrows['ttl-lickL']]
+        self.ttl_licksR = metafiledata[hrows['ttl-lickR']]
+        
         self.left = {}
         self.right = {}
         self.both = {}
@@ -47,44 +52,53 @@ class Session(object):
         self.data = self.output.blue
         self.dataUV = self.output.uv
         
-    def time2samples(self):
+    def setticks(self):
         try:
-            tick = self.output.tick.onset
+            self.tick = self.output.tick.onset
         except AttributeError:
-            tick = self.output.tick
-        maxsamples = len(tick)*int(self.fs)
+            self.tick = self.output.tick        
+        
+    def time2samples(self):
+        maxsamples = len(self.tick)*int(self.fs)
         if (len(self.data) - maxsamples) > 2*int(self.fs):
             print('Something may be wrong with conversion from time to samples')
             print(str(len(self.data) - maxsamples) + ' samples left over. This is more than double fs.')
-            self.t2sMap = np.linspace(min(tick), max(tick), maxsamples)
+            self.t2sMap = np.linspace(min(self.tick), max(self.tick), maxsamples)
         else:
-            self.t2sMap = np.linspace(min(tick), max(tick), maxsamples)
+            self.t2sMap = np.linspace(min(self.tick), max(self.tick), maxsamples)
 
     def event2sample(self, EOI):
         idx = (np.abs(self.t2sMap - EOI)).argmin()   
         return idx
-    
-    def check4events(self):        
-        if hasattr(self.output.trialsL, 'onset'):
+
+    def check4events(self):
+
+        try:
+            lt = getattr(self.output, self.ttl_trialsL)
             self.left['exist'] = True
-            self.left['sipper'] = self.output.trialsL.onset
-            self.left['sipper_off'] = self.output.trialsL.offset
-            self.left['licks'] = np.array([i for i in self.output.licksL.onset if i<max(self.left['sipper_off'])])
-            self.left['licks_off'] = self.output.licksL.offset[:len(self.left['licks'])]
-        else:
+            self.left['sipper'] = lt.onset
+            self.left['sipper_off'] = lt.offset
+            ll = getattr(self.output, self.ttl_licksL)
+            self.left['licks'] = np.array([i for i in ll.onset if i<max(self.left['sipper_off'])])
+            self.left['licks_off'] = ll.offset[:len(self.left['licks'])]
+            print('Left trials detected!')
+        except AttributeError:
+            print('No left trials detected')
             self.left['exist'] = False
             self.left['sipper'] = []
             self.left['sipper_off'] = []
             self.left['licks'] = []
             self.left['licks_off'] = []
            
-        if hasattr(self.output.trialsR, 'onset'):
+        try:
+            rt = getattr(self.output, self.ttl_trialsR)
             self.right['exist'] = True
-            self.right['sipper'] = self.output.trialsR.onset
-            self.right['sipper_off'] = self.output.trialsR.offset
-            self.right['licks'] = np.array([i for i in self.output.licksR.onset if i<max(self.right['sipper_off'])])
-            self.right['licks_off'] = self.output.licksR.offset[:len(self.right['licks'])]
-        else:
+            self.right['sipper'] = rt.onset
+            self.right['sipper_off'] = rt.offset
+            rl = getattr(self.output, self.ttl_licksR)
+            self.right['licks'] = np.array([i for i in rl.onset if i<max(self.right['sipper_off'])])
+            self.right['licks_off'] = rl.offset[:len(self.right['licks'])]
+        except AttributeError:
             self.right['exist'] = False
             self.right['sipper'] = []
             self.right['sipper_off'] = []
@@ -107,7 +121,7 @@ class Session(object):
                 self.left['nlicks-free'] = len(self.left['licks-free'])
                 self.right['nlicks-free'] = len(self.right['licks-free'])
 
-            except:
+            except IndexError:
                 print('Problem separating out free choice trials')
                         
     def removephantomlicks(self):
@@ -193,6 +207,16 @@ class Session(object):
         if 'malt' in self.right['subs']:
             self.malt = self.right
 
+def findfreechoice(left, right):
+    first = [idx for idx, x in enumerate(left) if x in right][0]
+    return first
+        
+def dividelicks(licks, time):
+    before = [x for x in licks if x < time]
+    after = [x for x in licks if x > time]
+    
+    return before, after    
+
 # Extracts data from metafile
 metafile = 'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile.txt'
 #medfolder = 'R:\\DA_and_Reward\\gc214\\IPP1\\MED-PC datafile\\'
@@ -225,6 +249,7 @@ x.loadmatfile()
 #x = rats[i].sessions[j]
 x.loadmatfile()
 # Work out time to samples
+x.setticks()
 x.time2samples()       
 # Find out which bottles have TTLs/Licks associated with them     
 x.check4events()
@@ -241,13 +266,15 @@ x.right['lickdata'] = jmf.lickCalc(x.right['licks'],
 
 bins = 300
 
-x.randomevents = jmf.makerandomevents(120, max(x.output.tick.onset)-120)
+x.randomevents = jmf.makerandomevents(120, max(x.tick)-120)
 x.bgTrials, x.pps = jmf.snipper(x.data, x.randomevents,
                                 t2sMap = x.t2sMap, fs = x.fs, bins=bins)
 
 if x.left['exist'] == True:
     x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
     x.left['snips_licks'] = jmf.mastersnipper(x, x.left['lickdata']['rStart'])
+    
+    
     x.left['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.left['lickdata']['rStart'] if licks < x.both['sipper'][0]])
     x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
  
@@ -257,8 +284,8 @@ if x.right['exist'] == True:
     x.right['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.right['lickdata']['rStart'] if licks < x.both['sipper'][0]])
     x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
     
-#        makeBehavFigs(x)
-#        makePhotoFigs(x)
+makeBehavFigs(x)
+#makePhotoFigs(x)
 
 x.side2subs()
   
