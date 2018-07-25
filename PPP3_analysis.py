@@ -26,7 +26,7 @@ class Session(object):
     
     def __init__(self, metafiledata):
         self.medfile = metafiledata[hrows['medfile']]
-        self.rat = metafiledata[hrows['rat']]
+        self.rat = metafiledata[hrows['rat']].replace('.', '-')
         self.session = metafiledata[hrows['session']]
         self.diet = metafiledata[hrows['dietgroup']]
         self.bottleL = metafiledata[hrows['bottleL']]
@@ -48,7 +48,10 @@ class Session(object):
         self.dataUV = self.output.uv
         
     def time2samples(self):
-        tick = self.output.tick.onset
+        try:
+            tick = self.output.tick.onset
+        except AttributeError:
+            tick = self.output.tick
         maxsamples = len(tick)*int(self.fs)
         if (len(self.data) - maxsamples) > 2*int(self.fs):
             print('Something may be wrong with conversion from time to samples')
@@ -205,11 +208,11 @@ for idx, field in enumerate(header):
 sessions = {}
         
 for row in rows:
-    sessionID = row[hrows['rat']] + '-' + row[hrows['session']]
+    sessionID = row[hrows['rat']].replace('.','-') + '_' + row[hrows['session']]
     sessions[sessionID] = Session(row)
     
     
-x = sessions['PPP3.8-s3']
+x = sessions['PPP3-1_s10']
 x.loadmatfile()
 
 #for i in sessions:
