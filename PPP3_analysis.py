@@ -221,6 +221,11 @@ metafile = 'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile.txt'
 #medfolder = 'R:\\DA_and_Reward\\gc214\\IPP1\\MED-PC datafile\\'
 datafolder = 'R:\\DA_and_Reward\\gc214\\PPP3\\matfiles\\'
 outputfolder = 'R:\\DA_and_Reward\\gc214\\PPP3\\output\\'
+xlfile = 'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx'
+metafile = 'PPP3_metafile'
+
+
+metafilemaker(xlfile, metafile, sheetname='PPP3_metafile', fileformat='txt')
 
 rows, header = jmf.metafilereader(metafile)
 
