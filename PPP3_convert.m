@@ -6,19 +6,19 @@
 
 folder = 'R:\DA_and_Reward\gc214\PPP3\'
 
-metafile = strcat(folder, 'PPP3_metafile.csv');
-tankfolder = strcat(folder, 'tdtfile\');
+tankfolder = strcat(folder, 'tdtfiles\');
 savefolder = strcat(folder, 'matfiles\');
 
-skipfiles = 0;
+skipfiles = 1;
 processfiles = 0;
 nboxes = 2;
 
-txtfileformat = '%s %s %s %s %d %s %d %s %s %d %d %d %d %d %d %s %s %s %s %s %s %d %d %d';
+metafile = 'R:\DA_and_Reward\gc214\PPP3\PPP3.xlsx'
+sheet = 'PPP3_metafile';
+[~,~,a] = xlsread(metafile,sheet);
 
-TDTmasterconvert(metafile, tankfolder, savefolder,...
-    skipfiles, processfiles, nboxes, txtfileformat);
-
+TDTmasterconvert(a, tankfolder, savefolder,...
+     skipfiles, processfiles, nboxes);
 
 %%%
 % for testing
@@ -33,3 +33,13 @@ TDTmasterconvert(metafile, tankfolder, savefolder,...
 % tank = 'C:\Users\James Rig\Documents\Test data\Kate-170810-072909'
 % data = TDTbin2mat(tank);
 % toc
+
+% 
+% tank = 'R:\DA_and_Reward\Shared\Scripts\THPH Tanks\Kate-170810-072909';
+% data = TDTbin2mat(tank);
+% 
+% tank = 'R:\DA_and_Reward\gc214\PPP3\tdtfiles\Giulia-180709-083142';
+% data = TDTbin2mat(tank);
+% 
+% tank = 'R:\DA_and_Reward\gc214\PPP3\tdtfiles\Giulia-180709-100216';
+% data = TDTbin2mat(tank);
