@@ -257,7 +257,7 @@ for session in sessions:
 
 rats_to_include = []
 rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7']
-sessions_to_include = ['s10', 's11']
+sessions_to_include = ['s16']
 
 if len(rats_to_include) > 0:
     print('Overriding values in rats_to_exclude because of entry in rats_to_include.')
