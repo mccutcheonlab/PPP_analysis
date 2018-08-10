@@ -8,8 +8,10 @@
 *.csv
 output/choice-and-pref.csv
 *.asv
+
 ~$tails for PPP analysis.docx
 
 
 *.tmp
+
 

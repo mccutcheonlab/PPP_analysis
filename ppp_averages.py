@@ -264,7 +264,6 @@ for j, n, cas, malt in zip(included_sessions, [2,4,6],
 
 
 ##df2.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
-#df2.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\licks-forced.csv')
 
 df3 = pd.DataFrame([x for x in rats])
 df3.insert(1,'diet', [rats.get(x) for x in rats])
@@ -275,15 +274,7 @@ for j, n, cas, malt in zip(included_sessions, [2,4,6],
     df3.insert(n, cas, [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j])
     df3.insert(n, malt, [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j])
 
-#    df3.insert(n, cas, [rats[x].sessions[j].cas['nlicks-free'] for x in rats])
-#    df3.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-free'] for x in rats])
-
-##df3.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-free.csv')
 #df3.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\licks-free.csv')
-#
-### Creating new dataframe for photometry data so I can exclude rats
-#
-#ratsX = excluderats(rats, ['PPP1.8'])
 
 df4 = pd.DataFrame([x for x in rats])
 df4.insert(1,'diet', [rats.get(x) for x in rats])

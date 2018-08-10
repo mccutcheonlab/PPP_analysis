@@ -570,3 +570,33 @@ dietswitch=True
 
 pref3_photofig = mainPhotoFig()
 #pref3_photofig.savefig(savepath + 'pref3_photofig.eps')
+
+
+def behav_vs_photoFig(ax, xdata, ydata, diet):
+    for x, y, d in zip(xdata, ydata, diet):
+        if d == 'NR':
+            color = 'k'
+        else:
+            color = 'g'
+        ax.scatter(x, y, c=color)
+
+
+
+
+testfig, ax = plt.subplots()
+Ydata = df1['pref1']
+Xdata = df4['pref1_peak_delta']
+
+behav_vs_photoFig(ax, Xdata, Ydata, df1['diet'])
+
+
+
+testfig, ax = plt.subplots()
+Ydata = df1['pref2']
+Xdata = df4['pref2_peak_delta']
+behav_vs_photoFig(ax, Xdata, Ydata, df1['diet'])
+
+testfig, ax = plt.subplots()
+Ydata = df1['pref3']
+Xdata = df4['pref3_peak_delta']
+behav_vs_photoFig(ax, Xdata, Ydata, df1['diet'])
