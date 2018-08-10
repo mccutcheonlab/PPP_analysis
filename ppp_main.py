@@ -256,9 +256,9 @@ for session in sessions:
     if x.rat not in rats:
         rats.append(x.rat)
 
-rats_to_include = []
+rats_to_include = ['PPP1-2']
 rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7']
-sessions_to_include = ['s10', 's11','s16']
+sessions_to_include = ['s6']
 
 if len(rats_to_include) > 0:
     print('Overriding values in rats_to_exclude because of entry in rats_to_include.')
@@ -286,14 +286,19 @@ for session in sessions:
         x.check4events()
         #        x.removephantomlicks()
         x.setbottlecolors()
-        
-        x.left['lickdata'] = jmf.lickCalc(x.left['licks'],
-                          offset = x.left['licks_off'],
-                          burstThreshold = 0.50)
-        
-        x.right['lickdata'] = jmf.lickCalc(x.right['licks'],
-                  offset = x.right['licks_off'],
-                  burstThreshold = 0.50)
+        try:
+            x.left['lickdata'] = jmf.lickCalc(x.left['licks'],
+                              offset = x.left['licks_off'],
+                              burstThreshold = 0.50)
+        except IndexError:
+            x.left['lickdata'] = 'none'
+            
+        try:
+            x.right['lickdata'] = jmf.lickCalc(x.right['licks'],
+                      offset = x.right['licks_off'],
+                      burstThreshold = 0.50)
+        except IndexError:
+            x.right['lickdata'] = 'none'
         
         bins = 300
         
@@ -304,15 +309,21 @@ for session in sessions:
         if x.left['exist'] == True:
             x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
             x.left['snips_licks'] = jmf.mastersnipper(x, x.left['lickdata']['rStart'])
+            try:
+                x.left['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.left['lickdata']['rStart'] if licks < x.both['sipper'][0]])
+            except KeyError:
+                pass
             
-            
-            x.left['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.left['lickdata']['rStart'] if licks < x.both['sipper'][0]])
             x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
          
         if x.right['exist'] == True:
             x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
             x.right['snips_licks'] = jmf.mastersnipper(x, x.right['lickdata']['rStart'])
-            x.right['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.right['lickdata']['rStart'] if licks < x.both['sipper'][0]])
+            try:
+                x.right['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.right['lickdata']['rStart'] if licks < x.both['sipper'][0]])
+            except KeyError:
+                pass
+            
             x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
             
         makeBehavFigs(x)
