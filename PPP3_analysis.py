@@ -25,7 +25,7 @@ col['lp_malt'] = 'xkcd:light green'
 
 class Session(object):
     
-    def __init__(self, metafiledata, hrows):
+    def __init__(self, metafiledata, hrows, datafolder, outputfolder):
         self.medfile = metafiledata[hrows['medfile']]
         self.rat = metafiledata[hrows['rat']].replace('.', '-')
         self.session = metafiledata[hrows['session']]
@@ -45,6 +45,8 @@ class Session(object):
         self.right['subs'] = metafiledata[hrows['bottleR']]
         
         self.matlabfile = datafolder + self.rat + '_' + self.session + '.mat'
+        
+        self.outputfolder = outputfolder
         
     def loadmatfile(self):
         a = sio.loadmat(self.matlabfile, squeeze_me=True, struct_as_record=False) 
@@ -216,7 +218,7 @@ def dividelicks(licks, time):
     
     return before, after    
 
-def metafile2sessions(xlfile, metafile, sheetname='metafile'):
+def metafile2sessions(xlfile, metafile, datafolder, outputfolder, sheetname='metafile'):
     jmf.metafilemaker(xlfile, metafile, sheetname=sheetname, fileformat='txt')
     rows, header = jmf.metafilereader(metafile + '.txt')
     
@@ -226,72 +228,79 @@ def metafile2sessions(xlfile, metafile, sheetname='metafile'):
                
     for row in rows:
         sessionID = row[hrows['rat']].replace('.','-') + '_' + row[hrows['session']]
-        sessions[sessionID] = Session(row, hrows)
+        sessions[sessionID] = Session(row, hrows, datafolder, outputfolder)
 
 # Extracts data from metafile
-metafile = 'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile.txt'
-datafolder = 'R:\\DA_and_Reward\\gc214\\PPP3\\matfiles\\'
-outputfolder = 'R:\\DA_and_Reward\\gc214\\PPP3\\output\\'
-#xlfile = 'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx'
-#metafile = 'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile'
-#sheetname='PPP3_metafile'
 
+outputfolder = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\'
 
 sessions = {}
+metafile2sessions('R:\\DA_and_Reward\\es334\PPP1\\PPP1.xlsx',
+                  'R:\\DA_and_Reward\\es334\PPP1\\PPP1_metafile',
+                  'R:\\DA_and_Reward\\es334\\PPP1\\matfiles\\',
+                  'R:\\DA_and_Reward\\es334\\PPP1\\output\\',
+                  sheetname='metafile')
+    
+
 metafile2sessions('R:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx',
                   'R:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile',
+                  'R:\\DA_and_Reward\\gc214\\PPP3\\matfiles\\',
+                  'R:\\DA_and_Reward\\gc214\\PPP3\\output\\',
                   sheetname='PPP3_metafile')
-    
+
 #for session in ['PPP3-1_s10', 'PPP3-2_s10', 'PPP3-3_s10', 'PPP3-4_s10', 'PPP3-5_s10', 'PPP3-8_s10']:
-#    pdf_pages = PdfPages(outputfolder + session + '.pdf')
-#        
-#    x = sessions[session]
-#    x.loadmatfile()     
-#    
-#    print('\nAnalysing rat ' + x.rat + ' in session ' + x.session)
-#    
-#    # Load in data from .mat file (convert from Tank first using Matlab script)
-#    x.loadmatfile()
-#    # Work out time to samples
-#    x.setticks()
-#    x.time2samples()       
-#    # Find out which bottles have TTLs/Licks associated with them     
-#    x.check4events()
-#    #        x.removephantomlicks()
-#    x.setbottlecolors()
-#    
-#    x.left['lickdata'] = jmf.lickCalc(x.left['licks'],
-#                      offset = x.left['licks_off'],
-#                      burstThreshold = 0.50)
-#    
-#    x.right['lickdata'] = jmf.lickCalc(x.right['licks'],
-#              offset = x.right['licks_off'],
-#              burstThreshold = 0.50)
-#    
-#    bins = 300
-#    
-#    x.randomevents = jmf.makerandomevents(120, max(x.tick)-120)
-#    x.bgTrials, x.pps = jmf.snipper(x.data, x.randomevents,
-#                                    t2sMap = x.t2sMap, fs = x.fs, bins=bins)
-#    
-#    if x.left['exist'] == True:
-#        x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
-#        x.left['snips_licks'] = jmf.mastersnipper(x, x.left['lickdata']['rStart'])
-#        
-#        
-#        x.left['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.left['lickdata']['rStart'] if licks < x.both['sipper'][0]])
-#        x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
-#     
-#    if x.right['exist'] == True:
-#        x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
-#        x.right['snips_licks'] = jmf.mastersnipper(x, x.right['lickdata']['rStart'])
-#        x.right['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.right['lickdata']['rStart'] if licks < x.both['sipper'][0]])
-#        x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
-#        
-#    makeBehavFigs(x)
-#    makePhotoFigs(x)
-#    
-#    x.side2subs()
-#      
-#    pdf_pages.close()
-#    plt.close('all')
+
+for session in ['PPP1-1_s10']:
+      
+    x = sessions[session]
+    pdf_pages = PdfPages(x.outputfolder + session + '.pdf')
+    
+    x.loadmatfile()     
+    
+    print('\nAnalysing rat ' + x.rat + ' in session ' + x.session)
+    
+    # Load in data from .mat file (convert from Tank first using Matlab script)
+    x.loadmatfile()
+    # Work out time to samples
+    x.setticks()
+    x.time2samples()       
+    # Find out which bottles have TTLs/Licks associated with them     
+    x.check4events()
+    #        x.removephantomlicks()
+    x.setbottlecolors()
+    
+    x.left['lickdata'] = jmf.lickCalc(x.left['licks'],
+                      offset = x.left['licks_off'],
+                      burstThreshold = 0.50)
+    
+    x.right['lickdata'] = jmf.lickCalc(x.right['licks'],
+              offset = x.right['licks_off'],
+              burstThreshold = 0.50)
+    
+    bins = 300
+    
+    x.randomevents = jmf.makerandomevents(120, max(x.tick)-120)
+    x.bgTrials, x.pps = jmf.snipper(x.data, x.randomevents,
+                                    t2sMap = x.t2sMap, fs = x.fs, bins=bins)
+    
+    if x.left['exist'] == True:
+        x.left['snips_sipper'] = jmf.mastersnipper(x, x.left['sipper'])
+        x.left['snips_licks'] = jmf.mastersnipper(x, x.left['lickdata']['rStart'])
+        
+        
+        x.left['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.left['lickdata']['rStart'] if licks < x.both['sipper'][0]])
+        x.left['lats'] = jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
+     
+    if x.right['exist'] == True:
+        x.right['snips_sipper'] = jmf.mastersnipper(x, x.right['sipper'])
+        x.right['snips_licks'] = jmf.mastersnipper(x, x.right['lickdata']['rStart'])
+        x.right['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in x.right['lickdata']['rStart'] if licks < x.both['sipper'][0]])
+        x.right['lats'] = jmf.latencyCalc(x.right['lickdata']['licks'], x.right['sipper'], cueoff=x.right['sipper_off'], lag=0)
+        
+    makeBehavFigs(x)
+    makePhotoFigs(x)
+    
+    x.side2subs()
+      
+    pdf_pages.close()
+    plt.close('all')
