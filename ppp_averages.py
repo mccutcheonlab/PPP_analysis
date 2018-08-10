@@ -185,20 +185,28 @@ except NameError:
         pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_rats.pickle', 'rb')
     except FileNotFoundError:
         print('Cannot access pickled file')
-    rats = dill.load(pickle_in)
+    sessions, rats = dill.load(pickle_in)
 
-#ratsX = excluderats(rats, ['PPP1.8'])
-#ratsX = rats
-#
-#testsessions = ['s10', 's11', 's16']
-#
-#for i in rats:
-#    for j in testsessions:
-#        x = rats[i].sessions[j]
-#        ratkey = i
-#              
-#        x.choices = choicetest(x)
-#        x.pref = prefcalc(x)
+pref_sessions = {}
+for session in sessions:
+    x = sessions[session]
+    try:
+        len(x.data)
+        pref_sessions[x.sessionID] = x
+        
+    except AttributeError:
+        pass
+
+rats = {}
+for session in pref_sessions:
+    x = pref_sessions[session]
+    if x.rat not in rats.keys():
+        rats[x.rat] = x.diet
+        
+for session in pref_sessions:
+    x = pref_sessions[session]          
+    x.choices = choicetest(x)
+    x.pref = prefcalc(x)
 #
 #df1 = pd.DataFrame([x for x in rats])
 #df1.insert(1,'diet', [rats[x].dietgroup for x in rats])

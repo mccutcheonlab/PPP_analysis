@@ -25,7 +25,8 @@ col['lp_malt'] = 'xkcd:light green'
 
 class Session(object):
     
-    def __init__(self, metafiledata, hrows, datafolder, outputfolder):
+    def __init__(self, sessionID, metafiledata, hrows, datafolder, outputfolder):
+        self.sessionID = sessionID
         self.medfile = metafiledata[hrows['medfile']]
         self.rat = metafiledata[hrows['rat']].replace('.', '-')
         self.session = metafiledata[hrows['session']]
@@ -228,7 +229,7 @@ def metafile2sessions(xlfile, metafile, datafolder, outputfolder, sheetname='met
                
     for row in rows:
         sessionID = row[hrows['rat']].replace('.','-') + '_' + row[hrows['session']]
-        sessions[sessionID] = Session(row, hrows, datafolder, outputfolder)
+        sessions[sessionID] = Session(sessionID, row, hrows, datafolder, outputfolder)
 
 # Extracts data from metafile
 
@@ -257,7 +258,7 @@ for session in sessions:
 
 rats_to_include = []
 rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7']
-sessions_to_include = ['s16']
+sessions_to_include = ['s10', 's11','s16']
 
 if len(rats_to_include) > 0:
     print('Overriding values in rats_to_exclude because of entry in rats_to_include.')
