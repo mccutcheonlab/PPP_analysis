@@ -26,6 +26,9 @@ col['np_malt'] = 'white'
 col['lp_cas'] = 'xkcd:kelly green'
 col['lp_malt'] = 'xkcd:light green'
 
+savefigs=True
+savefolder='R:\\DA_and_Reward\\gc214\\PPP_combined\\figs\\'
+
 #Set general rcparams
 mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=10, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
@@ -352,7 +355,7 @@ def mainPhotoFig():
         rowcolors.reverse()
         rowcolors_bar.reverse()
 
-    # Non-restricted figures, row 0
+# Non-restricted figures, row 0
     ax1 = f.add_subplot(gs[0,0])
     freechoicegraph(ax1, 'NR', keys_choicebars, bar_colors=rowcolors_bar[0], sc_color='w')
     
@@ -362,7 +365,7 @@ def mainPhotoFig():
     ax3 = f.add_subplot(gs[0,2]) 
     peakbargraph(ax3, 'NR', keys_photobars, bar_colors=rowcolors_bar[0], sc_color='w')
     
-# Protein-restricted figures, row 0
+# Protein-restricted figures, row 1
     ax4 = f.add_subplot(gs[1,0])
     freechoicegraph(ax4, 'PR', keys_choicebars, bar_colors=rowcolors_bar[1], sc_color='w')
     
@@ -497,7 +500,7 @@ def makesummaryFig2():
 
     return f
 
-#summaryFig = makesummaryFig2()
+summaryFig = makesummaryFig2()
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
     
 savepath = 'C:\\Users\\jaimeHP\\Dropbox\\AbstractsAndTalks\\180718_SSIB_Florida\\figs\\'
@@ -600,3 +603,10 @@ testfig, ax = plt.subplots()
 Ydata = df1['pref3']
 Xdata = df4['pref3_peak_delta']
 behav_vs_photoFig(ax, Xdata, Ydata, df1['diet'])
+
+if savefigs == True:
+    forcedandfreelicksfig.savefig(savefolder + 'forcedandfree.eps')
+    
+    pref1_photofig.savefig(savefolder + 'pref1_photofig.eps')
+    pref2_photofig.savefig(savefolder + 'pref2_photofig.eps')
+    pref3_photofig.savefig(savefolder + 'pref3_photofig.eps')
