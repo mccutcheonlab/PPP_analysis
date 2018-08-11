@@ -115,6 +115,22 @@ for ax in ax:
     
 
 
+for session in cond_sessions:
+    x = cond_sessions[session]
+    try:
+        print(np.shape(x.cas['snips_sipper']['peak']))
+    except:
+        print(np.shape(x.malt['snips_sipper']['peak']))
 
 
+binnedtrials = ['1-5','6-10','11-15','16-20','21-25','26-30','31-35','36-40']
+trialindex = []
 
+df_condtrials_cas = pd.DataFrame([x for x in rats])
+df_condtrials_cas['diet'] = [rats.get(x) for x in rats]
+
+# need to add trials to average to this code!!!!
+
+#for trials in zip(binnedtrials):
+#    df[trials] = [np.mean(cond_sessions[x].cas['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == 'cond1-cas1']
+#    
