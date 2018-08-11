@@ -27,6 +27,7 @@ class Session(object):
     
     def __init__(self, sessionID, metafiledata, hrows, datafolder, outputfolder):
         self.sessionID = sessionID
+        self.sessiontype = metafiledata[hrows['stype']]
         self.medfile = metafiledata[hrows['medfile']]
         self.rat = metafiledata[hrows['rat']].replace('.', '-')
         self.session = metafiledata[hrows['session']]
