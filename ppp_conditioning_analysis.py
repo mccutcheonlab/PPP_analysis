@@ -57,3 +57,56 @@ df1.insert(1,'diet', [rats.get(x) for x in rats])
 for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
     df1.insert(n, cas, [cond_sessions[x].cas['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == cas])
     df1.insert(n+1, malt, [cond_sessions[x].malt['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == malt])
+
+df2 = pd.DataFrame([x for x in rats])
+df2.insert(1,'diet', [rats.get(x) for x in rats])
+
+for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
+    df2.insert(n, cas, [cond_sessions[x].cas['snips_licks']['peak'] for x in cond_sessions if cond_sessions[x].sessiontype == cas])
+    df2.insert(n+1, malt, [cond_sessions[x].malt['snips_licks']['peak'] for x in cond_sessions if cond_sessions[x].sessiontype == malt])
+
+df3 = pd.DataFrame([x for x in rats])
+df3['diet'] = [rats.get(x) for x in rats]
+
+for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
+    df3[cas] = [np.mean(cond_sessions[x].cas['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df3[malt] = [np.mean(cond_sessions[x].malt['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+df4 = pd.DataFrame([x for x in rats])
+df4['diet'] = [rats.get(x) for x in rats]
+
+for cas, malt in zip(cas_sessions, malt_sessions):
+    df4[cas] = [np.mean(cond_sessions[x].cas['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df4[malt] = [np.mean(cond_sessions[x].malt['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+def condfigs(df, keys, dietmsk, cols, ax):
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
+          [df[keys[2]][dietmsk], df[keys[3]][dietmsk]]]
+
+    x=a
+    ax, x, _, _ = jmfig.barscatter(a, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = cols,
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 100,
+                 ax=ax)
+
+    return x
+
+figcond, ax = plt.subplots(nrows=1, ncols=2, sharey=True)
+
+dietmsk = df['diet'] == 'NR'
+cols = ['xkcd:silver']*2 + ['white']*2
+data = condfigs(df4, cas_sessions+malt_sessions, dietmsk, cols, ax[0])
+
+dietmsk = df['diet'] == 'PR'
+cols = ['xkcd:kelly green']*2 + ['xkcd:light green']*2
+data = condfigs(df4, cas_sessions+malt_sessions, dietmsk, cols, ax[1])
+
+
+
+
+
