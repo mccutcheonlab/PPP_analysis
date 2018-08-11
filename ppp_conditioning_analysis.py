@@ -51,60 +51,68 @@ for session in cond_sessions:
 cas_sessions = ['cond1-cas1', 'cond1-cas2']
 malt_sessions = ['cond1-malt1', 'cond1-malt2']  
 
-df1 = pd.DataFrame([x for x in rats])
-df1.insert(1,'diet', [rats.get(x) for x in rats])
-
-for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
-    df1.insert(n, cas, [cond_sessions[x].cas['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == cas])
-    df1.insert(n+1, malt, [cond_sessions[x].malt['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == malt])
-
-df2 = pd.DataFrame([x for x in rats])
-df2.insert(1,'diet', [rats.get(x) for x in rats])
-
-for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
-    df2.insert(n, cas, [cond_sessions[x].cas['snips_licks']['peak'] for x in cond_sessions if cond_sessions[x].sessiontype == cas])
-    df2.insert(n+1, malt, [cond_sessions[x].malt['snips_licks']['peak'] for x in cond_sessions if cond_sessions[x].sessiontype == malt])
-
-df3 = pd.DataFrame([x for x in rats])
-df3['diet'] = [rats.get(x) for x in rats]
-
-for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
-    df3[cas] = [np.mean(cond_sessions[x].cas['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
-    df3[malt] = [np.mean(cond_sessions[x].malt['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
-
-df4 = pd.DataFrame([x for x in rats])
-df4['diet'] = [rats.get(x) for x in rats]
+df_licks = pd.DataFrame([x for x in rats])
+df_licks['diet'] = [rats.get(x) for x in rats]
 
 for cas, malt in zip(cas_sessions, malt_sessions):
-    df4[cas] = [np.mean(cond_sessions[x].cas['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
-    df4[malt] = [np.mean(cond_sessions[x].malt['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+    df_licks[cas] = [cond_sessions[x].cas['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df_licks[malt] = [cond_sessions[x].malt['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+df_lickpeak = pd.DataFrame([x for x in rats])
+df_lickpeak['diet'] = [rats.get(x) for x in rats]
+
+for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
+    df_lickpeak[cas] = [np.mean(cond_sessions[x].cas['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df_lickpeak[malt] = [np.mean(cond_sessions[x].malt['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+df_sipperpeak = pd.DataFrame([x for x in rats])
+df_sipperpeak['diet'] = [rats.get(x) for x in rats]
+
+for cas, malt in zip(cas_sessions, malt_sessions):
+    df_sipperpeak[cas] = [np.mean(cond_sessions[x].cas['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df_sipperpeak[malt] = [np.mean(cond_sessions[x].malt['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
 
 def condfigs(df, keys, dietmsk, cols, ax):
     
     a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
           [df[keys[2]][dietmsk], df[keys[3]][dietmsk]]]
 
-    x=a
-    ax, x, _, _ = jmfig.barscatter(a, paired=True,
+    ax, barx, _, _ = jmfig.barscatter(a, paired=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = cols,
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
                  scattersize = 100,
                  ax=ax)
 
-    return x
+    return barx
+
+
 
 figcond, ax = plt.subplots(nrows=1, ncols=2, sharey=True)
-
+df = df_licks
 dietmsk = df['diet'] == 'NR'
 cols = ['xkcd:silver']*2 + ['white']*2
-data = condfigs(df4, cas_sessions+malt_sessions, dietmsk, cols, ax[0])
+barx = condfigs(df, cas_sessions+malt_sessions, dietmsk, cols, ax[0])
 
 dietmsk = df['diet'] == 'PR'
 cols = ['xkcd:kelly green']*2 + ['xkcd:light green']*2
-data = condfigs(df4, cas_sessions+malt_sessions, dietmsk, cols, ax[1])
+barx = condfigs(df, cas_sessions+malt_sessions, dietmsk, cols, ax[1])
+
+ax[0].set_ylabel('Licks')
+ax[0].set_yticks([0, 1000, 2000, 3000, 4000])
+
+yrange = ax[0].get_ylim()[1] - ax[0].get_ylim()[0]
+grouplabel=['Casein', 'Maltodextrin']
+barlabels=['1','2','3','4']
+barlabeloffset=ax[0].get_ylim()[0] - yrange*0.04
+grouplabeloffset=ax[0].get_ylim()[0] - yrange*0.12
+for ax in ax:
+    for x, label in zip(barx, barlabels):
+        ax.text(x, barlabeloffset, label, va='top', ha='center')
+    for x, label in zip([1,2], grouplabel):
+        ax.text(x, grouplabeloffset, label, va='top', ha='center')
+    
 
 
 
