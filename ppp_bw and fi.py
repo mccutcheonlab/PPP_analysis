@@ -99,15 +99,52 @@ df = pd.read_excel(xlfile, sheet_name='PPP_bodyweight')
 df.set_index(['rat', 'diet'], inplace=True)
 df.drop('cage', axis=1, inplace=True)
 
-data = df.stack()
+df.drop(['PPP3.7'], inplace=True)
+
+df_days = df.loc[:,'d0':'d14']
+
+data = df_days.stack()
 data = data.to_frame()
 data.reset_index(inplace=True) 
 data.columns = ['rat', 'diet', 'day', 'bw']
 ro.globalenv['r_data'] = data
 
+
 ro.r('bodyweight = aov(formula = bw ~ day * diet + Error(rat / day), data = r_data)')
 
 print(ro.r('summary(bodyweight)'))
+
+ro.globalenv['r_data2'] = df_days
+print(ro.r('r_data2'))
+
+
+#ro.r('data = read.csv("C:\\Users\\James Rig\\Documents\\GitHub\\PPP_analysis\\df_days.csv")')
+ro.r('str(data)')
+
+df_days.to_csv('R:\\DA_and_Reward\\gc214\\PPP_combined\\df_days.csv')
+
+#ro.r('Filter(is.factor, r_data2)')
+
+#ro.r('dvm <- with(r_data, cbind(bw[day=="d0"], bw[day=="d1"], bw[day=="d2"]))')
+#ro.r('mlm <- lm(dvm ~ 1)')
+#print(ro.r('mlm'))
+#ro.r('rfactor <- factor(c("f1","f2","f3"))')
+#
+#ro.r('mlm.aov <- Anova(mlm,idata = data.frame(rfactor), idesign = ~rfactor, type="III")')
+#print(ro.r('summary(mlm.aov, multivariate=FALSE)'))
+#
+##ro.r('idata <- )
+#ro.r('output.aov <- Anova(mlm, idata= idata, idesign= day*diet, type="III")')
+#
+#print(ro.r('output.aov'))
+#
+#print(ro.r('summary(output.aov)'))
+#
+#print(ro.r('r_data'))
+#
+##ro.r('bw2 = lmer(bw ~ day*diet + (1 | rat/day), data = r_data)')
+#
+#ro.r('a <- installed.packages()')
 
 # Stats on food intake
 fi_stats = stats.ttest_ind(foodintake_NR, foodintake_PR)
