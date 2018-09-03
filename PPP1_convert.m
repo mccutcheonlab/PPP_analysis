@@ -1,6 +1,3 @@
-% TDT test convert - mini-script for testing TDT conversion scripts
-% In general, a similar script should be stored for each set of conversions
-% somewhere near the data folder
 
 [folder, name, ext] = fileparts(which(mfilename('fullpath')));
 
