@@ -13,10 +13,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
-import rpy2.robjects as ro
-from rpy2.robjects import r, pandas2ri, numpy2ri
-pandas2ri.activate()
-numpy2ri.activate()
+#import rpy2.robjects as ro
+#from rpy2.robjects import r, pandas2ri, numpy2ri
+#pandas2ri.activate()
+#numpy2ri.activate()
 
 from scipy import stats
 
@@ -25,6 +25,8 @@ col['np_cas'] = 'xkcd:silver'
 col['np_malt'] = 'white'
 col['lp_cas'] = 'xkcd:kelly green'
 col['lp_malt'] = 'xkcd:light green'
+
+usr = jmf.getuserhome()
 
 # Loads in data
 
@@ -107,46 +109,34 @@ data = df_days.stack()
 data = data.to_frame()
 data.reset_index(inplace=True) 
 data.columns = ['rat', 'diet', 'day', 'bw']
-ro.globalenv['r_data'] = data
 
+data.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\df_days_stacked.csv')
 
-ro.r('bodyweight = aov(formula = bw ~ day * diet + Error(rat / day), data = r_data)')
+"""
+Code for running stats using R
 
-print(ro.r('summary(bodyweight)'))
+This requires R to be installed and an Rscript written. At the moment I am using
+the R package, EZ, which makes running mixed, between-within ANOVAs simple, and
+tests for sphericity etc as appropriate.
 
-ro.globalenv['r_data2'] = df_days
-print(ro.r('r_data2'))
+EZ can be installed using the command install.packages('ez') in R. The package
+seems to work best in R3.4.4 or later.
 
+An R script is written to run the analysis and print the results. This script
+is then called by Rscript.exe via the subprocess module in Python.
 
-#ro.r('data = read.csv("C:\\Users\\James Rig\\Documents\\GitHub\\PPP_analysis\\df_days.csv")')
-ro.r('str(data)')
+"""
 
-df_days.to_csv('R:\\DA_and_Reward\\gc214\\PPP_combined\\df_days.csv')
+from subprocess import PIPE, run
 
-#ro.r('Filter(is.factor, r_data2)')
+Rscriptpath = 'C:\\Program Files\\R\\R-3.5.1\\bin\\Rscript'
+Rprogpath = usr + '\\Documents\\GitHub\\PPP_analysis\\bw_fi_stats.R'
 
-#ro.r('dvm <- with(r_data, cbind(bw[day=="d0"], bw[day=="d1"], bw[day=="d2"]))')
-#ro.r('mlm <- lm(dvm ~ 1)')
-#print(ro.r('mlm'))
-#ro.r('rfactor <- factor(c("f1","f2","f3"))')
-#
-#ro.r('mlm.aov <- Anova(mlm,idata = data.frame(rfactor), idesign = ~rfactor, type="III")')
-#print(ro.r('summary(mlm.aov, multivariate=FALSE)'))
-#
-##ro.r('idata <- )
-#ro.r('output.aov <- Anova(mlm, idata= idata, idesign= day*diet, type="III")')
-#
-#print(ro.r('output.aov'))
-#
-#print(ro.r('summary(output.aov)'))
-#
-#print(ro.r('r_data'))
-#
-##ro.r('bw2 = lmer(bw ~ day*diet + (1 | rat/day), data = r_data)')
-#
-#ro.r('a <- installed.packages()')
+result = run([Rscriptpath, "--vanilla", Rprogpath], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+
+print(result.returncode, result.stderr, result.stdout)
+
 
 # Stats on food intake
 fi_stats = stats.ttest_ind(foodintake_NR, foodintake_PR)
 print(fi_stats)
-
