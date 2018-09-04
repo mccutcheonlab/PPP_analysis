@@ -5,7 +5,8 @@ Created on Wed Nov  8 08:47:56 2017
 @author: Jaime
 """
 
-# Analysis of data from PPP1 and PPP3
+# Assembles data from PPP1 and PPP3 into pandas dataframes for plotting. Saves
+# dataframes, df_behav and df_photo, as pickle object (ppp_dfs_pref)
 
 # Choice data
 import scipy.io as sio
@@ -95,34 +96,29 @@ for session in pref_sessions:
     x.choices = choicetest(x)
     x.pref = prefcalc(x)
 
-df_choice = pd.DataFrame([x for x in rats], columns=['rat'])
-df_choice['diet'] = [rats.get(x) for x in rats]
-df_choice.set_index(['rat', 'diet'], inplace=True)
+df_behav = pd.DataFrame([x for x in rats], columns=['rat'])
+df_behav['diet'] = [rats.get(x) for x in rats]
+df_behav.set_index(['rat', 'diet'], inplace=True)
 
 for j, ch, pr, cas, malt in zip(included_sessions,
                                 ['choices1', 'choices2', 'choices3'],
                                 ['pref1', 'pref2', 'pref3'],
                                 ['ncas1', 'ncas2', 'ncas3'],
                                 ['nmalt1', 'nmalt2', 'nmalt3']):
-    df_choice[ch] = [pref_sessions[x].choices for x in pref_sessions if pref_sessions[x].session == j]
-    df_choice[pr] = [pref_sessions[x].pref for x in pref_sessions if pref_sessions[x].session == j]
-    df_choice[cas] = [c.count('cas') for c in df_choice[ch]]
-    df_choice[malt] = [m.count('mal') for m in df_choice[ch]]
-
-# Assembles dataframe with lick data
-df_licks = pd.DataFrame([x for x in rats], columns=['rat'])
-df_licks['diet'] = [rats.get(x) for x in rats]
-df_licks.set_index(['rat', 'diet'], inplace=True)
+    df_behav[ch] = [pref_sessions[x].choices for x in pref_sessions if pref_sessions[x].session == j]
+    df_behav[pr] = [pref_sessions[x].pref for x in pref_sessions if pref_sessions[x].session == j]
+    df_behav[cas] = [c.count('cas') for c in df_behav[ch]]
+    df_behav[malt] = [m.count('mal') for m in df_behav[ch]]
 
 for j, forc_cas, forc_malt, free_cas, free_malt in zip(included_sessions,
                         ['forced1-cas', 'forced2-cas', 'forced3-cas'],
                         ['forced1-malt', 'forced2-malt', 'forced3-malt'],
                         ['free1-cas', 'free2-cas', 'free3-cas'],
                         ['free1-malt', 'free2-malt', 'free3-malt']):
-    df_licks[forc_cas] = [pref_sessions[x].cas['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
-    df_licks[forc_malt] = [pref_sessions[x].malt['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
-    df_licks[free_cas] = [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
-    df_licks[free_malt] = [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_behav[forc_cas] = [pref_sessions[x].cas['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_behav[forc_malt] = [pref_sessions[x].malt['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_behav[free_cas] = [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_behav[free_malt] = [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
 
 # Assembles dataframe with photometry data
 df_photo = pd.DataFrame([x for x in rats], columns=['rat'])
@@ -155,7 +151,9 @@ for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
     df_photo[m_licks_peak] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[delta_licks_peak] = df_photo[c_licks_peak] - df_photo[m_licks_peak]
 
-    
+pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
+dill.dump([df_behav, df_photo], pickle_out)
+pickle_out.close()
 
 
 

@@ -38,6 +38,47 @@ def inch(mm):
     result = mm*0.0393701
     return result
 
+def forcedandfreelicks(ax, df, prefsession=1, dietswitch=False):
+
+    forced_cas_key = 'forced' + str(prefsession) + '-cas'
+    forced_malt_key = 'forced' + str(prefsession) + '-malt'
+    free_cas_key = 'free' + str(prefsession) + '-cas'
+    free_malt_key = 'free' + str(prefsession) + '-malt'
+    
+    x = [[df.xs('NR', level=1)[forced_cas_key], df.xs('NR', level=1)[forced_malt_key]],
+         [df.xs('PR', level=1)[forced_cas_key], df.xs('PR', level=1)[forced_malt_key]]]
+    jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR', 'PR'],
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 grouplabeloffset=0.1,
+                 barlabeloffset=0.025,
+                 scattersize = 80,
+                 ax=ax[0])
+
+# Fig for free choice licks
+    x = [[df.xs('NR', level=1)[free_cas_key], df.xs('NR', level=1)[free_malt_key]],
+         [df.xs('PR', level=1)[free_cas_key], df.xs('PR', level=1)[free_malt_key]]]
+    jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR', 'PR'],
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 grouplabeloffset=0.1,
+                 barlabeloffset=0.025,
+                 scattersize = 80,
+                 ax=ax[1])
+
+    ax[0].set_ylabel('Licks')
+    ax[0].set_ylim([-50, 1050])
+    ax[0].set_yticks([0, 500, 1000])
+    ax[0].set_xticks([])
+
 def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot_licks=True):
     
     # Plots data
@@ -419,44 +460,7 @@ def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[
     else:
         ax.set_yticklabels([])
 
-def makesummaryFig():
-    gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
-    mpl.rcParams['figure.subplot.left'] = 0.10
-    mpl.rcParams['figure.subplot.top'] = 0.90
-    mpl.rcParams['axes.labelpad'] = 4
-    f = plt.figure(figsize=(inch(300), inch(120)))
-    
-    adjust = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0],
-                                             wspace=0.05,
-                                             height_ratios=[18,1])
-    
-    ax0 = f.add_subplot(adjust[0])
-    choicefig(df1, ['pref1', 'pref2', 'pref3'], ax0)
-    ax0.set_ylabel('Casein preference')
-    plt.yticks([0, 0.5, 1.0])
-    ax_ = f.add_subplot(adjust[1])
-    jmfig.invisible_axes(ax_)
-    
-    inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
-                                             wspace=0.15)
-    ax1 = f.add_subplot(inner[0])
-    ax2 = f.add_subplot(inner[1])
-    ax3 = f.add_subplot(inner[2])
-    
-    peakresponsebargraph(ax1, df4, ['cas1_licks_peak', 'malt1_licks_peak'],
-                         xlabels=['NR', 'PR'])
-    peakresponsebargraph(ax2, df4, ['cas2_licks_peak', 'malt2_licks_peak'],
-                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
-                         ylabels=False, dietswitch=True)
-    peakresponsebargraph(ax3, df4, ['cas3_licks_peak', 'malt3_licks_peak'],
-                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
-                         ylabels=False, dietswitch=True)
-    
-    titles = ['Preference test 1', 'Preference test 2', 'Preference test 3']
-    for ax, title in zip([ax1, ax2, ax3], titles):
-        ax.set_title(title)
-    
-    return f
+
 
 def makesummaryFig2(df_pref, df_photo):
     gs = gridspec.GridSpec(1, 2, wspace=0.5)
@@ -482,48 +486,7 @@ def makesummaryFig2(df_pref, df_photo):
 
     return f
 
-def forcedandfreelicks(ax, df_forced, df_free, prefsession=1, dietswitch=False):
 
-    forced_cas_key = 'forced' + str(prefsession) + '-cas'
-    forced_malt_key = 'forced' + str(prefsession) + '-malt'
-    free_cas_key = 'free' + str(prefsession) + '-cas'
-    free_malt_key = 'free' + str(prefsession) + '-malt'
-    
-    dietmsk = df_forced.diet == 'NR'
-    x = [[df_forced[forced_cas_key][dietmsk], df_forced[forced_malt_key][dietmsk]],
-         [df_forced[forced_cas_key][~dietmsk], df_forced[forced_malt_key][~dietmsk]]]
-    jmfig.barscatter(x, paired=True, unequal=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR', 'PR'],
-                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-                 grouplabeloffset=0.1,
-                 barlabeloffset=0.025,
-                 scattersize = 80,
-                 ax=ax[0])
-
-# Fig for free choice licks
-    dietmsk = df_free.diet == 'NR'
-    x = [[df_free[free_cas_key][dietmsk], df_free[free_malt_key][dietmsk]],
-         [df_free[free_cas_key][~dietmsk], df_free[free_malt_key][~dietmsk]]]
-    jmfig.barscatter(x, paired=True, unequal=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR', 'PR'],
-                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-                 grouplabeloffset=0.1,
-                 barlabeloffset=0.025,
-                 scattersize = 80,
-                 ax=ax[1])
-
-    ax[0].set_ylabel('Licks')
-    ax[0].set_ylim([-50, 1050])
-    ax[0].set_yticks([0, 500, 1000])
-    ax[0].set_xticks([])
 
 
 def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
@@ -607,3 +570,43 @@ def behav_vs_photoFig(ax, xdata, ydata, diet):
         else:
             color = 'g'
         ax.scatter(x, y, c=color)
+
+
+def makesummaryFig():
+    gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
+    mpl.rcParams['figure.subplot.left'] = 0.10
+    mpl.rcParams['figure.subplot.top'] = 0.90
+    mpl.rcParams['axes.labelpad'] = 4
+    f = plt.figure(figsize=(inch(300), inch(120)))
+    
+    adjust = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0],
+                                             wspace=0.05,
+                                             height_ratios=[18,1])
+    
+    ax0 = f.add_subplot(adjust[0])
+    choicefig(df1, ['pref1', 'pref2', 'pref3'], ax0)
+    ax0.set_ylabel('Casein preference')
+    plt.yticks([0, 0.5, 1.0])
+    ax_ = f.add_subplot(adjust[1])
+    jmfig.invisible_axes(ax_)
+    
+    inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
+                                             wspace=0.15)
+    ax1 = f.add_subplot(inner[0])
+    ax2 = f.add_subplot(inner[1])
+    ax3 = f.add_subplot(inner[2])
+    
+    peakresponsebargraph(ax1, df4, ['cas1_licks_peak', 'malt1_licks_peak'],
+                         xlabels=['NR', 'PR'])
+    peakresponsebargraph(ax2, df4, ['cas2_licks_peak', 'malt2_licks_peak'],
+                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
+                         ylabels=False, dietswitch=True)
+    peakresponsebargraph(ax3, df4, ['cas3_licks_peak', 'malt3_licks_peak'],
+                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
+                         ylabels=False, dietswitch=True)
+    
+    titles = ['Preference test 1', 'Preference test 2', 'Preference test 3']
+    for ax, title in zip([ax1, ax2, ax3], titles):
+        ax.set_title(title)
+    
+    return f
