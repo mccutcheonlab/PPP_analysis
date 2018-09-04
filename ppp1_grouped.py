@@ -40,6 +40,8 @@ mpl.rcParams['axes.spines.right']=False
 
 import dill
 
+usr = jmf.getuserhome()
+
 def choicetest(x):
     choices = []
     for trial, trial_off in zip(x.both['sipper'], x.both['sipper_off']):
@@ -182,9 +184,9 @@ try:
 except NameError:
     print('Loading in data from pickled file')
     try:
-        pickle_in = open('C:\\Users\\jaimeHP\\Documents\\rats.pickle', 'rb')
-    except:
-        pickle_in = open('C:\\Users\\James Rig\\Documents\\rats.pickle', 'rb')
+        pickle_in = open(usr + '\\Documents\\rats.pickle', 'rb')
+    except FileNotFoundError:
+        print('Cannot find data.')
     rats = dill.load(pickle_in)
 
 ratsX = excluderats(rats, ['PPP1.8'])
@@ -215,7 +217,7 @@ for n, ch, cas, malt in zip([8,10,12],
     df1.insert(n+1, malt, [m.count('mal') for m in df1[ch]])
 
 #df1.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
-df1.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\choice-and-pref.csv')
+df1.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\output\\choice-and-pref.csv')
 # Figure showing one day preference data
     
 mpl.rcParams['figure.subplot.left'] = 0.30
@@ -246,7 +248,7 @@ for j, n, cas, malt in zip(testsessions, [2,4,6],
     df2.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-forced'] for x in rats])
 
 #df2.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
-df2.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\licks-forced.csv')
+df2.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\output\\licks-forced.csv')
 
 df3 = pd.DataFrame([x for x in rats])
 df3.insert(1,'diet', [rats[x].dietgroup for x in rats])
@@ -258,7 +260,7 @@ for j, n, cas, malt in zip(testsessions, [2,4,6],
     df3.insert(n+1, malt, [rats[x].sessions[j].malt['nlicks-free'] for x in rats])
 
 #df3.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-free.csv')
-df3.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\licks-free.csv')
+df3.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\output\\licks-free.csv')
 
 ## Creating new dataframe for photometry data so I can exclude rats
 

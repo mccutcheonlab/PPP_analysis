@@ -22,7 +22,6 @@ col['np_malt'] = 'white'
 col['lp_cas'] = 'xkcd:kelly green'
 col['lp_malt'] = 'xkcd:light green'
 
-
 class Session(object):
     
     def __init__(self, sessionID, metafiledata, hrows, datafolder, outputfolder):
@@ -77,7 +76,6 @@ class Session(object):
         return idx
 
     def check4events(self):
-
         try:
             lt = getattr(self.output, self.ttl_trialsL)
             self.left['exist'] = True
