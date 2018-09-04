@@ -526,6 +526,79 @@ def forcedandfreelicks(ax, df_forced, df_free, prefsession=1, dietswitch=False):
     ax[0].set_xticks([])
 
 
+def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
+    dietmsk = df.diet == diet    
+    ax1.axis('off')
+    ax2.axis('off')
+
+    shadedError(ax1, df[factor1][dietmsk], linecolor='black')
+    shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
+    ax1.plot([50,50], [0.02, 0.04], c='k')
+    ax1.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
+    
+    shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
+    shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
+    ax2.plot([250,300], [-0.03, -0.03], c='k')
+    ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
+    
+def choicefig(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
+
+    x = jmf.data2obj2D(a)
+    
+    cols = ['xkcd:silver', 'xkcd:kelly green']
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 100,
+                 ax=ax)
+    
+def onedaypreffig(df, key, ax):
+    dietmsk = df.diet == 'NR'
+    a = jmf.data2obj1D([df[key][dietmsk], df[key][~dietmsk]])
+
+        
+    jmfig.barscatter(a, barfacecoloroption = 'between', barfacecolor = ['xkcd:silver', 'xkcd:kelly green'],
+                         scatteredgecolor = ['black'],
+                         scatterfacecolor = ['none'],
+                         scatterlinecolor = 'black',
+                         grouplabel=['NR', 'PR'],
+                         barwidth = 0.8,
+                         scattersize = 80,
+                         ylabel = 'Casein preference',
+                         ax=ax)
+    ax.set_yticks([0, 0.5, 1.0])
+    ax.set_xlim([0.25,2.75])
+    ax.set_ylim([0, 1.1])
+
+def peakresponsebargraph(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
+
+    x = data2obj2D(a)
+    
+    cols = ['xkcd:silver', 'w', 'xkcd:kelly green', 'xkcd:light green']
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR', 'PR'],
+                 scattersize = 100,
+                 ax=ax)
+    ax.set_ylim([-.02, 0.15])
+    ax.set_yticks([0, 0.05, 0.1, 0.15])
+#    ax.set_ylabel('\u0394F')
 
 def behav_vs_photoFig(ax, xdata, ydata, diet):
     for x, y, d in zip(xdata, ydata, diet):

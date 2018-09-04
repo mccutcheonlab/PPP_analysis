@@ -28,6 +28,27 @@ savefolder='R:\\DA_and_Reward\\gc214\\PPP_combined\\figs\\'
 savefolder=usr + '\Dropbox\Publications in Progress\PPP Paper\Figs\\'
 
 #Set general rcparams
+
+#mpl.style.use('classic')
+
+mpl.rcParams['figure.figsize'] = (4.8, 3.2)
+mpl.rcParams['figure.dpi'] = 100
+
+mpl.rcParams['font.size'] = 12.0
+mpl.rcParams['axes.labelsize'] = 'medium'
+mpl.rcParams['ytick.labelsize'] = 'small'
+
+mpl.rcParams['figure.subplot.left'] = 0.15
+mpl.rcParams['figure.subplot.bottom'] = 0.20
+
+mpl.rcParams['errorbar.capsize'] = 5
+
+mpl.rcParams['savefig.transparent'] = True
+
+mpl.rcParams['axes.spines.top']=False
+mpl.rcParams['axes.spines.right']=False
+
+
 mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=10, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
 mpl.rc('font', family='Arial', size=10)

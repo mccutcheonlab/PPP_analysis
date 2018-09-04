@@ -19,25 +19,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-#mpl.style.use('classic')
-
-mpl.rcParams['figure.figsize'] = (4.8, 3.2)
-mpl.rcParams['figure.dpi'] = 100
-
-mpl.rcParams['font.size'] = 12.0
-mpl.rcParams['axes.labelsize'] = 'medium'
-mpl.rcParams['ytick.labelsize'] = 'small'
-
-mpl.rcParams['figure.subplot.left'] = 0.15
-mpl.rcParams['figure.subplot.bottom'] = 0.20
-
-mpl.rcParams['errorbar.capsize'] = 5
-
-mpl.rcParams['savefig.transparent'] = True
-
-mpl.rcParams['axes.spines.top']=False
-mpl.rcParams['axes.spines.right']=False
-
 import dill
 
 def choicetest(x):
@@ -67,22 +48,6 @@ def prefcalc(x):
     
     return pref
 
-def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
-    dietmsk = df.diet == diet    
-    ax1.axis('off')
-    ax2.axis('off')
-
-    shadedError(ax1, df[factor1][dietmsk], linecolor='black')
-    shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
-    ax1.plot([50,50], [0.02, 0.04], c='k')
-    ax1.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
-    
-    shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
-    shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
-    ax2.plot([250,300], [-0.03, -0.03], c='k')
-    ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
-
-
 def excluderats(rats, ratstoexclude):  
     ratsX = [x for x in rats if x not in ratstoexclude]        
     return ratsX
@@ -93,65 +58,6 @@ def makemeansnips(snips, noiseindex):
     meansnip = np.mean(trials, axis=0)
         
     return meansnip
-
-def choicefig(df, keys, ax):
-    dietmsk = df.diet == 'NR'
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
-
-    x = jmf.data2obj2D(a)
-    
-    cols = ['xkcd:silver', 'xkcd:kelly green']
-    
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
-                 scattersize = 100,
-                 ax=ax)
-    
-def onedaypreffig(df, key, ax):
-    dietmsk = df.diet == 'NR'
-    a = jmf.data2obj1D([df[key][dietmsk], df[key][~dietmsk]])
-
-        
-    jmfig.barscatter(a, barfacecoloroption = 'between', barfacecolor = ['xkcd:silver', 'xkcd:kelly green'],
-                         scatteredgecolor = ['black'],
-                         scatterfacecolor = ['none'],
-                         scatterlinecolor = 'black',
-                         grouplabel=['NR', 'PR'],
-                         barwidth = 0.8,
-                         scattersize = 80,
-                         ylabel = 'Casein preference',
-                         ax=ax)
-    ax.set_yticks([0, 0.5, 1.0])
-    ax.set_xlim([0.25,2.75])
-    ax.set_ylim([0, 1.1])
-
-def peakresponsebargraph(df, keys, ax):
-    dietmsk = df.diet == 'NR'
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
-
-    x = data2obj2D(a)
-    
-    cols = ['xkcd:silver', 'w', 'xkcd:kelly green', 'xkcd:light green']
-    
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR', 'PR'],
-                 scattersize = 100,
-                 ax=ax)
-    ax.set_ylim([-.02, 0.15])
-    ax.set_yticks([0, 0.05, 0.1, 0.15])
-#    ax.set_ylabel('\u0394F')
 
 # Looks for existing data and if not there loads pickled file
 try:
