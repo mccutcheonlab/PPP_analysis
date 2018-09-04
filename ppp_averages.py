@@ -189,96 +189,66 @@ for session in pref_sessions:
     x.choices = choicetest(x)
     x.pref = prefcalc(x)
 
-df1 = pd.DataFrame([x for x in rats])
-df1.insert(1,'diet', [rats.get(x) for x in rats])
+df_choice = pd.DataFrame([x for x in rats], columns=['rat'])
+df_choice['diet'] = [rats.get(x) for x in rats]
+df_choice.set_index(['rat', 'diet'], inplace=True)
 
-for j, n, ch, pr in zip(included_sessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
-    df1.insert(n, ch, [pref_sessions[x].choices for x in pref_sessions if pref_sessions[x].session == j])
-    df1.insert(n+1, pr, [pref_sessions[x].pref for x in pref_sessions if pref_sessions[x].session == j])
+for j, ch, pr, cas, malt in zip(included_sessions,
+                                ['choices1', 'choices2', 'choices3'],
+                                ['pref1', 'pref2', 'pref3'],
+                                ['ncas1', 'ncas2', 'ncas3'],
+                                ['nmalt1', 'nmalt2', 'nmalt3']):
+    df_choice[ch] = [pref_sessions[x].choices for x in pref_sessions if pref_sessions[x].session == j]
+    df_choice[pr] = [pref_sessions[x].pref for x in pref_sessions if pref_sessions[x].session == j]
+    df_choice[cas] = [c.count('cas') for c in df_choice[ch]]
+    df_choice[malt] = [m.count('mal') for m in df_choice[ch]]
 
-#for j, n, ch, pr in zip(included_sessions, [2,4,6], ['choices1', 'choices2', 'choices3'], ['pref1', 'pref2', 'pref3']):
-#    df1.insert(n, ch, [pref_sessions[x].choices for x in pref_sessions if pref_sessions[x].session == j])
-#    df1.insert(n+1, pr, [pref_sessions[x].pref for x in pref_sessions if pref_sessions[x].session == j])
-#    
+# Assembles dataframe with lick data
+df_licks = pd.DataFrame([x for x in rats], columns=['rat'])
+df_licks['diet'] = [rats.get(x) for x in rats]
+df_licks.set_index(['rat', 'diet'], inplace=True)
 
-for n, ch, cas, malt in zip([8,10,12],
-                            ['choices1', 'choices2', 'choices3'],
-                            ['ncas1', 'ncas2', 'ncas3'],
-                            ['nmalt1', 'nmalt2', 'nmalt3']):
-    df1.insert(n, cas, [c.count('cas') for c in df1[ch]])
-    df1.insert(n+1, malt, [m.count('mal') for m in df1[ch]])
-
-#df1.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\choice-and-pref.csv')
-#df1.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\choice-and-pref.csv')
-# Figure showing one day preference data
-    
-mpl.rcParams['figure.subplot.left'] = 0.30
-fig = plt.figure(figsize=(3.2, 4.0))
-ax = plt.subplot(1,1,1)
-onedaypreffig(df1, 'pref1', ax)
-
-##plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/onedaypref.eps')
-#
-## Figure showing casein preference across all three test sessions
-mpl.rcParams['figure.subplot.left'] = 0.15
-fig = plt.figure(figsize=(4.4, 4.0))
-ax = plt.subplot(1,1,1)                
- 
-choicefig(df1, ['pref1', 'pref2', 'pref3'], ax)
-ax.set_ylabel('Casein preference')
-plt.yticks([0, 0.5, 1.0])
-##plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/alldayspref.eps')
-#
-## Figure showing licks divide into free choice and forced choice
-df2 = pd.DataFrame([x for x in rats])
-df2.insert(1,'diet', [rats.get(x) for x in rats])
-
-for j, n, cas, malt in zip(included_sessions, [2,4,6],
+for j, forc_cas, forc_malt, free_cas, free_malt in zip(included_sessions,
                         ['forced1-cas', 'forced2-cas', 'forced3-cas'],
-                        ['forced1-malt', 'forced2-malt', 'forced3-malt']):
-    df2.insert(n, cas, [pref_sessions[x].cas['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j])
-    df2.insert(n+1, malt, [pref_sessions[x].malt['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j])
-
-
-##df2.to_csv('R:\\DA_and_Reward\\es334\\PPP1\\output\\licks-forced.csv')
-
-df3 = pd.DataFrame([x for x in rats])
-df3.insert(1,'diet', [rats.get(x) for x in rats])
-
-for j, n, cas, malt in zip(included_sessions, [2,4,6],
+                        ['forced1-malt', 'forced2-malt', 'forced3-malt'],
                         ['free1-cas', 'free2-cas', 'free3-cas'],
                         ['free1-malt', 'free2-malt', 'free3-malt']):
-    df3.insert(n, cas, [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j])
-    df3.insert(n, malt, [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j])
+    df_licks[forc_cas] = [pref_sessions[x].cas['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_licks[forc_malt] = [pref_sessions[x].malt['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_licks[free_cas] = [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_licks[free_malt] = [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
 
-#df3.to_csv('C:\\Users\\jaimeHP\\Documents\\GitHub\\PPP_analysis\\output\\licks-free.csv')
+# Assembles dataframe with photometry data
+df_photo = pd.DataFrame([x for x in rats], columns=['rat'])
+df_photo['diet'] = [rats.get(x) for x in rats]
+df_photo.set_index(['rat', 'diet'], inplace=True)
 
-df4 = pd.DataFrame([x for x in rats])
-df4.insert(1,'diet', [rats.get(x) for x in rats])
+for j, c_sip_diff, m_sip_diff, c_licks_diff, m_licks_diff in zip(included_sessions,
+                             ['cas1_sip', 'cas2_sip', 'cas3_sip'],
+                             ['malt1_sip', 'malt2_sip', 'malt3_sip'],
+                             ['cas1_licks', 'cas2_licks', 'cas3_licks'],
+                             ['malt1_licks', 'malt2_licks', 'malt3_licks']):
 
-for j, n, cas, malt in zip(included_sessions, [2,4,6], ['cas1', 'cas2', 'cas3'], ['malt1', 'malt2', 'malt3']):
-    df4.insert(n, cas, [np.mean(pref_sessions[x].cas['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
-    df4.insert(n+1, malt, [np.mean(pref_sessions[x].malt['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])    
+    df_photo[c_sip_diff] = [np.mean(pref_sessions[x].cas['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_sip_diff] = [np.mean(pref_sessions[x].malt['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j] 
+    df_photo[c_licks_diff] = [np.mean(pref_sessions[x].cas['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_diff] = [np.mean(pref_sessions[x].malt['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
-for j, n, cas, malt in zip(included_sessions, [8, 10, 12], ['cas1_licks', 'cas2_licks', 'cas3_licks'], ['malt1_licks', 'malt2_licks', 'malt3_licks']):
-    df4.insert(n, cas, [np.mean(pref_sessions[x].cas['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
-    df4.insert(n+1, malt, [np.mean(pref_sessions[x].malt['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
-
-for j, n, cas, malt in zip(included_sessions, [14, 16, 18],
+for j, c_licks_forc, m_licks_forc in zip(included_sessions,
                            ['cas1_licks_forced', 'cas2_licks_forced', 'cas3_licks_forced'],
                            ['malt1_licks_forced', 'malt2_licks_forced', 'malt3_licks_forced']):
-    df4.insert(n, cas, [np.mean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
-    df4.insert(n+1, malt, [np.mean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
+    df_photo[c_licks_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
-for j, n, cas, malt in zip(included_sessions, [20, 22, 24],
+for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
                            ['cas1_licks_peak', 'cas2_licks_peak', 'cas3_licks_peak'],
-                           ['malt1_licks_peak', 'malt2_licks_peak', 'malt3_licks_peak']):
-    df4.insert(n, cas, [np.mean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
-    df4.insert(n+1, malt, [np.mean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j])
+                           ['malt1_licks_peak', 'malt2_licks_peak', 'malt3_licks_peak'],
+                           ['pref1_peak_delta', 'pref2_peak_delta', 'pref3_peak_delta']):
     
-df4['pref1_peak_delta'] = df4['cas1_licks_peak'] - df4['malt1_licks_peak']
-df4['pref2_peak_delta'] = df4['cas2_licks_peak'] - df4['malt2_licks_peak']
-df4['pref3_peak_delta'] = df4['cas3_licks_peak'] - df4['malt3_licks_peak']
+    df_photo[c_licks_peak] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_peak] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[delta_licks_peak] = df_photo[c_licks_peak] - df_photo[m_licks_peak]
+
     
 
 

@@ -109,3 +109,18 @@ if savefigs == True:
     pref1_photofig.savefig(savefolder + 'pref1_photofig.eps')
     pref2_photofig.savefig(savefolder + 'pref2_photofig.eps')
     pref3_photofig.savefig(savefolder + 'pref3_photofig.eps')
+
+#
+#mpl.rcParams['figure.subplot.left'] = 0.30
+#fig = plt.figure(figsize=(3.2, 4.0))
+#ax = plt.subplot(1,1,1)
+#onedaypreffig(df1, 'pref1', ax)
+#    
+#    ## Figure showing casein preference across all three test sessions
+#mpl.rcParams['figure.subplot.left'] = 0.15
+#fig = plt.figure(figsize=(4.4, 4.0))
+#ax = plt.subplot(1,1,1)                
+# 
+#choicefig(df1, ['pref1', 'pref2', 'pref3'], ax)
+#ax.set_ylabel('Casein preference')
+#plt.yticks([0, 0.5, 1.0])
