@@ -106,18 +106,7 @@ def makemeansnips(snips, noiseindex):
         
     return meansnip
 
-def data2obj2D(data):
-    obj = np.empty((np.shape(data)[0], np.shape(data)[1]), dtype=np.object)
-    for i,x in enumerate(data):
-        for j,y in enumerate(x):
-            obj[i][j] = np.array(y)
-    return obj
 
-def data2obj1D(data):
-    obj = np.empty(len(data), dtype=np.object)
-    for i,x in enumerate(data):
-        obj[i] = np.array(x)  
-    return obj
 
 def choicefig(df, keys, ax):
     dietmsk = df.diet == 'NR'

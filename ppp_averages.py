@@ -5,7 +5,7 @@ Created on Wed Nov  8 08:47:56 2017
 @author: Jaime
 """
 
-# Analysis of PPP1 grouped data
+# Analysis of data from PPP1 and PPP3
 
 # Choice data
 import scipy.io as sio
@@ -67,7 +67,6 @@ def prefcalc(x):
     
     return pref
 
-
 def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
     dietmsk = df.diet == diet    
     ax1.axis('off')
@@ -83,15 +82,6 @@ def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
     ax2.plot([250,300], [-0.03, -0.03], c='k')
     ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
 
-def shadedError(ax, yarray, linecolor='black', errorcolor = 'xkcd:silver'):
-    yarray = np.array(yarray)
-    y = np.mean(yarray)
-    yerror = np.std(yarray)/np.sqrt(len(yarray))
-    x = np.arange(0, len(y))
-    line = ax.plot(x, y, color=linecolor)
-    patch = ax.fill_between(x, y-yerror, y+yerror, color=errorcolor, alpha=0.4)
-    
-    return ax, line, patch
 
 def excluderats(rats, ratstoexclude):  
     ratsX = [x for x in rats if x not in ratstoexclude]        
@@ -104,26 +94,13 @@ def makemeansnips(snips, noiseindex):
         
     return meansnip
 
-def data2obj2D(data):
-    obj = np.empty((np.shape(data)[0], np.shape(data)[1]), dtype=np.object)
-    for i,x in enumerate(data):
-        for j,y in enumerate(x):
-            obj[i][j] = np.array(y)
-    return obj
-
-def data2obj1D(data):
-    obj = np.empty(len(data), dtype=np.object)
-    for i,x in enumerate(data):
-        obj[i] = np.array(x)  
-    return obj
-
 def choicefig(df, keys, ax):
     dietmsk = df.diet == 'NR'
     
     a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
           [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
 
-    x = data2obj2D(a)
+    x = jmf.data2obj2D(a)
     
     cols = ['xkcd:silver', 'xkcd:kelly green']
     
@@ -138,7 +115,7 @@ def choicefig(df, keys, ax):
     
 def onedaypreffig(df, key, ax):
     dietmsk = df.diet == 'NR'
-    a = data2obj1D([df[key][dietmsk], df[key][~dietmsk]])
+    a = jmf.data2obj1D([df[key][dietmsk], df[key][~dietmsk]])
 
         
     jmfig.barscatter(a, barfacecoloroption = 'between', barfacecolor = ['xkcd:silver', 'xkcd:kelly green'],
@@ -303,47 +280,7 @@ df4['pref1_peak_delta'] = df4['cas1_licks_peak'] - df4['malt1_licks_peak']
 df4['pref2_peak_delta'] = df4['cas2_licks_peak'] - df4['malt2_licks_peak']
 df4['pref3_peak_delta'] = df4['cas3_licks_peak'] - df4['malt3_licks_peak']
     
-# Figure to show malt vs cas in PR vs NR
-mpl.rcParams['figure.subplot.hspace'] = 0.15
-mpl.rcParams['figure.subplot.left'] = 0.05
-mpl.rcParams['figure.subplot.right'] = 0.95
-mpl.rcParams['figure.subplot.top'] = 0.95
-mpl.rcParams['figure.subplot.bottom'] = 0.05
 
-mpl.rcParams['axes.spines.bottom']=False
-mpl.rcParams['axes.spines.left']=False
-
-fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas1', 'malt1')
-
-
-fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas1_licks_forced', 'malt1_licks_forced')
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref1photo_licks.eps')
-
-
-fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas2_licks', 'malt2_licks')
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref2photo_licks.eps')
-
-fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True, figsize=(3, 6))
-doublesnipFig(ax[0], ax[1], df4, 'NR', 'cas3_licks', 'malt3_licks')
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/pref3photo_licks.eps')
-
-# Figure for peak responses to casein and malto licks
-#mpl.rcParams['figure.subplot.left'] = 0.30
-#fig = plt.figure(figsize=(8, 4))
-fig, ax = plt.subplots(nrows=1, ncols=3, sharex=True, sharey=True, figsize=(8, 4))
-peakresponsebargraph(df4, ['cas1_licks_peak', 'malt1_licks_peak'], ax[0])
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
-
-peakresponsebargraph(df4, ['cas2_licks_peak', 'malt2_licks_peak'], ax[1])
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/peak1_licks.eps')
-
-peakresponsebargraph(df4, ['cas3_licks_peak', 'malt3_licks_peak'], ax[2])
-
-ax[0].set_ylabel('\u0394F')
-#plt.savefig('R:/DA_and_Reward/es334/PPP1/figures/allpeaks_licks.eps')
 
 
 ##
