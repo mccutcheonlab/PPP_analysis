@@ -1,6 +1,6 @@
 #! C:\\Program Files\\R\\R-3.5.1\\bin\\Rscript
 
-df <- read.csv("R:\\DA_and_Reward\\gc214\\PPP_combined\\df_days_stacked.csv")
+df <- read.csv("C:\\Users\\James Rig\\Documents\\GitHub\\PPP_analysis\\df_days_stacked.csv")
 
 library(ez)
 

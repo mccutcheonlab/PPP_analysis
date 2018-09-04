@@ -36,14 +36,27 @@ xlfile = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\PPP_body weight and food intak
 df = pd.read_excel(xlfile, sheet_name='PPP_bodyweight')
 df.set_index('rat', inplace=True)
 
+df.drop('cage', axis=1, inplace=True)
+
 df.drop(['PPP3.7'], inplace=True)
 
 df_days = df.loc[:,'d0':'d14']
+
 nr_mean = df_days[df['diet'] == 'NR'].mean()
 nr_sem = df_days[df['diet'] == 'NR'].std() / np.sqrt(len(df['diet'] == 'NR'))
 
 pr_mean = df_days[df['diet'] == 'PR'].mean()
 pr_sem = df_days[df['diet'] == 'PR'].std() / np.sqrt(len(df['diet'] == 'PR'))
+
+# Prepare data for stats
+df.set_index(['diet'], inplace=True, append=True)
+df_days = df.loc[:,'d0':'d14']
+data = df_days.stack()
+data = data.to_frame()
+data.reset_index(inplace=True) 
+data.columns = ['rat', 'diet', 'day', 'bw']
+
+data.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\df_days_stacked.csv')
 
 # Food intake data
 df = pd.read_excel(xlfile, sheet_name='PPP_foodintake')
@@ -62,7 +75,7 @@ fi = [foodintake_NR, foodintake_PR]
 
 gs = gridspec.GridSpec(1, 2, width_ratios=[2,1], wspace=0.5)
 fig1 = plt.figure(figsize=(5,2))
-fig1.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, left=0.15, right=0.95)
+fig1.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, bottom=0.25, left=0.15, right=0.95)
 
 # Makes bodyweight subplot
 ax1 = fig1.add_subplot(gs[0,0])
@@ -95,22 +108,7 @@ ax2.set_ylim([0, 35])
 # Saves figure
 fig1.savefig('R:\\DA_and_Reward\\gc214\\PPP_combined\\figs\\body weight and food intake.eps')
 
-# Stats on body weight
-df = pd.read_excel(xlfile, sheet_name='PPP_bodyweight')
 
-df.set_index(['rat', 'diet'], inplace=True)
-df.drop('cage', axis=1, inplace=True)
-
-df.drop(['PPP3.7'], inplace=True)
-
-df_days = df.loc[:,'d0':'d14']
-
-data = df_days.stack()
-data = data.to_frame()
-data.reset_index(inplace=True) 
-data.columns = ['rat', 'diet', 'day', 'bw']
-
-data.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\df_days_stacked.csv')
 
 """
 Code for running stats using R
