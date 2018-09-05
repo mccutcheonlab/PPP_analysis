@@ -88,10 +88,8 @@ fflicks_pref1_fig, ax = plt.subplots(figsize=(5, 2), ncols=2, sharey=True, share
 fflicks_pref1_fig.subplots_adjust(left=0.25, bottom=0.2)
 pppfig.forcedandfreelicks(ax, df_behav, prefsession=1)
 #fflicks_pref1_fig.savefig(savefolder + 'forcedandfree.eps')
-#forcedandfreelicksfig.savefig(savepath + 'forcedandfree.eps')
-#
 
-#summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
+summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
 
 ## Fig for Preference Test 1

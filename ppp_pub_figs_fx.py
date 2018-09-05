@@ -79,6 +79,51 @@ def forcedandfreelicks(ax, df, prefsession=1, dietswitch=False):
     ax[0].set_yticks([0, 500, 1000])
     ax[0].set_xticks([])
 
+
+def choicefig(df, keys, ax):
+    
+    df_NR = df.xs('NR', level=1)
+    df_PR = df.xs('PR', level=1)
+    
+    a = [[df_NR[keys[0]], df_NR[keys[1]], df_NR[keys[2]]],
+          [df_PR[keys[0]], df_PR[keys[1]], df_PR[keys[2]]]]
+    x = jmf.data2obj2D(a)
+    
+    cols = ['xkcd:silver', green]
+    
+    jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scattersize = 100,
+                 ax=ax)
+    
+    ax.set_xticks([])
+    yval = ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])/20
+    xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
+    for x,label in enumerate(xlabels):
+        ax.text(x+1, yval, label, ha='center')
+    
+def choicefig2(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
+
+    x = jmf.data2obj2D(a)
+    
+    cols = ['xkcd:silver', 'xkcd:kelly green']
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 100,
+                 ax=ax)
+    
 def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot_licks=True):
     
     # Plots data
@@ -402,28 +447,6 @@ def mainPhotoFig(df_choice, df_photo, keys_choicebars, keys_traces, keys_photoba
 
 # To make summary figure
 
-def choicefig(df, keys, ax):
-    dietmsk = df.diet == 'NR'
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
-    x = jmf.data2obj2D(a)
-    
-    cols = ['xkcd:silver', green]
-    
-    jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 scattersize = 100,
-                 ax=ax)
-    
-    ax.set_xticks([])
-    yval = ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])/20
-    xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
-    for x,label in enumerate(xlabels):
-        ax.text(x+1, yval, label, ha='center')
 
 def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
     dietmsk = df.diet == 'NR'
@@ -503,25 +526,7 @@ def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
     shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
     ax2.plot([250,300], [-0.03, -0.03], c='k')
     ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
-    
-def choicefig(df, keys, ax):
-    dietmsk = df.diet == 'NR'
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
 
-    x = jmf.data2obj2D(a)
-    
-    cols = ['xkcd:silver', 'xkcd:kelly green']
-    
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
-                 scattersize = 100,
-                 ax=ax)
     
 def onedaypreffig(df, key, ax):
     dietmsk = df.diet == 'NR'
