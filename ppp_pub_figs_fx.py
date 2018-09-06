@@ -105,25 +105,91 @@ def choicefig(df, keys, ax):
     for x,label in enumerate(xlabels):
         ax.text(x+1, yval, label, ha='center')
     
-def choicefig2(df, keys, ax):
-    dietmsk = df.diet == 'NR'
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
+def freechoicegraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
 
-    x = jmf.data2obj2D(a)
+    df = df.xs(diet, level=1)
+    a = [df[keys[0]], df[keys[1]]]
     
-    cols = ['xkcd:silver', 'xkcd:kelly green']
+    jmfig.barscatter(a, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=['Cas', 'Malt'],
+                 scattersize = 80,
+                 ax=ax)
+
+    ax.set_ylabel('Free choices')
+    ax.set_ylim([-2, 22])
+#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+
+def averagetracesx2(f, gs, gsx, gsy, df, keys, diet,
+                    color=[almost_black, 'xkcd:bluish grey'],
+                    errorcolor=['xkcd:silver', 'xkcd:silver'],
+                    title=False):
+    
+#    fig.subplots_adjust(wspace=0.01, hspace=0.2, top=0.95)
+    df = df.xs(diet, level=1)
+    inner = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[gsx,gsy],
+                                             wspace=0.15)
+    
+    ax1 = f.add_subplot(inner[0])
+    jmfig.shadedError(ax1, df[keys[0]], linecolor=color[0], errorcolor=errorcolor[0])
+    
+    ax2 = f.add_subplot(inner[1], sharey=ax1)
+    jmfig.shadedError(ax2, df[keys[1]], linecolor=color[1], errorcolor=errorcolor[1])
+
+#    
+    if title == True:
+        for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
+            ax.title.set_position([0.5, 1.2])
+            ax.set_title(title)
+#    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
+#    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')  
+#    ax2.legend(handles=[cas_line, malt_line], fancybox=True)
+
+    for ax in [ax1, ax2]:
+        ax.axis('off')
+        
+        arrow_y = ax.get_ylim()[1]
+        ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
+        ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+                    ha='center', va='bottom')
+    
+    for ax in [ax1]:
+        y = [y for y in ax.get_yticks() if y>0][:2]
+        l = y[1] - y[0]
+        scale_label = '{0:.0f}% \u0394F'.format(l*100)
+        ax.plot([10,10], [y[0], y[1]], c=almost_black)
+        ax.text(0, y[0]+(l/2), scale_label, va='center', ha='right')
+        
+    for ax in [ax2]:
+        y = ax.get_ylim()[0]
+        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
+        ax.annotate('5 s', xy=(276,y), xycoords='data',
+                    xytext=(0,-5), textcoords='offset points',
+                    ha='center',va='top')
+
+def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+    df = df.xs(diet, level=1)
+    a = [df[keys[0]], df[keys[1]]]
+    x = jmf.data2obj1D(a)
     
     ax, x, _, _ = jmfig.barscatter(x, paired=True,
                  barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
-                 scattersize = 100,
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=['Cas', 'Malt'],
+                 scattersize = 80,
                  ax=ax)
-    
+
+    ax.set_ylabel('\u0394F')
+#    ax.set_ylim([-0.04, 0.14])
+    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+
 def singletrialFig(ax, blue, uv, licks=[], color=almost_black, xscale=True, plot_licks=True):
     
     # Plots data
@@ -325,90 +391,11 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
     if ylabel == True:
         ax.annotate('Licks', xy=(95,1), va='center', ha='right')
 
-def freechoicegraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
 
-    dietmsk = df.diet == diet
-    a = [df[keys[0]][dietmsk], df[keys[1]][dietmsk]]
-    
-    jmfig.barscatter(a, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = bar_colors,
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 scatterfacecolor = [sc_color],
-                 grouplabel=['Cas', 'Malt'],
-                 scattersize = 80,
-                 ax=ax)
 
-    ax.set_ylabel('Free choices')
-    ax.set_ylim([-2, 22])
-#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
-def averagetracesx2(f, gs, gsx, gsy, df, keys, diet,
-                    color=[almost_black, 'xkcd:bluish grey'],
-                    errorcolor=['xkcd:silver', 'xkcd:silver'],
-                    title=False):
-    
-#    fig.subplots_adjust(wspace=0.01, hspace=0.2, top=0.95)
-    dietmsk = df.diet == diet
-    inner = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[gsx,gsy],
-                                             wspace=0.15)
-    
-    ax1 = f.add_subplot(inner[0])
-    jmfig.shadedError(ax1, df[keys[0]][dietmsk], linecolor=color[0], errorcolor=errorcolor[0])
-    
-    ax2 = f.add_subplot(inner[1], sharey=ax1)
-    jmfig.shadedError(ax2, df[keys[1]][dietmsk], linecolor=color[1], errorcolor=errorcolor[1])
 
-#    
-    if title == True:
-        for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
-            ax.title.set_position([0.5, 1.2])
-            ax.set_title(title)
-#    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
-#    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')  
-#    ax2.legend(handles=[cas_line, malt_line], fancybox=True)
 
-    for ax in [ax1, ax2]:
-        ax.axis('off')
-        
-        arrow_y = ax.get_ylim()[1]
-        ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
-        ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
-                    ha='center', va='bottom')
-    
-    for ax in [ax1]:
-        y = [y for y in ax.get_yticks() if y>0][:2]
-        l = y[1] - y[0]
-        scale_label = '{0:.0f}% \u0394F'.format(l*100)
-        ax.plot([10,10], [y[0], y[1]], c=almost_black)
-        ax.text(0, y[0]+(l/2), scale_label, va='center', ha='right')
-        
-    for ax in [ax2]:
-        y = ax.get_ylim()[0]
-        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
-        ax.annotate('5 s', xy=(276,y), xycoords='data',
-                    xytext=(0,-5), textcoords='offset points',
-                    ha='center',va='top')
-
-def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
-    dietmsk = df.diet == diet
-    a = [df[keys[0]][dietmsk], df[keys[1]][dietmsk]]
-    x = jmf.data2obj1D(a)
-    
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = bar_colors,
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 scatterfacecolor = [sc_color],
-                 grouplabel=['Cas', 'Malt'],
-                 scattersize = 80,
-                 ax=ax)
-
-    ax.set_ylabel('\u0394F')
-#    ax.set_ylim([-0.04, 0.14])
-    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
 def mainPhotoFig(df_choice, df_photo, keys_choicebars, keys_traces, keys_photobars, dietswitch=False):
     
@@ -615,3 +602,22 @@ def makesummaryFig():
         ax.set_title(title)
     
     return f
+
+def choicefig2(df, keys, ax):
+    dietmsk = df.diet == 'NR'
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk], df[keys[2]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk], df[keys[2]][~dietmsk]]]
+
+    x = jmf.data2obj2D(a)
+    
+    cols = ['xkcd:silver', 'xkcd:kelly green']
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR \u2192 PR', 'PR \u2192 NR'],
+                 scattersize = 100,
+                 ax=ax)

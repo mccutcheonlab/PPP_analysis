@@ -92,12 +92,12 @@ pppfig.forcedandfreelicks(ax, df_behav, prefsession=1)
 summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
 
-## Fig for Preference Test 1
-#keys_choicebars = ['ncas1', 'nmalt1']
-#keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-#keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
-#
-#pref1_photofig = pppfig.mainPhotoFig(df1, df4, keys_choicebars, keys_traces, keys_photobars)
+# Fig for Preference Test 1
+keys_choicebars = ['ncas1', 'nmalt1']
+keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
+
+pref1_photofig = pppfig.mainPhotoFig(df_behav, df_photo, keys_choicebars, keys_traces, keys_photobars)
 ##pref1_photofig.savefig(savepath + 'pref1_photofig.eps')
 #
 ## Fig for Preference Test 2
