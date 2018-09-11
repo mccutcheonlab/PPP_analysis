@@ -89,6 +89,8 @@ fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
 pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=1)
 fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
 
+photo_pref1_fig, ax = plt.subplots(figsize=(7.2, 5), ncols)
+
 #summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
 

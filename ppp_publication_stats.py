@@ -66,7 +66,8 @@ def ppp_ttest_unpaired(df, index1, index2, key):
     return result
     
 # Prepare data for stats on preference day FORCED licks
-    
+
+# Stats on preference day 1 - behaviour
 ppp_licksANOVA(df_behav,
                ['forced1-cas', 'forced1-malt'],
                usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref1_forc_licks.csv')
@@ -91,6 +92,19 @@ ppp_ttest_paired(df_behav, 'PR', 'ncas1', 'nmalt1')
 
 ppp_ttest_unpaired(df_behav, 'NR', 'PR', 'ncas1')
 ppp_ttest_unpaired(df_behav, 'NR', 'PR', 'nmalt1')
+
+
+# Stats on pref 1- photometry
+
+ppp_licksANOVA(df_photo,
+               ['cas1_licks_peak', 'malt1_licks_peak'],
+               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref1_forc_licks.csv')
+
+ppp_ttest_paired(df_photo, 'NR', 'cas1_licks_peak', 'malt1_licks_peak')
+ppp_ttest_paired(df_photo, 'PR', 'cas1_licks_peak', 'malt1_licks_peak')
+
+ppp_ttest_unpaired(df_photo, 'NR', 'PR', 'cas1_licks_peak')
+ppp_ttest_unpaired(df_photo, 'NR', 'PR', 'malt1_licks_peak')
 
 #ppp_licksANOVA(df_behav,
 #               ['forced2-cas', 'forced2-malt'],

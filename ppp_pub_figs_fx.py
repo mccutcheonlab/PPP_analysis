@@ -97,7 +97,7 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
              ylim=[-2,22],
              ax=ax[2])
     
-    ax[2].set_ylabel('Choices')
+    ax[2].set_ylabel('Choices (out of 20)')
     ax[2].set_yticks([0, 10, 20])
 
 
