@@ -10,6 +10,8 @@ import JM_general_functions as jmf
 import dill
 import pandas as pd
 
+from scipy import stats
+
 from subprocess import PIPE, run
 
 Rscriptpath = 'C:\\Program Files\\R\\R-3.5.1\\bin\\Rscript'
@@ -50,6 +52,19 @@ def ppp_licksANOVA(df, cols, csvfile):
     print(result.returncode, result.stderr, result.stdout)
     return result
 
+def ppp_ttest_paired(df, subset, key1, key2):
+    df = df.xs(subset, level=1)
+    result = stats.ttest_rel(df[key1], df[key2])
+    print(subset, result, '\n')
+    return result
+
+def ppp_ttest_unpaired(df, index1, index2, key):
+    df1 = df.xs(index1, level=1)
+    df2 = df.xs(index2, level=1)
+    result = stats.ttest_ind(df1[key], df2[key])
+    print(key, result, '\n')
+    return result
+    
 # Prepare data for stats on preference day FORCED licks
     
 ppp_licksANOVA(df_behav,
@@ -60,20 +75,37 @@ ppp_licksANOVA(df_behav,
                ['free1-cas', 'free1-malt'],
                usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref1_free_licks.csv')
 
-ppp_licksANOVA(df_behav,
-               ['forced2-cas', 'forced2-malt'],
-               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref2_forc_licks.csv')
+
+ppp_ttest_paired(df_behav, 'NR', 'free1-cas', 'free1-malt')
+ppp_ttest_paired(df_behav, 'PR', 'free1-cas', 'free1-malt')
+
+ppp_ttest_unpaired(df_behav, 'NR', 'PR', 'free1-cas')
+ppp_ttest_unpaired(df_behav, 'NR', 'PR', 'free1-malt')
 
 ppp_licksANOVA(df_behav,
-               ['free2-cas', 'free2-malt'],
-               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref2_free_licks.csv')
+               ['ncas1', 'nmalt1'],
+               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref1_choice.csv')
 
-ppp_licksANOVA(df_behav,
-               ['forced3-cas', 'forced3-malt'],
-               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref3_forc_licks.csv')
+ppp_ttest_paired(df_behav, 'NR', 'ncas1', 'nmalt1')
+ppp_ttest_paired(df_behav, 'PR', 'ncas1', 'nmalt1')
 
-ppp_licksANOVA(df_behav,
-               ['free3-cas', 'free3-malt'],
-               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref3_free_licks.csv')
+ppp_ttest_unpaired(df_behav, 'NR', 'PR', 'ncas1')
+ppp_ttest_unpaired(df_behav, 'NR', 'PR', 'nmalt1')
+
+#ppp_licksANOVA(df_behav,
+#               ['forced2-cas', 'forced2-malt'],
+#               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref2_forc_licks.csv')
+#
+#ppp_licksANOVA(df_behav,
+#               ['free2-cas', 'free2-malt'],
+#               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref2_free_licks.csv')
+#
+#ppp_licksANOVA(df_behav,
+#               ['forced3-cas', 'forced3-malt'],
+#               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref3_forc_licks.csv')
+#
+#ppp_licksANOVA(df_behav,
+#               ['free3-cas', 'free3-malt'],
+#               usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref3_free_licks.csv')
 
 
