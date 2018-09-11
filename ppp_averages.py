@@ -151,11 +151,45 @@ for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
     df_photo[m_licks_peak] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[delta_licks_peak] = df_photo[c_licks_peak] - df_photo[m_licks_peak]
 
+
+
+# Assembles dataframe for reptraces
+
+    
+groups = ['NR-cas', 'NR-malt', 'PR-cas', 'PR-malt']
+rats = ['PPP1-7', 'PPP1-7', 'PPP1-4', 'PPP1-4']
+traces = [16, 19, 6, 4]
+s = 's10'
+event = 'snips_licks_forced'
+keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+
+df_reptraces = pd.DataFrame(groups, columns=['group'])
+df_reptraces.set_index(['group'], inplace=True)
+
+df_reptraces['pref1-photo-blue'] = ""
+df_reptraces['pref1-photo-uv'] = ""
+df_reptraces['pref1-licks'] = ""
+
+for group, rat, trace in zip(groups, rats, traces):
+    
+    x = pref_sessions[rat + '_' + s]
+    
+    if 'cas' in group:
+        trial = x.cas[event]    
+        run = x.cas['lickdata']['rStart'][trace]
+        all_licks = x.cas['licks']
+    elif 'malt' in group:
+        trial = x.malt[event]    
+        run = x.malt['lickdata']['rStart'][trace]
+        all_licks = x.malt['licks']
+    
+    df_reptraces.at[group, 'pref1-licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
+    df_reptraces.at[group, 'pref1-photo-blue'] = trial['blue'][trace]
+    df_reptraces.at[group, 'pref1-photo-uv'] = trial['uv'][trace]
+
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
-dill.dump([df_behav, df_photo], pickle_out)
+dill.dump([df_behav, df_photo, df_reptraces], pickle_out)
 pickle_out.close()
-
-
 
 ##
 ### TO DO!!!

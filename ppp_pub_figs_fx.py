@@ -101,6 +101,177 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
     ax[2].set_yticks([0, 10, 20])
 
 
+def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
+    x = rats[rat].sessions[s]
+    data_cas = removenoise(x.cas['snips_licks_forced'])
+    data_malt = removenoise(x.malt['snips_licks_forced'])
+
+    inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
+                                             width_ratios=[12,1],
+                                             wspace=0.05)
+    ax1 = f.add_subplot(inner[0,0])
+    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein')
+    mesh.set_clim(clims)
+    
+    ax2 = f.add_subplot(inner[1,0], sharex=ax1)
+    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt')
+    mesh.set_clim(clims)
+   
+    cbar_ax = f.add_subplot(inner[:,1])   
+    cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
+    cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
+                   '0% \u0394F',
+                   '{0:.0f}%'.format(clims[1]*100)]
+    cbar.ax.set_yticklabels(cbar_labels)
+
+def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=False):
+    
+    inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
+                                             wspace=0.05, hspace=0.00,
+                                             height_ratios=[1,8])    
+    ax1 = f.add_subplot(inner[1,0])
+    repFig(ax1, casdata, sub='cas', color=color)
+    ax2 = f.add_subplot(inner[1,1], sharey=ax1)
+    repFig(ax2, maltdata, sub='malt', color=color, yscale=False, legend=True)
+
+    ax3 = f.add_subplot(inner[0,0], sharex=ax1)
+    lickplot(ax3, casdata, sub='cas')
+    ax4 = f.add_subplot(inner[0,1], sharey=ax3, sharex=ax2)
+    lickplot(ax4, maltdata, sub='malt', ylabel=False)
+    
+    if title == True:
+        ax3.set_title('Casein')
+        ax4.set_title('Maltodextrin')
+
+def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):        
+    # Removes axes and spines
+    jmfig.invisible_axes(ax)
+
+    x = rats[data[0]].sessions[s]
+    n = data[1]
+    
+    if sub == 'cas':
+        trial = x.cas[event]    
+        run = x.cas['lickdata']['rStart'][n]
+        all_licks = x.cas['licks']
+    else:
+        trial = x.malt[event]    
+        run = x.malt['lickdata']['rStart'][n]
+        all_licks = x.malt['licks']
+ 
+    licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
+    licks_x = [(x+10)*10 for x in licks]
+    if style == 'histo':
+        hist, bins = np.histogram(licks_x, bins=30, range=(0,300))
+        center = (bins[:-1] + bins[1:]) / 2
+        width = 1 * (bins[1] - bins[0])   
+        ax.bar(center, hist, align='center', width=width, color='xkcd:silver')
+    
+    if style == 'raster':
+        yvals = [1]*len(licks)
+        ax.plot(licks_x,yvals,linestyle='None',marker='|',markersize=5, color='xkcd:silver')
+        
+    else:
+        print('Not a valid style for plotting licks')
+
+    if ylabel == True:
+        ax.annotate('Licks', xy=(95,1), va='center', ha='right')
+
+def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
+    x = rats[data[0]].sessions[s]
+    n = data[1]
+    
+    if sub == 'cas':
+        trial = x.cas[event]    
+        run = x.cas['lickdata']['rStart'][n]
+        all_licks = x.cas['licks']
+    else:
+        trial = x.malt[event]    
+        run = x.malt['lickdata']['rStart'][n]
+        all_licks = x.malt['licks']
+ 
+    licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
+    singletrialFig(ax, trial['blue'][n], trial['uv'][n],
+                   licks=licks, color=color, plot_licks=False)
+    
+    if yscale == True:
+        l = 0.05
+        y1 = [y for y in ax.get_yticks() if y>0][0]
+        y2 = y1 + l        
+        scale_label = '{0:.0f}% \u0394F'.format(l*100)
+        ax.plot([50,50], [y1, y2], c=almost_black)
+        ax.text(45, y1 + (l/2), scale_label, va='center', ha='right')
+
+    if legend == True:
+        ax.annotate('470 nm', xy=(310,trial['blue'][n][299]), color=color, va='center')
+        ax.annotate('405 nm', xy=(310,trial['uv'][n][299]), color=color, alpha=0.3, va='center')
+    
+    return ax
+
+def mainphotoFig(reptrials, dietswitch=False):
+    
+    """ Important! reptrials has to be in the following order:
+        NR-casein; NR-maltodextrin; PR-casein; PR-maltodextrin
+    """
+    gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3)
+    f = plt.figure(figsize=(7.2,5))
+    
+    rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+    rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+    
+    if dietswitch == True:
+        rowcolors.reverse()
+        rowcolors_bar.reverse()
+
+    # Non-restricted figures, row 0
+    reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
+#    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
+#    # average traces NR cas v malt
+#    ax3 = f.add_subplot(gs[0,3])
+#    averagetrace(ax3, 'NR', keys_traces, color=rowcolors[0])
+#
+#    ax7 = f.add_subplot(gs[0,4]) 
+#    peakbargraph(ax7, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
+#   
+#    # Protein-restricted figures, row 1
+#    reptracesFig(f, gs, 1, 0, rep_pr_cas, rep_pr_malt, color=rowcolors[1][0])    
+#    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
+#    # average traces NR cas v malt
+#    ax6 = f.add_subplot(gs[1,3])
+#    averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
+#
+#    ax8 = f.add_subplot(gs[1,4])
+#    peakbargraph(ax8, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+     
+    return f
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def freechoicegraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
 
     df = df.xs(diet, level=1)
