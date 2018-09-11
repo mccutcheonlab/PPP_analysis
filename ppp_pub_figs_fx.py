@@ -38,13 +38,18 @@ def inch(mm):
     result = mm*0.0393701
     return result
 
-def forcedandfreelicks(ax, df, prefsession=1, dietswitch=False):
+def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
 
     forced_cas_key = 'forced' + str(prefsession) + '-cas'
     forced_malt_key = 'forced' + str(prefsession) + '-malt'
     free_cas_key = 'free' + str(prefsession) + '-cas'
     free_malt_key = 'free' + str(prefsession) + '-malt'
+    choice_cas_key = 'ncas' + str(prefsession)
+    choice_malt_key = 'nmalt' + str(prefsession)
     
+    scattersize = 50
+    
+#panel 1 - forced choice licks    
     x = [[df.xs('NR', level=1)[forced_cas_key], df.xs('NR', level=1)[forced_malt_key]],
          [df.xs('PR', level=1)[forced_cas_key], df.xs('PR', level=1)[forced_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
@@ -54,12 +59,14 @@ def forcedandfreelicks(ax, df, prefsession=1, dietswitch=False):
                  scatterlinecolor = 'xkcd:charcoal',
                  grouplabel=['NR', 'PR'],
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-                 grouplabeloffset=0.1,
-                 barlabeloffset=0.025,
-                 scattersize = 80,
+                 scattersize = scattersize,
+                 ylim=[-50,1050],
                  ax=ax[0])
 
-# Fig for free choice licks
+    ax[0].set_ylabel('Licks')
+    ax[0].set_yticks([0, 500, 1000])
+    
+#panel 2 - free choice licks
     x = [[df.xs('NR', level=1)[free_cas_key], df.xs('NR', level=1)[free_malt_key]],
          [df.xs('PR', level=1)[free_cas_key], df.xs('PR', level=1)[free_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
@@ -69,16 +76,84 @@ def forcedandfreelicks(ax, df, prefsession=1, dietswitch=False):
                  scatterlinecolor = 'xkcd:charcoal',
                  grouplabel=['NR', 'PR'],
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-                 grouplabeloffset=0.1,
-                 barlabeloffset=0.025,
-                 scattersize = 80,
+                 scattersize = scattersize,
+                 ylim=[-50, 800],
                  ax=ax[1])
 
-    ax[0].set_ylabel('Licks')
-    ax[0].set_ylim([-50, 1050])
-    ax[0].set_yticks([0, 500, 1000])
-    ax[0].set_xticks([])
+    ax[1].set_ylabel('Licks')
+    ax[1].set_yticks([0, 250, 500, 750])
 
+#panel 3 - free choice, choices   
+    x = [[df.xs('NR', level=1)[choice_cas_key], df.xs('NR', level=1)[choice_malt_key]],
+         [df.xs('PR', level=1)[choice_cas_key], df.xs('PR', level=1)[choice_malt_key]]]
+    jmfig.barscatter(x, paired=True, unequal=True,
+             barfacecoloroption = 'individual',
+             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+             scatteredgecolor = ['xkcd:charcoal'],
+             scatterlinecolor = 'xkcd:charcoal',
+             grouplabel=['NR', 'PR'],
+             barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+             scattersize = scattersize,
+             ylim=[-2,22],
+             ax=ax[2])
+    
+    ax[2].set_ylabel('Choices')
+    ax[2].set_yticks([0, 10, 20])
+
+
+def freechoicegraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+
+    df = df.xs(diet, level=1)
+    a = [df[keys[0]], df[keys[1]]]
+    
+    jmfig.barscatter(a, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=['Cas', 'Malt'],
+                 scattersize = 80,
+                 ax=ax)
+
+    ax.set_ylabel('Free choices')
+    ax.set_ylim([-2, 22])
+#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+
+def mainPhotoFig(df_choice, df_photo, keys_choicebars, keys_traces, keys_photobars, dietswitch=False):
+    
+    gs = gridspec.GridSpec(2, 3, width_ratios=[1,4,1], wspace=0.5)
+    f = plt.figure(figsize=(7,4))
+    f.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, left=0.1)
+    
+    rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+    rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+    
+    if dietswitch == True:
+        rowcolors.reverse()
+        rowcolors_bar.reverse()
+
+# Non-restricted figures, row 0
+    ax1 = f.add_subplot(gs[0,0])
+    freechoicegraph(ax1, df_choice, 'NR', keys_choicebars, bar_colors=rowcolors_bar[0], sc_color='w')
+    
+    # average traces NR cas v malt
+    averagetracesx2(f, gs, 0, 1, df_photo, keys_traces, 'NR', color=rowcolors[0], title=True)
+
+    ax3 = f.add_subplot(gs[0,2]) 
+    peakbargraph(ax3, df_photo, 'NR', keys_photobars, bar_colors=rowcolors_bar[0], sc_color='w')
+    
+# Protein-restricted figures, row 1
+    ax4 = f.add_subplot(gs[1,0])
+    freechoicegraph(ax4, df_choice, 'PR', keys_choicebars, bar_colors=rowcolors_bar[1], sc_color='w')
+    
+    # average traces NR cas v malt
+    averagetracesx2(f, gs, 1, 1, df_photo, keys_traces, 'PR', color=rowcolors[1])
+
+    ax6 = f.add_subplot(gs[1,2]) 
+    peakbargraph(ax6, df_photo, 'PR', keys_photobars, bar_colors=rowcolors_bar[1], sc_color='w')
+
+    return f
 
 def choicefig(df, keys, ax):
     
@@ -105,24 +180,7 @@ def choicefig(df, keys, ax):
     for x,label in enumerate(xlabels):
         ax.text(x+1, yval, label, ha='center')
     
-def freechoicegraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
 
-    df = df.xs(diet, level=1)
-    a = [df[keys[0]], df[keys[1]]]
-    
-    jmfig.barscatter(a, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = bar_colors,
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 scatterfacecolor = [sc_color],
-                 grouplabel=['Cas', 'Malt'],
-                 scattersize = 80,
-                 ax=ax)
-
-    ax.set_ylabel('Free choices')
-    ax.set_ylim([-2, 22])
-#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
 def averagetracesx2(f, gs, gsx, gsy, df, keys, diet,
                     color=[almost_black, 'xkcd:bluish grey'],
@@ -397,40 +455,7 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
 
 
 
-def mainPhotoFig(df_choice, df_photo, keys_choicebars, keys_traces, keys_photobars, dietswitch=False):
-    
-    gs = gridspec.GridSpec(2, 3, width_ratios=[1,4,1], wspace=0.5)
-    f = plt.figure(figsize=(7,4))
-    f.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, left=0.1)
-    
-    rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
-    rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
-    
-    if dietswitch == True:
-        rowcolors.reverse()
-        rowcolors_bar.reverse()
 
-# Non-restricted figures, row 0
-    ax1 = f.add_subplot(gs[0,0])
-    freechoicegraph(ax1, df_choice, 'NR', keys_choicebars, bar_colors=rowcolors_bar[0], sc_color='w')
-    
-    # average traces NR cas v malt
-    averagetracesx2(f, gs, 0, 1, df_photo, keys_traces, 'NR', color=rowcolors[0], title=True)
-
-    ax3 = f.add_subplot(gs[0,2]) 
-    peakbargraph(ax3, df_photo, 'NR', keys_photobars, bar_colors=rowcolors_bar[0], sc_color='w')
-    
-# Protein-restricted figures, row 1
-    ax4 = f.add_subplot(gs[1,0])
-    freechoicegraph(ax4, df_choice, 'PR', keys_choicebars, bar_colors=rowcolors_bar[1], sc_color='w')
-    
-    # average traces NR cas v malt
-    averagetracesx2(f, gs, 1, 1, df_photo, keys_traces, 'PR', color=rowcolors[1])
-
-    ax6 = f.add_subplot(gs[1,2]) 
-    peakbargraph(ax6, df_photo, 'PR', keys_photobars, bar_colors=rowcolors_bar[1], sc_color='w')
-
-    return f
 
 # To make summary figure
 

@@ -84,12 +84,12 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-fflicks_pref1_fig, ax = plt.subplots(figsize=(5, 2), ncols=2, sharey=True, sharex=False)
-fflicks_pref1_fig.subplots_adjust(left=0.25, bottom=0.2)
-pppfig.forcedandfreelicks(ax, df_behav, prefsession=1)
-#fflicks_pref1_fig.savefig(savefolder + 'forcedandfree.eps')
+fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
+fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=1)
+fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
 
-summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
+#summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
 
 # Fig for Preference Test 1
@@ -97,7 +97,7 @@ keys_choicebars = ['ncas1', 'nmalt1']
 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 keys_photobars = ['cas1_licks_peak', 'malt1_licks_peak']
 
-pref1_photofig = pppfig.mainPhotoFig(df_behav, df_photo, keys_choicebars, keys_traces, keys_photobars)
+#pref1_photofig = pppfig.mainPhotoFig(df_behav, df_photo, keys_choicebars, keys_traces, keys_photobars)
 ##pref1_photofig.savefig(savepath + 'pref1_photofig.eps')
 #
 ## Fig for Preference Test 2
