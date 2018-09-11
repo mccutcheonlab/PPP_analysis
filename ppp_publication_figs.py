@@ -90,8 +90,6 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
 
 
-
-
 clim_nr = [-0.15,0.20]
 clim_pr = [-0.11,0.17]
 

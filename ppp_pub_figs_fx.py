@@ -124,24 +124,7 @@ def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
                    '{0:.0f}%'.format(clims[1]*100)]
     cbar.ax.set_yticklabels(cbar_labels)
 
-def reptracesFig(f, gs, gsx, gsy, casdata, maltdata, color=almost_black, title=False):
-    
-    inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
-                                             wspace=0.05, hspace=0.00,
-                                             height_ratios=[1,8])    
-    ax1 = f.add_subplot(inner[1,0])
-    repFig(ax1, casdata, sub='cas', color=color)
-    ax2 = f.add_subplot(inner[1,1], sharey=ax1)
-    repFig(ax2, maltdata, sub='malt', color=color, yscale=False, legend=True)
 
-    ax3 = f.add_subplot(inner[0,0], sharex=ax1)
-    lickplot(ax3, casdata, sub='cas')
-    ax4 = f.add_subplot(inner[0,1], sharey=ax3, sharex=ax2)
-    lickplot(ax4, maltdata, sub='malt', ylabel=False)
-    
-    if title == True:
-        ax3.set_title('Casein')
-        ax4.set_title('Maltodextrin')
 
 def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):        
     # Removes axes and spines
@@ -178,19 +161,7 @@ def lickplot(ax, data, sub='malt', ylabel=True, style='raster'):
         ax.annotate('Licks', xy=(95,1), va='center', ha='right')
 
 def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
-    x = rats[data[0]].sessions[s]
-    n = data[1]
-    
-    if sub == 'cas':
-        trial = x.cas[event]    
-        run = x.cas['lickdata']['rStart'][n]
-        all_licks = x.cas['licks']
-    else:
-        trial = x.malt[event]    
-        run = x.malt['lickdata']['rStart'][n]
-        all_licks = x.malt['licks']
- 
-    licks = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
+
     singletrialFig(ax, trial['blue'][n], trial['uv'][n],
                    licks=licks, color=color, plot_licks=False)
     
@@ -208,11 +179,28 @@ def repFig(ax, data, sub, color=almost_black, yscale=True, legend=False):
     
     return ax
 
-def mainphotoFig(reptrials, dietswitch=False):
+def reptracesFig(f, df, index, gs, gsx, gsy, title=False, color=almost_black):
+    print('reptracesfig')
+#    inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
+#                                             wspace=0.05, hspace=0.00,
+#                                             height_ratios=[1,8])    
+#    ax1 = f.add_subplot(inner[1,0])
+#    repFig(ax1, df.loc[index[0]], sub='cas', color=color)
+#    ax2 = f.add_subplot(inner[1,1], sharey=ax1)
+#    repFig(ax2, df.loc[index[0]], sub='malt', color=color, yscale=False, legend=True)
+
+#    ax3 = f.add_subplot(inner[0,0], sharex=ax1)
+#    lickplot(ax3, casdata, sub='cas')
+#    ax4 = f.add_subplot(inner[0,1], sharey=ax3, sharex=ax2)
+#    lickplot(ax4, maltdata, sub='malt', ylabel=False)
+#    
+#    if title == True:
+#        ax3.set_title('Casein')
+#        ax4.set_title('Maltodextrin')
+
+def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
     
-    """ Important! reptrials has to be in the following order:
-        NR-casein; NR-maltodextrin; PR-casein; PR-maltodextrin
-    """
+
     gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3)
     f = plt.figure(figsize=(7.2,5))
     
@@ -224,7 +212,7 @@ def mainphotoFig(reptrials, dietswitch=False):
         rowcolors_bar.reverse()
 
     # Non-restricted figures, row 0
-    reptracesFig(f, gs, 0, 0, rep_nr_cas, rep_nr_malt, title=True, color=rowcolors[0][0])
+    reptracesFig(f, df_reptraces, ['NR-cas', 'NR-malt'], gs, 0, 0, title=True, color=rowcolors[0][0])
 #    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
 #    # average traces NR cas v malt
 #    ax3 = f.add_subplot(gs[0,3])
