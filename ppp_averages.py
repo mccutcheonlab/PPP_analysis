@@ -60,6 +60,11 @@ def makemeansnips(snips, noiseindex):
         
     return meansnip
 
+def removenoise(snipdata):
+    # returns blue snips with noisey ones removed
+    new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
+    return new_snips
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(sessions)
@@ -187,8 +192,22 @@ for group, rat, trace in zip(groups, rats, traces):
     df_reptraces.at[group, 'pref1-photo-blue'] = trial['blue'][trace]
     df_reptraces.at[group, 'pref1-photo-uv'] = trial['uv'][trace]
 
+rats = np.unique(rats)
+df_heatmap = pd.DataFrame(rats, columns=['rat'])
+df_heatmap.set_index(['rat'], inplace=True)
+
+df_heatmap['pref1-cas'] = ""
+df_heatmap['pref1-malt'] = ""
+
+for rat in rats:
+    x = pref_sessions[rat + '_' + s]
+    
+    df_heatmap.at[rat, 'pref1-cas'] = removenoise(x.cas[event])
+    df_heatmap.at[rat, 'pref1-malt'] = removenoise(x.malt[event])
+
+
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
-dill.dump([df_behav, df_photo, df_reptraces], pickle_out)
+dill.dump([df_behav, df_photo, df_reptraces, df_heatmap], pickle_out)
 pickle_out.close()
 
 ##
