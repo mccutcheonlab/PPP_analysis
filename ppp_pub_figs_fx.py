@@ -174,7 +174,7 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
     ax1 = f.add_subplot(inner[1,0])
     repFig(ax1, df.loc[index[0]], session, color=color, xscale=False)
     ax2 = f.add_subplot(inner[1,1], sharey=ax1)
-    repFig(ax2, df.loc[index[0]], session, color=color, yscale=False, legend=True)
+    repFig(ax2, df.loc[index[1]], session, color=color, yscale=False, legend=True)
 
     ax3 = f.add_subplot(inner[0,0], sharex=ax1)
     lickplot(ax3, df.loc[index[0]][session+'-licks'])
@@ -185,9 +185,7 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
         ax3.set_title('Casein')
         ax4.set_title('Maltodextrin')
 
-
-
-def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
+def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
     x = rats[rat].sessions[s]
     data_cas = removenoise(x.cas['snips_licks_forced'])
     data_malt = removenoise(x.malt['snips_licks_forced'])
@@ -210,12 +208,59 @@ def heatmapFig(f, gs, gsx, gsy, session, rat, clims=[0,1]):
                    '{0:.0f}%'.format(clims[1]*100)]
     cbar.ax.set_yticklabels(cbar_labels)
 
+def averagetrace(ax, df, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
+                 errorcolors=['xkcd:silver', 'xkcd:silver']):
+    df = df.xs(diet, level=1)
+
+    jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
+    jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
+    
+    ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
+    ax.axis('off')
+    
+    arrow_y = ax.get_ylim()[1]
+    ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
+    ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+                ha='center', va='bottom')
+
+    y = [y for y in ax.get_yticks() if y>0][:2]
+    l = y[1] - y[0]
+    scale_label = '{0:.0f}% \u0394F'.format(l*100)
+    ax.plot([50,50], [y[0], y[1]], c=almost_black)
+    ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
+   
+    y = ax.get_ylim()[0]
+    ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
+    ax.annotate('5 s', xy=(276,y), xycoords='data',
+                xytext=(0,-5), textcoords='offset points',
+                ha='center',va='top')
+
+def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+    df = df.xs(diet, level=1)
+    a = [df[keys[0]], df[keys[1]]]
+    x = jmf.data2obj1D(a)
+    
+    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=['Cas', 'Malt'],
+                 scattersize = 50,
+                 ax=ax)
+
+    ax.set_ylabel('\u0394F')
+#    ax.set_ylim([-0.04, 0.14])
+    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
 
 def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
     
-
-    gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3)
+    keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
+    keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
+    
+    gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3, hspace=0.6)
     f = plt.figure(figsize=(7.2,5))
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
@@ -227,23 +272,23 @@ def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
 
     # Non-restricted figures, row 0
     reptracesFig(f, df_reptraces, ['NR-cas', 'NR-malt'], 'pref1', gs, 0, 0, title=True, color=rowcolors[0][0])
-#    heatmapFig(f, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
+#    heatmapFig(f, df_heatmap, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
 #    # average traces NR cas v malt
-#    ax3 = f.add_subplot(gs[0,3])
-#    averagetrace(ax3, 'NR', keys_traces, color=rowcolors[0])
-#
-#    ax7 = f.add_subplot(gs[0,4]) 
-#    peakbargraph(ax7, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
+    ax3 = f.add_subplot(gs[0,3])
+    averagetrace(ax3, df_photo, 'NR', keys_traces, color=rowcolors[0])
+
+    ax7 = f.add_subplot(gs[0,4]) 
+    peakbargraph(ax7, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
 #   
 #    # Protein-restricted figures, row 1
     reptracesFig(f, df_reptraces, ['PR-cas', 'PR-malt'], 'pref1', gs, 1, 0, color=rowcolors[1][0])    
 #    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
 #    # average traces NR cas v malt
-#    ax6 = f.add_subplot(gs[1,3])
-#    averagetrace(ax6, 'PR', keys_traces, color=rowcolors[1])
-#
-#    ax8 = f.add_subplot(gs[1,4])
-#    peakbargraph(ax8, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+    ax6 = f.add_subplot(gs[1,3])
+    averagetrace(ax6, df_photo, 'PR', ['cas1_licks_forced', 'malt1_licks_forced'], color=rowcolors[1])
+
+    ax8 = f.add_subplot(gs[1,4])
+    peakbargraph(ax8, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
      
     return f
 
@@ -260,197 +305,6 @@ def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
 
 
 
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#def freechoicegraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
-#
-#    df = df.xs(diet, level=1)
-#    a = [df[keys[0]], df[keys[1]]]
-#    
-#    jmfig.barscatter(a, paired=True,
-#                 barfacecoloroption = 'individual',
-#                 barfacecolor = bar_colors,
-#                 scatteredgecolor = [almost_black],
-#                 scatterlinecolor = almost_black,
-#                 scatterfacecolor = [sc_color],
-#                 grouplabel=['Cas', 'Malt'],
-#                 scattersize = 80,
-#                 ax=ax)
-#
-#    ax.set_ylabel('Free choices')
-#    ax.set_ylim([-2, 22])
-##    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
-#
-
-
-#def averagetracesx2(f, gs, gsx, gsy, df, keys, diet,
-#                    color=[almost_black, 'xkcd:bluish grey'],
-#                    errorcolor=['xkcd:silver', 'xkcd:silver'],
-#                    title=False):
-#    
-##    fig.subplots_adjust(wspace=0.01, hspace=0.2, top=0.95)
-#    df = df.xs(diet, level=1)
-#    inner = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[gsx,gsy],
-#                                             wspace=0.15)
-#    
-#    ax1 = f.add_subplot(inner[0])
-#    jmfig.shadedError(ax1, df[keys[0]], linecolor=color[0], errorcolor=errorcolor[0])
-#    
-#    ax2 = f.add_subplot(inner[1], sharey=ax1)
-#    jmfig.shadedError(ax2, df[keys[1]], linecolor=color[1], errorcolor=errorcolor[1])
-#
-##    
-#    if title == True:
-#        for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
-#            ax.title.set_position([0.5, 1.2])
-#            ax.set_title(title)
-##    cas_line = mlines.Line2D([], [], color=color[0], label='Casein')
-##    malt_line = mlines.Line2D([], [], color=color[1], label='Maltodextrin')  
-##    ax2.legend(handles=[cas_line, malt_line], fancybox=True)
-#
-#    for ax in [ax1, ax2]:
-#        ax.axis('off')
-#        
-#        arrow_y = ax.get_ylim()[1]
-#        ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
-#        ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
-#                    ha='center', va='bottom')
-#    
-#    for ax in [ax1]:
-#        y = [y for y in ax.get_yticks() if y>0][:2]
-#        l = y[1] - y[0]
-#        scale_label = '{0:.0f}% \u0394F'.format(l*100)
-#        ax.plot([10,10], [y[0], y[1]], c=almost_black)
-#        ax.text(0, y[0]+(l/2), scale_label, va='center', ha='right')
-#        
-#    for ax in [ax2]:
-#        y = ax.get_ylim()[0]
-#        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
-#        ax.annotate('5 s', xy=(276,y), xycoords='data',
-#                    xytext=(0,-5), textcoords='offset points',
-#                    ha='center',va='top')
-#
-#def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
-#    df = df.xs(diet, level=1)
-#    a = [df[keys[0]], df[keys[1]]]
-#    x = jmf.data2obj1D(a)
-#    
-#    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-#                 barfacecoloroption = 'individual',
-#                 barfacecolor = bar_colors,
-#                 scatteredgecolor = [almost_black],
-#                 scatterlinecolor = almost_black,
-#                 scatterfacecolor = [sc_color],
-#                 grouplabel=['Cas', 'Malt'],
-#                 scattersize = 80,
-#                 ax=ax)
-#
-#    ax.set_ylabel('\u0394F')
-##    ax.set_ylim([-0.04, 0.14])
-#    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
-#
-#
-#
-#def averagetrace(ax, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
-#                 errorcolors=['xkcd:silver', 'xkcd:silver']):
-#    dietmsk = df4.diet == diet
-##    keys = ['cas1_licks_forced', 'malt1_licks_forced']
-#    shadedError(ax, df4[keys[0]][dietmsk], linecolor=color[0], errorcolor=errorcolors[0])
-#    ax = shadedError(ax, df4[keys[1]][dietmsk], linecolor=color[1], errorcolor=errorcolors[1])
-#    
-#    ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
-#    ax.axis('off')
-#    
-#    arrow_y = ax.get_ylim()[1]
-#    ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
-#    ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
-#                ha='center', va='bottom')
-#
-#    y = [y for y in ax.get_yticks() if y>0][:2]
-#    l = y[1] - y[0]
-#    scale_label = '{0:.0f}% \u0394F'.format(l*100)
-#    ax.plot([50,50], [y[0], y[1]], c=almost_black)
-#    ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
-#   
-#    y = ax.get_ylim()[0]
-#    ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
-#    ax.annotate('5 s', xy=(276,y), xycoords='data',
-#                xytext=(0,-5), textcoords='offset points',
-#                ha='center',va='top')
-#
-#def averagetracesx4(fig, keys, color=[almost_black, 'xkcd:bluish grey'],
-#                 errorcolor=['xkcd:silver', 'xkcd:silver']):
-#    
-#    fig.subplots_adjust(wspace=0.01, hspace=0.2, top=0.95)
-#    dietmsk = df4.diet == 'NR'
-#    
-#    ax1 = fig.add_subplot(221)
-#    shadedError(ax1, df4[keys[0]][dietmsk], linecolor=color[0][0], errorcolor=errorcolors[0][0])
-#    
-#    ax2 = fig.add_subplot(222, sharey=ax1)
-#    shadedError(ax2, df4[keys[1]][dietmsk], linecolor=color[0][1], errorcolor=errorcolors[0][1])
-#
-#    dietmsk = df4.diet == 'PR'
-#    
-#    ax3 = fig.add_subplot(223)
-#    shadedError(ax3, df4[keys[0]][dietmsk], linecolor=color[1][0], errorcolor=errorcolors[1][0])
-#    
-#    ax4 = fig.add_subplot(224, sharey=ax3)
-#    shadedError(ax4, df4[keys[1]][dietmsk], linecolor=color[1][1], errorcolor=errorcolors[1][1])
-#
-#    NRcas_line = mlines.Line2D([], [], color=color[0][0], label='Casein')
-#    NRmalt_line = mlines.Line2D([], [], color=color[0][1], label='Maltodextrin')
-#    
-#    PRcas_line = mlines.Line2D([], [], color=color[1][0], label='Casein')
-#    PRmalt_line = mlines.Line2D([], [], color=color[1][1], label='Maltodextrin')
-#    
-#    for ax, title in zip([ax1, ax2], ['Casein', 'Maltodextrin']):
-#        ax.title.set_position([0.5, 1.1])
-#        ax.set_title(title)
-#    
-#    for ax, lines in zip([ax2, ax4], [[NRcas_line, NRmalt_line], [PRcas_line, PRmalt_line]]):
-#        ax.legend(handles=lines, fancybox=True)
-#        
-#    for ax in [ax1, ax2, ax3, ax4]:
-#        print(ax.legend())
-#     
-#    for ax in [ax1, ax2, ax3, ax4]:
-#        ax.axis('off')
-#        
-#        arrow_y = ax.get_ylim()[1]
-#        ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
-#        ax.annotate('First lick', xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
-#                    ha='center', va='bottom')
-#    
-#    for ax in [ax1, ax3]:
-#        y = [y for y in ax.get_yticks() if y>0][:2]
-#        l = y[1] - y[0]
-#        scale_label = '{0:.0f}% \u0394F'.format(l*100)
-#        ax.plot([50,50], [y[0], y[1]], c=almost_black)
-#        ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
-#        
-#    for ax in [ax2, ax4]:
-#        y = ax.get_ylim()[0]
-#        ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
-#        ax.annotate('5 s', xy=(276,y), xycoords='data',
-#                    xytext=(0,-5), textcoords='offset points',
-#                    ha='center',va='top')
-#        
-#  
-#
-#
 #
 #
 #
@@ -525,40 +379,6 @@ def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
 #
 #
 #
-#
-#def doublesnipFig(ax1, ax2, df, diet, factor1, factor2):
-#    dietmsk = df.diet == diet    
-#    ax1.axis('off')
-#    ax2.axis('off')
-#
-#    shadedError(ax1, df[factor1][dietmsk], linecolor='black')
-#    shadedError(ax1, df[factor2][dietmsk], linecolor='xkcd:bluish grey')
-#    ax1.plot([50,50], [0.02, 0.04], c='k')
-#    ax1.text(45, 0.03, '2% \u0394F', verticalalignment='center', horizontalalignment='right')
-#    
-#    shadedError(ax2, df[factor1][~dietmsk], linecolor='xkcd:kelly green')
-#    shadedError(ax2, df[factor2][~dietmsk], linecolor='xkcd:light green')
-#    ax2.plot([250,300], [-0.03, -0.03], c='k')
-#    ax2.text(275, -0.035, '5 s', verticalalignment='top', horizontalalignment='center')
-#
-#    
-#def onedaypreffig(df, key, ax):
-#    dietmsk = df.diet == 'NR'
-#    a = jmf.data2obj1D([df[key][dietmsk], df[key][~dietmsk]])
-#
-#        
-#    jmfig.barscatter(a, barfacecoloroption = 'between', barfacecolor = ['xkcd:silver', 'xkcd:kelly green'],
-#                         scatteredgecolor = ['black'],
-#                         scatterfacecolor = ['none'],
-#                         scatterlinecolor = 'black',
-#                         grouplabel=['NR', 'PR'],
-#                         barwidth = 0.8,
-#                         scattersize = 80,
-#                         ylabel = 'Casein preference',
-#                         ax=ax)
-#    ax.set_yticks([0, 0.5, 1.0])
-#    ax.set_xlim([0.25,2.75])
-#    ax.set_ylim([0, 1.1])
 #
 #def peakresponsebargraph(df, keys, ax):
 #    dietmsk = df.diet == 'NR'
