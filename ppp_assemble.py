@@ -213,19 +213,27 @@ def metafile2sessions(xlfile, metafile, datafolder, outputfolder, sheetname='met
     
     return sessions   
 
-def assemble_sessions(sessions, rats,
+def assemble_sessions(sessions,
                       rats_to_include=[],
                       rats_to_exclude=[],
                       sessions_to_include=[],
                       outputfile=[],
                       savefile=False,
                       makefigs=False):
+    
+    rats = []
+    for session in sessions:
+        x = sessions[session]
+        if x.rat not in rats:
+            rats.append(x.rat)
 
     if len(rats_to_include) > 0:
         print('Overriding values in rats_to_exclude because of entry in rats_to_include.')
         rats_to_exclude = list(rats)
         for rat in rats_to_include:
             rats_to_exclude.remove(rat)
+    
+    sessions_to_remove = []
     
     for session in sessions:
           
@@ -292,10 +300,19 @@ def assemble_sessions(sessions, rats,
                 plt.close('all')
             except:
                 print('Nothing to close')
-
+        else:
+            sessions_to_remove.append(session)
+    
+    for session in sessions_to_remove:
+        sessions.pop(session)
+        
+    for rat in rats_to_exclude:
+        idx = rats.index(rat)
+        del rats[idx]
+    
     if savefile == True:
         pickle_out = open(outputfile, 'wb')
-        dill.dump([sessions], pickle_out)
+        dill.dump([sessions, rats], pickle_out)
         pickle_out.close()
         
     return sessions
