@@ -8,8 +8,11 @@ PPP1 session figs, for individual rats when assembling data
 """
 
 import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import JM_custom_figs as jmfig
+import numpy as np
 
-def makeBehavFigs(x):
+def makeBehavFigs(x, pdf_pages):
     # Initialize figure
     behavFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
     gs1 = gridspec.GridSpec(5, 2)
@@ -17,7 +20,7 @@ def makeBehavFigs(x):
     plt.suptitle('Rat ' + x.rat + ': Session ' + x.session)
     
     ax = plt.subplot(gs1[0, :])
-    x.sessionlicksFig(ax)
+    sessionlicksFig(x, ax)
 
     if x.left['exist'] == True:
         behavFigsCol(gs1, 0, x.left)
@@ -40,8 +43,25 @@ def behavFigsCol(gs1, col, side):
     ax = plt.subplot(gs1[3, col])
     jmfig.cuerasterFig(ax, side['sipper'], side['lickdata']['licks'])
     
+def sessionlicksFig(x, ax):
+    if x.left['exist'] == True:
+        licks = x.left['lickdata']['licks']
+        ax.hist(licks, range(0, 3600, 60), color=x.left['color'], alpha=0.4)          
+        yraster = [ax.get_ylim()[1]] * len(licks)
+        ax.scatter(licks, yraster, s=50, facecolors='none', edgecolors=x.left['color'])
+
+    if x.right['exist'] == True:
+        licks = x.right['lickdata']['licks']
+        ax.hist(licks, range(0, 3600, 60), color=x.right['color'], alpha=0.4)          
+        yraster = [ax.get_ylim()[1]] * len(licks)
+        ax.scatter(licks, yraster, s=50, facecolors='none', edgecolors=x.right['color'])           
     
-def makePhotoFigs(x):
+    ax.set_xticks(np.multiply([0, 10, 20, 30, 40, 50, 60],60))
+    ax.set_xticklabels(['0', '10', '20', '30', '40', '50', '60'])
+    ax.set_xlabel('Time (min)')
+    ax.set_ylabel('Licks per min')
+
+def makePhotoFigs(x, pdf_pages):
     # Initialize photometry figure
     photoFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
     gs1 = gridspec.GridSpec(6, 2)
