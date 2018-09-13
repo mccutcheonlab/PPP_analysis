@@ -286,19 +286,19 @@ def assemble_sessions(sessions, rats,
                     sessionfigs.makePhotoFigs(x, pdf_pages)
             except:
                 print('Could not extract data from ' + x.sessionID)
-
-                
+            
             try:
                 pdf_pages.close()
                 plt.close('all')
             except:
                 print('Nothing to close')
 
-    
     if savefile == True:
-        pickle_out = open(savefile)
+        pickle_out = open(outputfile, 'wb')
         dill.dump([sessions], pickle_out)
         pickle_out.close()
+        
+    return sessions
 
 
 
