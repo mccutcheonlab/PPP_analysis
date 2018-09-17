@@ -25,7 +25,7 @@ col['np_malt'] = 'white'
 col['lp_cas'] = 'xkcd:kelly green'
 col['lp_malt'] = 'xkcd:light green'
 
-# Extracts data from metafile
+# Extracts data from metafiles and sets up ppp_sessions dictionary
 
 picklefolder = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\'
 
@@ -46,22 +46,29 @@ ppp_sessions = {**ppp1_sessions, **ppp3_sessions}
 
 
 
-#ppp_sessions = assemble_sessions(ppp_sessions,
-#                  rats_to_include = [],
-#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
-#                  sessions_to_include = ['s3', 's4', 's5'],
-#                  outputfile=picklefolder + 'ppp_sacc.pickle',
-#                  savefile=True,
-#                  makefigs=False)
-
-
-assemble_sessions(ppp_sessions,
+sessions = assemble_sessions(ppp_sessions,
                   rats_to_include = [],
                   rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
-                  sessions_to_include = ['s6', 's7', 's8', 's9'],
-                  outputfile=picklefolder + 'ppp_cond1.pickle',
+                  sessions_to_include = ['s3', 's4', 's5'],
+                  outputfile=picklefolder + 'ppp_sacc.pickle',
                   savefile=True,
                   makefigs=False)
+
+#assemble_sessions(ppp_sessions,
+#                  rats_to_include = [],
+#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
+#                  sessions_to_include = ['s6', 's7', 's8', 's9'],
+#                  outputfile=picklefolder + 'ppp_cond1.pickle',
+#                  savefile=True,
+#                  makefigs=False)
+#
+#assemble_sessions(ppp_sessions,
+#                  rats_to_include = [],
+#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
+#                  sessions_to_include = ['s12', 's13', 's14', 's15'],
+#                  outputfile=picklefolder + 'ppp_cond2.pickle',
+#                  savefile=True,
+#                  makefigs=True)
 
 #assemble_sessions(ppp_sessions,
 #                  rats_to_include = [],
@@ -71,12 +78,11 @@ assemble_sessions(ppp_sessions,
 #                  savefile=False,
 #                  makefigs=False)
 
-
 # Code to run for single rat
-#sessions = assemble_sessions(ppp_sessions, rats,
-#                  rats_to_include = ['PPP1-7'],
+#sessions = assemble_sessions(ppp_sessions,
+#                  rats_to_include = ['PPP1-3'],
 #                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
-#                  sessions_to_include = ['s10', 's11', 's16'],
+#                  sessions_to_include = ['s3'],
 #                  outputfile=picklefolder + 'ppp_test.pickle',
 #                  savefile=True,
 #                  makefigs=False)
