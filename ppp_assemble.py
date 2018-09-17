@@ -26,6 +26,7 @@ class Session(object):
         self.rat = metafiledata[hrows['rat']].replace('.', '-')
         self.session = metafiledata[hrows['session']]
         self.diet = metafiledata[hrows['dietgroup']]
+        self.box = metafiledata[hrows['box']]
         self.bottleL = metafiledata[hrows['bottleL']]
         self.bottleR = metafiledata[hrows['bottleR']]
         
