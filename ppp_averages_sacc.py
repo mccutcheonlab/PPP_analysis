@@ -21,27 +21,19 @@ except NameError:
     except FileNotFoundError:
         print('Cannot access pickled file')
     sessions, rats = dill.load(pickle_in)
-
-#sacc_sessions = {}
-#for session in sessions:
-#    x = sessions[session]
-#    try:
-#        len(x.data)
-#        sacc_sessions[x.sessionID] = x
-#        
-#    except AttributeError:
-#        pass
-#
     
 def compile_lats(x):
     lats = {}
+    
+    for side in [x.left, x.right]:
+        if 'lats' not in side.keys():
+            side['lats'] = []   
     try:
         lats['all'] = x.left['lats'] + x.right['lats']
         lats['nans'] = len([n for n in lats['all'] if np.isnan(n)])
         lats['mean'] = np.nanmean(lats['all'])
     except KeyError:
         print('No latencies found for ', x.sessionID)
-        print(len(x.left['licks']))
     return lats
     
 sacc_sessions = {}
@@ -65,7 +57,7 @@ for session in sacc_sessions:
         
 for session in sacc_sessions:
     x = sacc_sessions[session]
-    x.latency = compile_lats(x)        
+    x.lats = compile_lats(x)        
 # this block will run any fx that are specific to certain sessions, e.g.
 #    x.choices = choicetest(x)
 #    x.pref = prefcalc(x)
@@ -74,8 +66,15 @@ for session in sacc_sessions:
 df_sacc_behav = pd.DataFrame([x for x in rats], columns=['rat'])
 df_sacc_behav['diet'] = [rats.get(x) for x in rats]
 df_sacc_behav.set_index(['rat', 'diet'], inplace=True)
-# latency
-    
-x = sessions['PPP1-3_s3']
 
-jmf.latencyCalc(x.left['lickdata']['licks'], x.left['sipper'], cueoff=x.left['sipper_off'], lag=0)
+for j, lats, latmean, missed in zip(included_sessions,
+                                    ['lats1', 'lats2', 'lats3'],
+                                    ['latx1', 'latx2', 'latx3'],
+                                    ['missed1', 'missed2', 'missed3']):
+    df_sacc_behav[lats] = [sacc_sessions[x].lats['all'] for x in sacc_sessions if sacc_sessions[x].session == j]
+    df_sacc_behav[latmean] = [sacc_sessions[x].lats['mean'] for x in sacc_sessions if sacc_sessions[x].session == j]
+    df_sacc_behav[missed] = [sacc_sessions[x].lats['nans'] for x in sacc_sessions if sacc_sessions[x].session == j]
+
+pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_sacc.pickle', 'wb')
+dill.dump(df_sacc_behav, pickle_out)
+pickle_out.close()

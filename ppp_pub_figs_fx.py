@@ -38,6 +38,68 @@ def inch(mm):
     result = mm*0.0393701
     return result
 
+def sacc_behav_fig(df):
+    f, ax = plt.subplots(figsize=(7.2, 2.5), ncols=2)
+    
+    scattersize = 50
+    
+    x = [[df.xs('NR', level=1)['latx1'], df.xs('NR', level=1)['latx2'], df.xs('NR', level=1)['latx3']],
+     [df.xs('PR', level=1)['latx1'], df.xs('PR', level=1)['latx2'], df.xs('PR', level=1)['latx3']]]
+    
+    jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR', 'PR'],
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 scattersize = scattersize,
+                 ylim=[-1,20],
+                 ax=ax[0])
+
+    x = [[df.xs('NR', level=1)['missed1'], df.xs('NR', level=1)['missed2'], df.xs('NR', level=1)['missed3']],
+     [df.xs('PR', level=1)['missed1'], df.xs('PR', level=1)['missed2'], df.xs('PR', level=1)['missed3']]]
+
+    jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=['NR', 'PR'],
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 scattersize = scattersize,
+                 ylim=[-5,50],
+                 ax=ax[1])
+
+    return f
+
+def cond_licks_fig(ax, df, diet):
+    
+    scattersize = 50
+    
+    if diet == 'NR':
+        cols = [col['np_cas'], col['np_cas'], col['np_malt'], col['np_malt']]
+        title = 'Non-restricted'
+    else:
+        cols = [col['lp_cas'], col['lp_cas'], col['lp_malt'], col['lp_malt']]
+        title = 'Protein restricted'
+
+    x = [[df.xs(diet, level=1)['cond1-cas1'], df.xs(diet, level=1)['cond1-cas2']],
+     [df.xs(diet, level=1)['cond1-malt1'], df.xs(diet, level=1)['cond1-malt2']]]
+
+    jmfig.barscatter(x, paired=True, unequal=True,
+             barfacecoloroption = 'individual',
+             barfacecolor = cols,
+             scatteredgecolor = ['xkcd:charcoal'],
+             scatterlinecolor = 'xkcd:charcoal',
+             grouplabel=['Cas', 'Malt'],
+             barlabels=['1', '2', '1', '2'],
+             scattersize = scattersize,
+             
+#             ylim=[-5,50],
+             ax=ax)
+    ax.set_title(title)
+
 def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
 
     forced_cas_key = 'forced' + str(prefsession) + '-cas'

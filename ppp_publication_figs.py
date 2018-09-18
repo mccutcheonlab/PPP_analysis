@@ -29,15 +29,18 @@ import dill
 
 # Looks for existing data and if not there loads pickled file
 try:
-    type(df_photo)
-    print('Using existing data')
-except NameError:
-    print('Loading in data from pickled file')
-    try:
-        pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'rb')
-    except FileNotFoundError:
-        print('Cannot access pickled file')
+    pickle_folder = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\'
+    
+    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
+    df_sacc_behav = dill.load(pickle_in)
+    
+    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
+    
+    pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     df_behav, df_photo, df_reptraces = dill.load(pickle_in)
+except FileNotFoundError:
+    print('Cannot access pickled file(s)')
 
 usr = jmf.getuserhome()
 
@@ -84,6 +87,16 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
+
+sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
+
+
+fig, ax = plt.subplots(figsize=(4,3), ncols=2, sharey=True)
+
+pppfig.cond_licks_fig(ax[0], df_cond1_behav, 'NR')
+pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
+ax[0].set_ylabel('Licks')
+
 #fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
 #fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
 #pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=1)
@@ -96,7 +109,7 @@ clim_pr = [-0.11,0.17]
 
 dietswitch=False
 
-photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_photo)
+#photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_photo)
 
 #summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')

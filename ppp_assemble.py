@@ -284,9 +284,11 @@ def assemble_sessions(sessions,
                             side['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in side['lickdata']['rStart'] if licks < x.both['sipper'][0]])
                         except KeyError:
                             pass
-                        
-                        side['lats'] = jmf.latencyCalc(side['lickdata']['licks'], side['sipper'], cueoff=side['sipper_off'], lag=0)
-                
+                        try:
+                            side['lats'] = jmf.latencyCalc(side['lickdata']['licks'], side['sipper'], cueoff=side['sipper_off'], lag=0)
+                        except TypeError:
+                            print('Cannot work out latencies as there are lick and/or sipper values missing.')
+                            side['lats'] = []
                 x.side2subs()
                  
                 if makefigs == True:

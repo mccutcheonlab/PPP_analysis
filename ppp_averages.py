@@ -83,7 +83,6 @@ for session in sessions:
     try:
         len(x.data)
         pref_sessions[x.sessionID] = x
-        
     except AttributeError:
         pass
 

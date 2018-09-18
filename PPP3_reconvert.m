@@ -18,7 +18,7 @@ sheet = 'PPP3_metafile';
 [~,~,a] = xlsread(metafile,sheet);
 
 header = a(1,:);
-input = a(57,:);
+input = a(27,:);
 
 b = cat(1,header,input);
 
