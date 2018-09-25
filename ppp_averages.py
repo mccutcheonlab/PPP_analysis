@@ -159,57 +159,74 @@ for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
 
 # Assembles dataframe for reptraces
 
-    
 groups = ['NR-cas', 'NR-malt', 'PR-cas', 'PR-malt']
 rats = ['PPP1-7', 'PPP1-7', 'PPP1-4', 'PPP1-4']
-traces = [16, 19, 6, 4]
-s = 's10'
+pref_list = ['pref1', 'pref2', 'pref3']
+
+traces_list = [[15, 18, 5, 3],
+          [6, 3, 19, 14],
+          [13, 13, 13, 9]]
+
 event = 'snips_licks_forced'
-keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
 
 df_reptraces = pd.DataFrame(groups, columns=['group'])
 df_reptraces.set_index(['group'], inplace=True)
 
-df_reptraces['pref1-photo-blue'] = ""
-df_reptraces['pref1-photo-uv'] = ""
-df_reptraces['pref1-licks'] = ""
+for s, pref, traces in zip(['s10', 's11', 's16'],
+                           pref_list,
+                           traces_list):
 
-for group, rat, trace in zip(groups, rats, traces):
+    df_reptraces[pref + '-photo-blue'] = ""
+    df_reptraces[pref + '-photo-uv'] = ""
+    df_reptraces[pref + '-licks'] = ""
     
-    x = pref_sessions[rat + '_' + s]
-    
-    if 'cas' in group:
-        trial = x.cas[event]    
-        run = x.cas['lickdata']['rStart'][trace]
-        all_licks = x.cas['licks']
-    elif 'malt' in group:
-        trial = x.malt[event]    
-        run = x.malt['lickdata']['rStart'][trace]
-        all_licks = x.malt['licks']
-    
-    df_reptraces.at[group, 'pref1-licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
-    df_reptraces.at[group, 'pref1-photo-blue'] = trial['blue'][trace]
-    df_reptraces.at[group, 'pref1-photo-uv'] = trial['uv'][trace]
+    for group, rat, trace in zip(groups, rats, traces):
+        
+        x = pref_sessions[rat + '_' + s]
+        
+        if 'cas' in group:
+            trial = x.cas[event]    
+            run = x.cas['lickdata']['rStart'][trace]
+            all_licks = x.cas['licks']
+        elif 'malt' in group:
+            trial = x.malt[event]    
+            run = x.malt['lickdata']['rStart'][trace]
+            all_licks = x.malt['licks']
+        
+        df_reptraces.at[group, pref + '-licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
+        df_reptraces.at[group, pref + '-photo-blue'] = trial['blue'][trace]
+        df_reptraces.at[group, pref + '-photo-uv'] = trial['uv'][trace]
 
 rats = np.unique(rats)
 df_heatmap = pd.DataFrame(rats, columns=['rat'])
 df_heatmap.set_index(['rat'], inplace=True)
 
-df_heatmap['pref1-cas'] = ""
-df_heatmap['pref1-malt'] = ""
+for s, pref in zip(['s10', 's11', 's16'],
+                           pref_list):
 
-for rat in rats:
-    x = pref_sessions[rat + '_' + s]
+    df_heatmap[pref + '-cas'] = ""
+    df_heatmap[pref + '-malt'] = ""
     
-    df_heatmap.at[rat, 'pref1-cas'] = removenoise(x.cas[event])
-    df_heatmap.at[rat, 'pref1-malt'] = removenoise(x.malt[event])
+    for rat in rats:
+        x = pref_sessions[rat + '_' + s]
+        
+        df_heatmap.at[rat, pref + '-cas'] = removenoise(x.cas[event])
+        df_heatmap.at[rat, pref + '-malt'] = removenoise(x.malt[event])
 
 
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
 dill.dump([df_behav, df_photo, df_reptraces, df_heatmap], pickle_out)
 pickle_out.close()
 
+## to find rep traces
+#x = pref_sessions['PPP1-4_s11']
+#trials = x.malt['snips_licks_forced']
+#trialsb = trials['blue']
+#plt.plot(trialsb[14])
 ##
+
+
+
 ### TO DO!!!
 ### remove noise trials from grouped data
 ### figure out a way of excluding certain rats (e.g. PPP1.8) maybe just a line that removes at beginning of this code

@@ -38,7 +38,7 @@ try:
     df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
-    df_behav, df_photo, df_reptraces = dill.load(pickle_in)
+    df_behav, df_photo, df_reptraces, df_heatmap = dill.load(pickle_in)
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
 
@@ -59,7 +59,7 @@ mpl.rcParams['axes.labelsize'] = 'medium'
 mpl.rcParams['ytick.labelsize'] = 'small'
 
 mpl.rcParams['figure.subplot.left'] = 0.15
-mpl.rcParams['figure.subplot.bottom'] = 0.20
+mpl.rcParams['figure.subplot.bottom'] = 0.05
 
 mpl.rcParams['errorbar.capsize'] = 5
 
@@ -69,13 +69,13 @@ mpl.rcParams['axes.spines.top']=False
 mpl.rcParams['axes.spines.right']=False
 
 
-mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=10, labelpad=4)
+mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=8, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
-mpl.rc('font', family='Arial', size=10)
+mpl.rc('font', family='Arial', size=8)
 for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
-    mpl.rc(tick, color=almost_black, labelsize=10)
+    mpl.rc(tick, color=almost_black, labelsize=8)
     mpl.rc(subtick, width=1)
-mpl.rc('legend', fontsize=9)
+mpl.rc('legend', fontsize=8)
 mpl.rcParams['figure.subplot.left'] = 0.05
 mpl.rcParams['figure.subplot.top'] = 0.95
 
@@ -88,14 +88,14 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
+#sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
 
-fig, ax = plt.subplots(figsize=(4,3), ncols=2, sharey=True)
-
-pppfig.cond_licks_fig(ax[0], df_cond1_behav, 'NR')
-pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
-ax[0].set_ylabel('Licks')
+#fig, ax = plt.subplots(figsize=(4,3), ncols=2, sharey=True)
+#
+#pppfig.cond_licks_fig(ax[0], df_cond1_behav, 'NR')
+#pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
+#ax[0].set_ylabel('Licks')
 
 #fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
 #fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
@@ -103,13 +103,21 @@ ax[0].set_ylabel('Licks')
 #fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
 
 
-clim_nr = [-0.15,0.20]
-clim_pr = [-0.11,0.17]
+clims = [[-0.15,0.20], [-0.11,0.17]]
 
+photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims)
 
-dietswitch=False
+photo_pref1_fig.savefig(savefolder + 'pref1_photo.pdf')
 
-#photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_photo)
+#photopref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
+#                                     session='pref2',
+#                                     dietswitch=True,
+#                                     clims=clims)
+#
+#photopref3_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
+#                                     session='pref3',
+#                                     dietswitch=True,
+#                                     clims=clims)
 
 #summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')

@@ -9,11 +9,13 @@ Trying to do this using import statement - but at the moment not importing modul
 """
 import matplotlib.gridspec as gridspec
 import matplotlib.lines as mlines
-import JM_custom_figs as jmfig
-import JM_general_functions as jmf
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+import numpy as np
+
+import JM_custom_figs as jmfig
+import JM_general_functions as jmf
 
 import timeit
 tic = timeit.default_timer()
@@ -183,7 +185,7 @@ def lickplot(ax, licks, ylabel=True, style='raster'):
         print('Not a valid style for plotting licks')
 
     if ylabel == True:
-        ax.annotate('Licks', xy=(95,1), va='center', ha='right')
+        ax.annotate('Licks', xy=(90,1), va='center', ha='right')
 
 
 def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, xscale=True, legend=False):
@@ -192,16 +194,11 @@ def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, x
     datauv = df[session+'-photo-uv']
     datablue = df[session+'-photo-blue']
     
-    ax.plot(datauv, c=color, alpha=0.3)    
-    ax.plot(datablue, c=color)
-   
-    #Makes lick scatters
-    if plot_licks == True:
-        licks = df[session+'-licks']
-        xvals = [(x+10)*10 for x in licks]
-        yvals = [ax.get_ylim()[1]]*len(licks)
-        ax.plot(xvals,yvals,linestyle='None',marker='|',markersize=5)        
+    uv_color = jmfig.lighten_color(color, amount=0.3)
     
+    ax.plot(datauv, c=uv_color)
+    ax.plot(datablue, c=color)
+       
     # Adds x scale bar
     if xscale == True:
         y = ax.get_ylim()[0]
@@ -219,16 +216,15 @@ def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, x
         y2 = y1 + l        
         scale_label = '{0:.0f}% \u0394F'.format(l*100)
         ax.plot([50,50], [y1, y2], c=almost_black)
-        ax.text(45, y1 + (l/2), scale_label, va='center', ha='right')
+        ax.text(40, y1 + (l/2), scale_label, va='center', ha='right')
 
     if legend == True:
         ax.annotate('470 nm', xy=(310,datablue[299]), color=color, va='center')
-        ax.annotate('405 nm', xy=(310,datauv[299]), color=color, alpha=0.3, va='center')
+        ax.annotate('405 nm', xy=(310,datauv[299]), color=uv_color, va='center')
     
     return ax
 
 def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_black):
-    print('reptracesfig')
     
     inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
                                              wspace=0.05, hspace=0.00,
@@ -247,22 +243,37 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
         ax3.set_title('Casein')
         ax4.set_title('Maltodextrin')
 
+def makeheatmap(ax, data, ylabel='Trials'):
+    ntrials = np.shape(data)[0]
+    xvals = np.linspace(-9.9,20,300)
+    yvals = np.arange(1, ntrials+2)
+    xx, yy = np.meshgrid(xvals, yvals)
+    
+    mesh = ax.pcolormesh(xx, yy, data, cmap='YlGnBu', shading = 'flat')
+    ax.set_ylabel(ylabel)
+    ax.set_yticks([1, ntrials])
+    ax.set_xticks([])
+    ax.invert_yaxis()
+    
+    return ax, mesh
+
 def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
-    x = rats[rat].sessions[s]
-    data_cas = removenoise(x.cas['snips_licks_forced'])
-    data_malt = removenoise(x.malt['snips_licks_forced'])
+    
+    data_cas = df[session+'-cas'][rat]
+    data_malt = df[session+'-malt'][rat]
 
     inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
                                              width_ratios=[12,1],
                                              wspace=0.05)
     ax1 = f.add_subplot(inner[0,0])
-    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein')
+    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein trials')
     mesh.set_clim(clims)
+    ax1.plot([0], [-1], 'v', color='xkcd:silver')
     
     ax2 = f.add_subplot(inner[1,0], sharex=ax1)
-    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt')
+    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt. trials')
     mesh.set_clim(clims)
-   
+    
     cbar_ax = f.add_subplot(inner[:,1])   
     cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
     cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
@@ -277,7 +288,7 @@ def averagetrace(ax, df, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
     jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
     jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
     
-    ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
+    #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
     ax.axis('off')
     
     arrow_y = ax.get_ylim()[1]
@@ -289,7 +300,7 @@ def averagetrace(ax, df, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
     l = y[1] - y[0]
     scale_label = '{0:.0f}% \u0394F'.format(l*100)
     ax.plot([50,50], [y[0], y[1]], c=almost_black)
-    ax.text(45, y[0]+(l/2), scale_label, va='center', ha='right')
+    ax.text(40, y[0]+(l/2), scale_label, va='center', ha='right')
    
     y = ax.get_ylim()[0]
     ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
@@ -312,17 +323,16 @@ def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='
                  scattersize = 50,
                  ax=ax)
 
-    ax.set_ylabel('\u0394F')
+    ax.set_ylabel('Peak (\u0394F)')
 #    ax.set_ylim([-0.04, 0.14])
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
-
-def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
+def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,1], [0,1]], dietswitch=False):
     
     keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
     keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
     
-    gs = gridspec.GridSpec(2, 5, width_ratios=[1.5,0.01,1,1,0.4], wspace=0.3, hspace=0.6)
+    gs = gridspec.GridSpec(2, 7, width_ratios=[1.3,0.3,1,0.05,1,0.05,0.4], wspace=0.3, hspace=0.6, left=0.04, right=0.98)
     f = plt.figure(figsize=(7.2,5))
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
@@ -333,23 +343,24 @@ def mainphotoFig(df_reptraces, df_photo, dietswitch=False):
         rowcolors_bar.reverse()
 
     # Non-restricted figures, row 0
-    reptracesFig(f, df_reptraces, ['NR-cas', 'NR-malt'], 'pref1', gs, 0, 0, title=True, color=rowcolors[0][0])
-#    heatmapFig(f, df_heatmap, gs, 0, 2, 's10', 'PPP1.7', clims=clim_nr)
+    reptracesFig(f, df_reptraces, ['NR-cas', 'NR-malt'], session, gs, 0, 0, title=True, color=rowcolors[0][0])
+    heatmapFig(f, df_heatmap, gs, 0, 2, session, 'PPP1-7', clims=clims[0])
 #    # average traces NR cas v malt
-    ax3 = f.add_subplot(gs[0,3])
+    ax3 = f.add_subplot(gs[0,4])
     averagetrace(ax3, df_photo, 'NR', keys_traces, color=rowcolors[0])
 
-    ax7 = f.add_subplot(gs[0,4]) 
+    ax7 = f.add_subplot(gs[0,6]) 
     peakbargraph(ax7, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
 #   
 #    # Protein-restricted figures, row 1
-    reptracesFig(f, df_reptraces, ['PR-cas', 'PR-malt'], 'pref1', gs, 1, 0, color=rowcolors[1][0])    
+    reptracesFig(f, df_reptraces, ['PR-cas', 'PR-malt'], 'pref1', gs, 1, 0, color=rowcolors[1][0])
+    heatmapFig(f, df_heatmap, gs, 1, 2, session, 'PPP1-4', clims=clims[1])
 #    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
 #    # average traces NR cas v malt
-    ax6 = f.add_subplot(gs[1,3])
+    ax6 = f.add_subplot(gs[1,4])
     averagetrace(ax6, df_photo, 'PR', ['cas1_licks_forced', 'malt1_licks_forced'], color=rowcolors[1])
 
-    ax8 = f.add_subplot(gs[1,4])
+    ax8 = f.add_subplot(gs[1,6])
     peakbargraph(ax8, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
      
     return f
