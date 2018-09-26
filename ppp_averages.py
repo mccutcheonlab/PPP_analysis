@@ -107,18 +107,18 @@ df_behav.set_index(['rat', 'diet'], inplace=True)
 for j, ch, pr, cas, malt in zip(included_sessions,
                                 ['choices1', 'choices2', 'choices3'],
                                 ['pref1', 'pref2', 'pref3'],
-                                ['ncas1', 'ncas2', 'ncas3'],
-                                ['nmalt1', 'nmalt2', 'nmalt3']):
+                                ['pref1_ncas', 'pref2_ncas', 'pref3_ncas'],
+                                ['pref1_nmalt', 'pref2_nmalt', 'pref3_nmalt']):
     df_behav[ch] = [pref_sessions[x].choices for x in pref_sessions if pref_sessions[x].session == j]
     df_behav[pr] = [pref_sessions[x].pref for x in pref_sessions if pref_sessions[x].session == j]
     df_behav[cas] = [c.count('cas') for c in df_behav[ch]]
     df_behav[malt] = [m.count('mal') for m in df_behav[ch]]
 
 for j, forc_cas, forc_malt, free_cas, free_malt in zip(included_sessions,
-                        ['forced1-cas', 'forced2-cas', 'forced3-cas'],
-                        ['forced1-malt', 'forced2-malt', 'forced3-malt'],
-                        ['free1-cas', 'free2-cas', 'free3-cas'],
-                        ['free1-malt', 'free2-malt', 'free3-malt']):
+                        ['pref1_cas_forced', 'pref2_cas_forced', 'pref3_cas_forced'],
+                        ['pref1_malt_forced', 'pref2_malt_forced', 'pref2_malt_forced'],
+                        ['pref1_cas_free', 'pref2_cas_free', 'pref3_cas_free'],
+                        ['pref1_malt_free', 'pref2_malt_free', 'pref3_malt_free']):
     df_behav[forc_cas] = [pref_sessions[x].cas['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
     df_behav[forc_malt] = [pref_sessions[x].malt['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
     df_behav[free_cas] = [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
@@ -130,10 +130,10 @@ df_photo['diet'] = [rats.get(x) for x in rats]
 df_photo.set_index(['rat', 'diet'], inplace=True)
 
 for j, c_sip_diff, m_sip_diff, c_licks_diff, m_licks_diff in zip(included_sessions,
-                             ['cas1_sip', 'cas2_sip', 'cas3_sip'],
-                             ['malt1_sip', 'malt2_sip', 'malt3_sip'],
-                             ['cas1_licks', 'cas2_licks', 'cas3_licks'],
-                             ['malt1_licks', 'malt2_licks', 'malt3_licks']):
+                             ['pref1_cas_sip', 'pref2_cas_sip', 'pref3_cas_sip'],
+                             ['pref1_malt_sip', 'pref2_malt_sip', 'pref3_malt_sip'],
+                             ['pref1_cas_licks', 'pref2_cas_licks', 'pref3_cas_licks'],
+                             ['pref1_malt_licks', 'pref2_malt_licks', 'pref3_malt_licks']):
 
     df_photo[c_sip_diff] = [np.mean(pref_sessions[x].cas['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_sip_diff] = [np.mean(pref_sessions[x].malt['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j] 
@@ -141,14 +141,14 @@ for j, c_sip_diff, m_sip_diff, c_licks_diff, m_licks_diff in zip(included_sessio
     df_photo[m_licks_diff] = [np.mean(pref_sessions[x].malt['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
 for j, c_licks_forc, m_licks_forc in zip(included_sessions,
-                           ['cas1_licks_forced', 'cas2_licks_forced', 'cas3_licks_forced'],
-                           ['malt1_licks_forced', 'malt2_licks_forced', 'malt3_licks_forced']):
+                           ['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced'],
+                           ['pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced']):
     df_photo[c_licks_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
 for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
-                           ['cas1_licks_peak', 'cas2_licks_peak', 'cas3_licks_peak'],
-                           ['malt1_licks_peak', 'malt2_licks_peak', 'malt3_licks_peak'],
+                           ['pref1_cas_licks_peak', 'pref2_cas_licks_peak', 'pref3_cas_licks_peak'],
+                           ['pref1_malt_licks_peak', 'pref2_malt_licks_peak', 'pref3_malt_licks_peak'],
                            ['pref1_peak_delta', 'pref2_peak_delta', 'pref3_peak_delta']):
     
     df_photo[c_licks_peak] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
@@ -159,7 +159,7 @@ for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
 
 # Assembles dataframe for reptraces
 
-groups = ['NR-cas', 'NR-malt', 'PR-cas', 'PR-malt']
+groups = ['NR_cas', 'NR_malt', 'PR_cas', 'PR_malt']
 rats = ['PPP1-7', 'PPP1-7', 'PPP1-4', 'PPP1-4']
 pref_list = ['pref1', 'pref2', 'pref3']
 
@@ -176,9 +176,9 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
                            pref_list,
                            traces_list):
 
-    df_reptraces[pref + '-photo-blue'] = ""
-    df_reptraces[pref + '-photo-uv'] = ""
-    df_reptraces[pref + '-licks'] = ""
+    df_reptraces[pref + '_photo_blue'] = ""
+    df_reptraces[pref + '_photo_uv'] = ""
+    df_reptraces[pref + '_licks'] = ""
     
     for group, rat, trace in zip(groups, rats, traces):
         
@@ -193,9 +193,9 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
             run = x.malt['lickdata']['rStart'][trace]
             all_licks = x.malt['licks']
         
-        df_reptraces.at[group, pref + '-licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
-        df_reptraces.at[group, pref + '-photo-blue'] = trial['blue'][trace]
-        df_reptraces.at[group, pref + '-photo-uv'] = trial['uv'][trace]
+        df_reptraces.at[group, pref + '_licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
+        df_reptraces.at[group, pref + '_photo_blue'] = trial['blue'][trace]
+        df_reptraces.at[group, pref + '_photo_uv'] = trial['uv'][trace]
 
 rats = np.unique(rats)
 df_heatmap = pd.DataFrame(rats, columns=['rat'])
@@ -204,14 +204,14 @@ df_heatmap.set_index(['rat'], inplace=True)
 for s, pref in zip(['s10', 's11', 's16'],
                            pref_list):
 
-    df_heatmap[pref + '-cas'] = ""
-    df_heatmap[pref + '-malt'] = ""
+    df_heatmap[pref + '_cas'] = ""
+    df_heatmap[pref + '_malt'] = ""
     
     for rat in rats:
         x = pref_sessions[rat + '_' + s]
         
-        df_heatmap.at[rat, pref + '-cas'] = removenoise(x.cas[event])
-        df_heatmap.at[rat, pref + '-malt'] = removenoise(x.malt[event])
+        df_heatmap.at[rat, pref + '_cas'] = removenoise(x.cas[event])
+        df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event])
 
 
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')

@@ -109,15 +109,19 @@ photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=
 
 photo_pref1_fig.savefig(savefolder + 'pref1_photo.pdf')
 
-#photopref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
-#                                     session='pref2',
-#                                     dietswitch=True,
-#                                     clims=clims)
-#
-#photopref3_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
-#                                     session='pref3',
-#                                     dietswitch=True,
-#                                     clims=clims)
+photo_pref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
+                                     session='pref2',
+                                     dietswitch=True,
+                                     clims=clims)
+
+photo_pref2_fig.savefig(savefolder + 'pref2_photo.pdf')
+
+photo_pref3_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
+                                     session='pref3',
+                                     dietswitch=True,
+                                     clims=clims)
+
+photo_pref3_fig.savefig(savefolder + 'pref3_photo.pdf')
 
 #summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')

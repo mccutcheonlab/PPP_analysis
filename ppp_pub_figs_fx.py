@@ -191,8 +191,8 @@ def lickplot(ax, licks, ylabel=True, style='raster'):
 def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, xscale=True, legend=False):
 
 # Plots data
-    datauv = df[session+'-photo-uv']
-    datablue = df[session+'-photo-blue']
+    datauv = df[session+'_photo_uv']
+    datablue = df[session+'_photo_blue']
     
     uv_color = jmfig.lighten_color(color, amount=0.3)
     
@@ -235,9 +235,9 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
     repFig(ax2, df.loc[index[1]], session, color=color, yscale=False, legend=True)
 
     ax3 = f.add_subplot(inner[0,0], sharex=ax1)
-    lickplot(ax3, df.loc[index[0]][session+'-licks'])
+    lickplot(ax3, df.loc[index[0]][session+'_licks'])
     ax4 = f.add_subplot(inner[0,1], sharey=ax3, sharex=ax2)
-    lickplot(ax4, df.loc[index[1]][session+'-licks'], ylabel=False)
+    lickplot(ax4, df.loc[index[1]][session+'_licks'], ylabel=False)
     
     if title == True:
         ax3.set_title('Casein')
@@ -259,8 +259,8 @@ def makeheatmap(ax, data, ylabel='Trials'):
 
 def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
     
-    data_cas = df[session+'-cas'][rat]
-    data_malt = df[session+'-malt'][rat]
+    data_cas = df[session+'_cas'][rat]
+    data_malt = df[session+'_malt'][rat]
 
     inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
                                              width_ratios=[12,1],
@@ -281,8 +281,12 @@ def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
                    '{0:.0f}%'.format(clims[1]*100)]
     cbar.ax.set_yticklabels(cbar_labels)
 
-def averagetrace(ax, df, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
+def averagetrace(ax, df, diet, session, color=[almost_black, 'xkcd:bluish grey'],
                  errorcolors=['xkcd:silver', 'xkcd:silver']):
+    
+    keys = [[session + '_cas_licks_forced'],
+            [session + '_malt_licks_forced']]
+                
     df = df.xs(diet, level=1)
 
     jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
@@ -308,8 +312,10 @@ def averagetrace(ax, df, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
                 xytext=(0,-5), textcoords='offset points',
                 ha='center',va='top')
 
-def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+def peakbargraph(ax, df, diet, session, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
+    
     df = df.xs(diet, level=1)
+    keys = [session + '_cas_licks_peak', session + '_malt_licks_peak']
     a = [df[keys[0]], df[keys[1]]]
     x = jmf.data2obj1D(a)
     
@@ -343,25 +349,25 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
         rowcolors_bar.reverse()
 
     # Non-restricted figures, row 0
-    reptracesFig(f, df_reptraces, ['NR-cas', 'NR-malt'], session, gs, 0, 0, title=True, color=rowcolors[0][0])
+    reptracesFig(f, df_reptraces, ['NR_cas', 'NR_malt'], session, gs, 0, 0, title=True, color=rowcolors[0][0])
     heatmapFig(f, df_heatmap, gs, 0, 2, session, 'PPP1-7', clims=clims[0])
 #    # average traces NR cas v malt
     ax3 = f.add_subplot(gs[0,4])
-    averagetrace(ax3, df_photo, 'NR', keys_traces, color=rowcolors[0])
+    averagetrace(ax3, df_photo, 'NR', session, color=rowcolors[0])
 
     ax7 = f.add_subplot(gs[0,6]) 
-    peakbargraph(ax7, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
+    peakbargraph(ax7, df_photo, 'NR', session, bar_colors=rowcolors_bar[0], sc_color='w')
 #   
 #    # Protein-restricted figures, row 1
-    reptracesFig(f, df_reptraces, ['PR-cas', 'PR-malt'], 'pref1', gs, 1, 0, color=rowcolors[1][0])
+    reptracesFig(f, df_reptraces, ['PR_cas', 'PR_malt'], session, gs, 1, 0, color=rowcolors[1][0])
     heatmapFig(f, df_heatmap, gs, 1, 2, session, 'PPP1-4', clims=clims[1])
 #    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
 #    # average traces NR cas v malt
     ax6 = f.add_subplot(gs[1,4])
-    averagetrace(ax6, df_photo, 'PR', ['cas1_licks_forced', 'malt1_licks_forced'], color=rowcolors[1])
+    averagetrace(ax6, df_photo, 'PR', session, color=rowcolors[1])
 
     ax8 = f.add_subplot(gs[1,6])
-    peakbargraph(ax8, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+    peakbargraph(ax8, df_photo, 'PR', session, bar_colors=rowcolors_bar[1], sc_color=almost_black)
      
     return f
 
