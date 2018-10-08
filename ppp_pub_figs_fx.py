@@ -104,24 +104,31 @@ def cond_licks_fig(ax, df, diet):
 
 def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
 
-    forced_cas_key = 'forced' + str(prefsession) + '-cas'
-    forced_malt_key = 'forced' + str(prefsession) + '-malt'
-    free_cas_key = 'free' + str(prefsession) + '-cas'
-    free_malt_key = 'free' + str(prefsession) + '-malt'
-    choice_cas_key = 'ncas' + str(prefsession)
-    choice_malt_key = 'nmalt' + str(prefsession)
+    forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
+    forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
+    free_cas_key = 'pref' + str(prefsession) + '_cas_free'
+    free_malt_key = 'pref' + str(prefsession) + '_malt_free'
+    choice_cas_key = 'pref' + str(prefsession) + '_ncas'
+    choice_malt_key = 'pref' + str(prefsession) + '_nmalt'
     
     scattersize = 50
+ 
+    if dietswitch == True:
+        grouplabel=['NR \u2192 PR', 'PR \u2192 NR']
+        barfacecolor = [col['lp_cas'], col['lp_malt'], col['np_cas'], col['np_malt']]
+    else:
+        grouplabel=['NR', 'PR']
+        barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']]
     
 #panel 1 - forced choice licks    
     x = [[df.xs('NR', level=1)[forced_cas_key], df.xs('NR', level=1)[forced_malt_key]],
          [df.xs('PR', level=1)[forced_cas_key], df.xs('PR', level=1)[forced_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
-                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+                 barfacecolor = barfacecolor,
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR', 'PR'],
+                 grouplabel=grouplabel,
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
                  scattersize = scattersize,
                  ylim=[-50,1050],
@@ -135,10 +142,10 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
          [df.xs('PR', level=1)[free_cas_key], df.xs('PR', level=1)[free_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
-                 barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+                 barfacecolor = barfacecolor,
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel=['NR', 'PR'],
+                 grouplabel = grouplabel,
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
                  scattersize = scattersize,
                  ylim=[-50, 800],
@@ -152,10 +159,10 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
          [df.xs('PR', level=1)[choice_cas_key], df.xs('PR', level=1)[choice_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
              barfacecoloroption = 'individual',
-             barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']],
+             barfacecolor = barfacecolor,
              scatteredgecolor = ['xkcd:charcoal'],
              scatterlinecolor = 'xkcd:charcoal',
-             grouplabel=['NR', 'PR'],
+             grouplabel = grouplabel,
              barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
              scattersize = scattersize,
              ylim=[-2,22],

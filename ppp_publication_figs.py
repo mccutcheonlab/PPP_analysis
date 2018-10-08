@@ -97,31 +97,41 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
 #ax[0].set_ylabel('Licks')
 
-#fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
-#fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
-#pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=1)
-#fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
+fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
+fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=1)
+fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
+
+fflicks_pref2_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
+fflicks_pref2_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=2, dietswitch=True)
+fflicks_pref2_fig.savefig(savefolder + 'pref2_behav.eps')
+
+fflicks_pref3_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=3, sharey=False, sharex=False)
+fflicks_pref3_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+pppfig.forcedandfreelicksandchoice(ax, df_behav, prefsession=3, dietswitch=True)
+fflicks_pref3_fig.savefig(savefolder + 'pref3_behav.eps')
 
 
 clims = [[-0.15,0.20], [-0.11,0.17]]
 
-photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims)
-
-photo_pref1_fig.savefig(savefolder + 'pref1_photo.pdf')
-
-photo_pref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
-                                     session='pref2',
-                                     dietswitch=True,
-                                     clims=clims)
-
-photo_pref2_fig.savefig(savefolder + 'pref2_photo.pdf')
-
-photo_pref3_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
-                                     session='pref3',
-                                     dietswitch=True,
-                                     clims=clims)
-
-photo_pref3_fig.savefig(savefolder + 'pref3_photo.pdf')
+#photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims)
+#
+#photo_pref1_fig.savefig(savefolder + 'pref1_photo.pdf')
+#
+#photo_pref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
+#                                     session='pref2',
+#                                     dietswitch=True,
+#                                     clims=clims)
+#
+#photo_pref2_fig.savefig(savefolder + 'pref2_photo.pdf')
+#
+#photo_pref3_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
+#                                     session='pref3',
+#                                     dietswitch=True,
+#                                     clims=clims)
+#
+#photo_pref3_fig.savefig(savefolder + 'pref3_photo.pdf')
 
 #summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
 #summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')

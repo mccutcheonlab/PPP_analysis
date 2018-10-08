@@ -116,7 +116,7 @@ for j, ch, pr, cas, malt in zip(included_sessions,
 
 for j, forc_cas, forc_malt, free_cas, free_malt in zip(included_sessions,
                         ['pref1_cas_forced', 'pref2_cas_forced', 'pref3_cas_forced'],
-                        ['pref1_malt_forced', 'pref2_malt_forced', 'pref2_malt_forced'],
+                        ['pref1_malt_forced', 'pref2_malt_forced', 'pref3_malt_forced'],
                         ['pref1_cas_free', 'pref2_cas_free', 'pref3_cas_free'],
                         ['pref1_malt_free', 'pref2_malt_free', 'pref3_malt_free']):
     df_behav[forc_cas] = [pref_sessions[x].cas['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
