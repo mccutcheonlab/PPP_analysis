@@ -102,7 +102,7 @@ def cond_licks_fig(ax, df, diet):
              ax=ax)
     ax.set_title(title)
 
-def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
+def forcedandfreelicksandchoice(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
@@ -110,6 +110,8 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
     free_malt_key = 'pref' + str(prefsession) + '_malt_free'
     choice_cas_key = 'pref' + str(prefsession) + '_ncas'
     choice_malt_key = 'pref' + str(prefsession) + '_nmalt'
+    lat_cas_key = 'pref' + str(prefsession) + '_cas_lats'
+    lat_malt_key = 'pref' + str(prefsession) + '_malt_lats'
     
     scattersize = 50
  
@@ -121,8 +123,8 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
         barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']]
     
 #panel 1 - forced choice licks    
-    x = [[df.xs('NR', level=1)[forced_cas_key], df.xs('NR', level=1)[forced_malt_key]],
-         [df.xs('PR', level=1)[forced_cas_key], df.xs('PR', level=1)[forced_malt_key]]]
+    x = [[df_behav.xs('NR', level=1)[forced_cas_key], df_behav.xs('NR', level=1)[forced_malt_key]],
+         [df_behav.xs('PR', level=1)[forced_cas_key], df_behav.xs('PR', level=1)[forced_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = barfacecolor,
@@ -136,10 +138,25 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
 
     ax[0].set_ylabel('Licks')
     ax[0].set_yticks([0, 500, 1000])
-    
+
+#panel 2 - latency for forced choice
+    x = [[df_photo.xs('NR', level=1)[lat_cas_key], df_photo.xs('NR', level=1)[lat_malt_key]],
+         [df_photo.xs('PR', level=1)[lat_cas_key], df_photo.xs('PR', level=1)[lat_malt_key]]]
+    jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = barfacecolor,
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=grouplabel,
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 scattersize = scattersize,
+                 ylim=[-0.5,10],
+                 ax=ax[1])
+    ax[1].set_ylabel('Latency (s)')
+
 #panel 2 - free choice licks
-    x = [[df.xs('NR', level=1)[free_cas_key], df.xs('NR', level=1)[free_malt_key]],
-         [df.xs('PR', level=1)[free_cas_key], df.xs('PR', level=1)[free_malt_key]]]
+    x = [[df_behav.xs('NR', level=1)[free_cas_key], df_behav.xs('NR', level=1)[free_malt_key]],
+         [df_behav.xs('PR', level=1)[free_cas_key], df_behav.xs('PR', level=1)[free_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = barfacecolor,
@@ -149,14 +166,14 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
                  scattersize = scattersize,
                  ylim=[-50, 800],
-                 ax=ax[1])
+                 ax=ax[2])
 
-    ax[1].set_ylabel('Licks')
-    ax[1].set_yticks([0, 250, 500, 750])
+    ax[2].set_ylabel('Licks')
+    ax[2].set_yticks([0, 250, 500, 750])
 
 #panel 3 - free choice, choices   
-    x = [[df.xs('NR', level=1)[choice_cas_key], df.xs('NR', level=1)[choice_malt_key]],
-         [df.xs('PR', level=1)[choice_cas_key], df.xs('PR', level=1)[choice_malt_key]]]
+    x = [[df_behav.xs('NR', level=1)[choice_cas_key], df_behav.xs('NR', level=1)[choice_malt_key]],
+         [df_behav.xs('PR', level=1)[choice_cas_key], df_behav.xs('PR', level=1)[choice_malt_key]]]
     jmfig.barscatter(x, paired=True, unequal=True,
              barfacecoloroption = 'individual',
              barfacecolor = barfacecolor,
@@ -166,11 +183,37 @@ def forcedandfreelicksandchoice(ax, df, prefsession=1, dietswitch=False):
              barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
              scattersize = scattersize,
              ylim=[-2,22],
-             ax=ax[2])
+             ax=ax[3])
     
-    ax[2].set_ylabel('Choices (out of 20)')
-    ax[2].set_yticks([0, 10, 20])
+    ax[3].set_ylabel('Choices (out of 20)')
+    ax[3].set_yticks([0, 10, 20])
 
+def pref_latency(ax, df, prefsession=1, dietswitch=False):
+
+
+    
+    scattersize = 50
+ 
+    if dietswitch == True:
+        grouplabel=['NR \u2192 PR', 'PR \u2192 NR']
+        barfacecolor = [col['lp_cas'], col['lp_malt'], col['np_cas'], col['np_malt']]
+    else:
+        grouplabel=['NR', 'PR']
+        barfacecolor = [col['np_cas'], col['np_malt'], col['lp_cas'], col['lp_malt']]
+    
+    x = [[df.xs('NR', level=1)[lat_cas_key], df.xs('NR', level=1)[lat_malt_key]],
+         [df.xs('PR', level=1)[lat_cas_key], df.xs('PR', level=1)[lat_malt_key]]]
+    jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = barfacecolor,
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=grouplabel,
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 scattersize = scattersize,
+                 ylim=[-0.5,10],
+                 ax=ax)
+    ax.set_ylabel('Latency (s)')
 
 def lickplot(ax, licks, ylabel=True, style='raster'):        
     # Removes axes and spines
@@ -288,11 +331,11 @@ def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
                    '{0:.0f}%'.format(clims[1]*100)]
     cbar.ax.set_yticklabels(cbar_labels)
 
-def averagetrace(ax, df, diet, session, color=[almost_black, 'xkcd:bluish grey'],
+def averagetrace(ax, df, diet, keys, color=[almost_black, 'xkcd:bluish grey'],
                  errorcolors=['xkcd:silver', 'xkcd:silver']):
     
-    keys = [[session + '_cas_licks_forced'],
-            [session + '_malt_licks_forced']]
+#    keys = [[session + '_cas_licks_forced'],
+#            [session + '_malt_licks_forced']]
                 
     df = df.xs(diet, level=1)
 
@@ -340,11 +383,11 @@ def peakbargraph(ax, df, diet, session, bar_colors=['xkcd:silver', 'w'], sc_colo
 #    ax.set_ylim([-0.04, 0.14])
     plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
 
-def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,1], [0,1]], dietswitch=False):
-    
-    keys_traces = ['cas1_licks_forced', 'malt1_licks_forced']
-    keys_bars = ['cas1_licks_peak', 'malt1_licks_peak']
-    
+def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,1], [0,1]],
+                 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced'],
+                 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak'],
+                 dietswitch=False):
+
     gs = gridspec.GridSpec(2, 7, width_ratios=[1.3,0.3,1,0.05,1,0.05,0.4], wspace=0.3, hspace=0.6, left=0.04, right=0.98)
     f = plt.figure(figsize=(7.2,5))
     
@@ -360,7 +403,7 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
     heatmapFig(f, df_heatmap, gs, 0, 2, session, 'PPP1-7', clims=clims[0])
 #    # average traces NR cas v malt
     ax3 = f.add_subplot(gs[0,4])
-    averagetrace(ax3, df_photo, 'NR', session, color=rowcolors[0])
+    averagetrace(ax3, df_photo, 'NR', keys_traces, color=rowcolors[0])
 
     ax7 = f.add_subplot(gs[0,6]) 
     peakbargraph(ax7, df_photo, 'NR', session, bar_colors=rowcolors_bar[0], sc_color='w')
@@ -371,7 +414,7 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
 #    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
 #    # average traces NR cas v malt
     ax6 = f.add_subplot(gs[1,4])
-    averagetrace(ax6, df_photo, 'PR', session, color=rowcolors[1])
+    averagetrace(ax6, df_photo, 'PR', keys_traces, color=rowcolors[1])
 
     ax8 = f.add_subplot(gs[1,6])
     peakbargraph(ax8, df_photo, 'PR', session, bar_colors=rowcolors_bar[1], sc_color=almost_black)

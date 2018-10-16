@@ -72,7 +72,7 @@ try:
 except NameError:
     print('Loading in data from pickled file')
     try:
-        pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_rats.pickle', 'rb')
+        pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_pref.pickle', 'rb')
     except FileNotFoundError:
         print('Cannot access pickled file')
     sessions, rats = dill.load(pickle_in)
@@ -123,7 +123,7 @@ for j, forc_cas, forc_malt, free_cas, free_malt in zip(included_sessions,
     df_behav[forc_malt] = [pref_sessions[x].malt['nlicks-forced'] for x in pref_sessions if pref_sessions[x].session == j]
     df_behav[free_cas] = [pref_sessions[x].cas['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
     df_behav[free_malt] = [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
-
+    
 # Assembles dataframe with photometry data
 df_photo = pd.DataFrame([x for x in rats], columns=['rat'])
 df_photo['diet'] = [rats.get(x) for x in rats]
@@ -140,11 +140,16 @@ for j, c_sip_diff, m_sip_diff, c_licks_diff, m_licks_diff in zip(included_sessio
     df_photo[c_licks_diff] = [np.mean(pref_sessions[x].cas['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_diff] = [np.mean(pref_sessions[x].malt['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
-for j, c_licks_forc, m_licks_forc in zip(included_sessions,
+for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc in zip(included_sessions,
                            ['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced'],
-                           ['pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced']):
+                           ['pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced'],
+                           ['pref1_cas_lats', 'pref2_cas_lats', 'pref3_cas_lats'],
+                           ['pref1_malt_lats', 'pref2_malt_lats', 'pref3_malt_lats']):
     df_photo[c_licks_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_lats_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_lats_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+
 
 for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
                            ['pref1_cas_licks_peak', 'pref2_cas_licks_peak', 'pref3_cas_licks_peak'],
