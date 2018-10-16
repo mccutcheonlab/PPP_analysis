@@ -44,46 +44,59 @@ ppp3_sessions = metafile2sessions('R:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx',
 
 ppp_sessions = {**ppp1_sessions, **ppp3_sessions}
 
+# Code to indictae which files to assemble and whether to save and/or make figures
+assemble_sacc = False
+assemble_cond1 = False
+assemble_cond2 = True
+assemble_pref = False
+assemble_single = False
 
+savefile=True
+makefigs=False
 
-#sessions = assemble_sessions(ppp_sessions,
-#                  rats_to_include = [],
-#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
-#                  sessions_to_include = ['s3', 's4', 's5'],
-#                  outputfile=picklefolder + 'ppp_sacc.pickle',
-#                  savefile=True,
-#                  makefigs=False)
+if assemble_sacc:
+    sessions = assemble_sessions(ppp_sessions,
+                  rats_to_include = [],
+                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
+                  sessions_to_include = ['s3', 's4', 's5'],
+                  outputfile=picklefolder + 'ppp_sacc.pickle',
+                  savefile=savefile,
+                  makefigs=makefigs)
 
-sessions = assemble_sessions(ppp_sessions,
+if assemble_cond1:
+    sessions = assemble_sessions(ppp_sessions,
                   rats_to_include = [],
                   rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
                   sessions_to_include = ['s6', 's7', 's8', 's9'],
                   outputfile=picklefolder + 'ppp_cond1.pickle',
-                  savefile=True,
-                  makefigs=False)
-#
-#assemble_sessions(ppp_sessions,
-#                  rats_to_include = [],
-#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
-#                  sessions_to_include = ['s12', 's13', 's14', 's15'],
-#                  outputfile=picklefolder + 'ppp_cond2.pickle',
-#                  savefile=True,
-#                  makefigs=True)
+                  savefile=savefile,
+                  makefigs=makefigs)
 
-#assemble_sessions(ppp_sessions,
-#                  rats_to_include = [],
-#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
-#                  sessions_to_include = ['s10', 's11', 's16'],
-#                  outputfile='R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_pref.pickle',
-#                  savefile=False,
-#                  makefigs=False)
+if assemble_cond2:
+    assemble_sessions(ppp_sessions,
+                  rats_to_include = [],
+                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
+                  sessions_to_include = ['s12', 's13', 's14', 's15'],
+                  outputfile=picklefolder + 'ppp_cond2.pickle',
+                  savefile=savefile,
+                  makefigs=makefigs)
+
+if assemble_pref:
+    assemble_sessions(ppp_sessions,
+                  rats_to_include = [],
+                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
+                  sessions_to_include = ['s10', 's11', 's16'],
+                  outputfile='R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_pref.pickle',
+                  savefile=savefile,
+                  makefigs=makefigs)
 
 # Code to run for single rat
-#sessions_to_add = assemble_sessions(ppp_sessions,
-#                  rats_to_include = ['PPP3-8'],
-#                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
-#                  sessions_to_include = ['s7'],
-#                  outputfile=picklefolder + 'ppp_test.pickle',
-#                  savefile=True,
-#                  makefigs=False)
+if assemble_single:
+    sessions_to_add = assemble_sessions(ppp_sessions,
+                  rats_to_include = ['PPP3-8'],
+                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
+                  sessions_to_include = ['s6'],
+                  outputfile=picklefolder + 'ppp_test.pickle',
+                  savefile=savefile,
+                  makefigs=makefigs)
 

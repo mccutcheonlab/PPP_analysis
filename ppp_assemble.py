@@ -120,6 +120,9 @@ class Session(object):
 
             except IndexError:
                 print('Problem separating out free choice trials')
+        else:
+            self.left['licks-forced'] = self.left['licks']
+            self.right['licks-forced'] = self.right['licks']
                         
     def removephantomlicks(self):
         if self.left['exist'] == True:
@@ -281,8 +284,9 @@ def assemble_sessions(sessions,
                         side['snips_sipper'] = jmf.mastersnipper(x, side['sipper'])
                         side['snips_licks'] = jmf.mastersnipper(x, side['lickdata']['rStart'])
                         try:
-                            side['snips_licks_forced'] = jmf.mastersnipper(x, [licks for licks in side['lickdata']['rStart'] if licks < x.both['sipper'][0]],
-                                latency_event=side['sipper'], latency_direction='pre')
+                            timelock_events = [licks for licks in side['lickdata']['rStart'] if licks in side['licks-forced']]
+                            latency_events = side['sipper']
+                            side['snips_licks_forced'] = jmf.mastersnipper(x, timelock_events, latency_events=latency_events, latency_direction='pre')
                         except KeyError:
                             pass
                         try:
