@@ -150,17 +150,23 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc in zip(included_sess
     df_photo[c_lats_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
+for j, c_sip_peak, m_sip_peak, delta_sip_peak in zip(included_sessions,
+                           ['pref1_cas_sip_peak', 'pref2_cas_sip_peak', 'pref3_cas_sip_peak'],
+                           ['pref1_malt_sip_peak', 'pref2_malt_sip_peak', 'pref3_malt_sip_peak'],
+                           ['pref1_sip_peak_delta', 'pref2_sip_peak_delta', 'pref3_sip_peak_delta']):
+    
+    df_photo[c_sip_peak] = [np.mean(pref_sessions[x].cas['snips_sipper']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_sip_peak] = [np.mean(pref_sessions[x].malt['snips_sipper']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[delta_sip_peak] = df_photo[c_sip_peak] - df_photo[m_sip_peak]
 
 for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
                            ['pref1_cas_licks_peak', 'pref2_cas_licks_peak', 'pref3_cas_licks_peak'],
                            ['pref1_malt_licks_peak', 'pref2_malt_licks_peak', 'pref3_malt_licks_peak'],
-                           ['pref1_peak_delta', 'pref2_peak_delta', 'pref3_peak_delta']):
+                           ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta']):
     
     df_photo[c_licks_peak] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_peak] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[delta_licks_peak] = df_photo[c_licks_peak] - df_photo[m_licks_peak]
-
-
 
 # Assembles dataframe for reptraces
 

@@ -47,8 +47,8 @@ ppp_sessions = {**ppp1_sessions, **ppp3_sessions}
 # Code to indictae which files to assemble and whether to save and/or make figures
 assemble_sacc = False
 assemble_cond1 = False
-assemble_cond2 = True
-assemble_pref = False
+assemble_cond2 = False
+assemble_pref = True
 assemble_single = False
 
 savefile=True
@@ -84,7 +84,7 @@ if assemble_cond2:
 if assemble_pref:
     assemble_sessions(ppp_sessions,
                   rats_to_include = [],
-                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
+                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
                   sessions_to_include = ['s10', 's11', 's16'],
                   outputfile='R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_pref.pickle',
                   savefile=savefile,
