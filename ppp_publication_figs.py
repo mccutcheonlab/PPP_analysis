@@ -38,7 +38,7 @@ try:
     df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
-    df_behav, df_photo, df_reptraces, df_heatmap = dill.load(pickle_in)
+    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip = dill.load(pickle_in)
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
 
@@ -88,8 +88,9 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-behav_figs=False
+behav_figs=True
 photo_sip_figs=True
+photo_licks_figs=False
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
@@ -119,16 +120,21 @@ if behav_figs:
 clims = [[-0.15,0.20], [-0.11,0.17]]
 
 if photo_sip_figs:
-    photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
+    photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,
                                                  keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
                                                  keys_bars = ['pref1_cas_sip_peak', 'pref1_malt_sip_peak'],
+                                                 keys_lats = ['pref1_cas_lats_all_fromsip', 'pref1_malt_lats_all_fromsip'],
                                                  event='Sipper')
     
     photo_pref1_sipper_fig.savefig(savefolder + 'pref1_sip_photo.pdf')
 
-#photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims)
-#
-#photo_pref1_fig.savefig(savefolder + 'pref1_photo.pdf')
+if photo_licks_figs:
+    
+    photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
+                                          keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'])
+    
+    photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
 ##
 ##photo_pref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
 ##                                     session='pref2',

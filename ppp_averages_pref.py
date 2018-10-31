@@ -141,26 +141,34 @@ for j, c_sip_diff, m_sip_diff, c_licks_diff, m_licks_diff in zip(included_sessio
     df_photo[m_licks_diff] = [np.mean(pref_sessions[x].malt['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
 # adds licks and lanetcies - all values
-for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc in zip(included_sessions,
+for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip, m_lats_forc_fromsip in zip(included_sessions,
                            ['pref1_cas_licks_forced_all', 'pref2_cas_licks_forced_all', 'pref3_cas_licks_forced_all'],
                            ['pref1_malt_licks_forced_all', 'pref2_malt_licks_forced_all', 'pref3_malt_licks_forced_all'],
                            ['pref1_cas_lats_all', 'pref2_cas_lats_all', 'pref3_cas_lats_all'],
-                           ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all']):
+                           ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all'],
+                           ['pref1_cas_lats_all_fromsip', 'pref2_cas_lats_all_fromsip', 'pref3_cas_lats_all_fromsip'],
+                           ['pref1_malt_lats_all_fromsip', 'pref2_malt_lats_all_fromsip', 'pref3_malt_lats_all_fromsip']):
     df_photo[c_licks_forc] = [pref_sessions[x].cas['snips_licks_forced']['diff'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_forc] = [pref_sessions[x].malt['snips_licks_forced']['diff'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc] = [pref_sessions[x].cas['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc] = [pref_sessions[x].malt['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_lats_forc_fromsip] = [pref_sessions[x].cas['lats'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_lats_forc_fromsip] = [pref_sessions[x].malt['lats'] for x in pref_sessions if pref_sessions[x].session == j]
 
 # adds means of licks and latencies
-for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc in zip(included_sessions,
+for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip, m_lats_forc_fromsip in zip(included_sessions,
                            ['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced'],
                            ['pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced'],
                            ['pref1_cas_lats', 'pref2_cas_lats', 'pref3_cas_lats'],
-                           ['pref1_malt_lats', 'pref2_malt_lats', 'pref3_malt_lats']):
-    df_photo[c_licks_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[c_lats_forc] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_lats_forc] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+                           ['pref1_malt_lats', 'pref2_malt_lats', 'pref3_malt_lats'],
+                           ['pref1_cas_lats_fromsip', 'pref2_cas_lats_fromsip', 'pref3_cas_lats_fromsip'],
+                           ['pref1_malt_lats_fromsip', 'pref2_malt_lats_fromsip', 'pref3_malt_lats_fromsip']):
+    df_photo[c_licks_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_lats_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_lats_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].malt['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
 for j, c_sip_peak, m_sip_peak, delta_sip_peak in zip(included_sessions,
                            ['pref1_cas_sip_peak', 'pref2_cas_sip_peak', 'pref3_cas_sip_peak'],
@@ -176,8 +184,8 @@ for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
                            ['pref1_malt_licks_peak', 'pref2_malt_licks_peak', 'pref3_malt_licks_peak'],
                            ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta']):
     
-    df_photo[c_licks_peak] = [np.mean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_peak] = [np.mean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_licks_peak] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_peak] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[delta_licks_peak] = df_photo[c_licks_peak] - df_photo[m_licks_peak]
 
 # Assembles dataframe for reptraces
@@ -236,18 +244,82 @@ for s, pref in zip(['s10', 's11', 's16'],
         df_heatmap.at[rat, pref + '_cas'] = removenoise(x.cas[event])
         df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event])
 
+# Assembles dataframe for reptraces     for SIPPER TRIALS    
+
+groups = ['NR_cas', 'NR_malt', 'PR_cas', 'PR_malt']
+rats = ['PPP1-7', 'PPP1-7', 'PPP1-4', 'PPP1-4']
+pref_list = ['pref1', 'pref2', 'pref3']
+
+traces_list = [[15, 18, 6, 3],
+          [6, 3, 19, 14],
+          [13, 13, 13, 9]]
+
+event = 'snips_sipper'
+
+df_reptraces_sip = pd.DataFrame(groups, columns=['group'])
+df_reptraces_sip.set_index(['group'], inplace=True)
+
+for s, pref, traces in zip(['s10', 's11', 's16'],
+                           pref_list,
+                           traces_list):
+
+    df_reptraces_sip[pref + '_photo_blue'] = ""
+    df_reptraces_sip[pref + '_photo_uv'] = ""
+    df_reptraces_sip[pref + '_licks'] = ""
+    
+    for group, rat, trace in zip(groups, rats, traces):
+        
+        x = pref_sessions[rat + '_' + s]
+        
+        if 'cas' in group:
+            trial = x.cas[event]    
+            run = x.cas['lickdata']['rStart'][trace]
+            all_licks = x.cas['licks']
+        elif 'malt' in group:
+            trial = x.malt[event]    
+            run = x.malt['lickdata']['rStart'][trace]
+            all_licks = x.malt['licks']
+        
+        df_reptraces_sip.at[group, pref + '_licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
+        df_reptraces_sip.at[group, pref + '_photo_blue'] = trial['blue'][trace]
+        df_reptraces_sip.at[group, pref + '_photo_uv'] = trial['uv'][trace]
+
+rats = np.unique(rats)
+df_heatmap_sip = pd.DataFrame(rats, columns=['rat'])
+df_heatmap_sip.set_index(['rat'], inplace=True)
+
+for s, pref in zip(['s10', 's11', 's16'],
+                           pref_list):
+
+    df_heatmap_sip[pref + '_cas'] = ""
+    df_heatmap_sip[pref + '_malt'] = ""
+    
+    for rat in rats:
+        x = pref_sessions[rat + '_' + s]
+        
+        df_heatmap_sip.at[rat, pref + '_cas'] = removenoise(x.cas[event])
+        df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
+
+
 
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
-dill.dump([df_behav, df_photo, df_reptraces, df_heatmap], pickle_out)
+dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip], pickle_out)
 pickle_out.close()
 
 ## to find rep traces
-#x = pref_sessions['PPP1-4_s11']
-#trials = x.malt['snips_licks_forced']
+#x = pref_sessions['PPP1-4_s10']
+#trials = x.malt['snips_sipper']
 #trialsb = trials['blue']
-#plt.plot(trialsb[14])
-##
+#
+#
+#
+#i = 6
+#fig, ax = plt.subplots()
+#ax.plot(trialsb[i])
+#ax.annotate(x.malt['lats'][i], xy=(100,0.1))
+#
 
+# possibles 'PPP1-4_s10' - 6, 13
 
 
 ### TO DO!!!
