@@ -88,8 +88,8 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-behav_figs=True
-photo_sip_figs=False
+behav_figs=False
+photo_sip_figs=True
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 

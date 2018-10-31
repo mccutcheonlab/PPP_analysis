@@ -304,37 +304,65 @@ def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
                    '{0:.0f}%'.format(clims[1]*100)]
     cbar.ax.set_yticklabels(cbar_labels)
 
-def averagetrace(ax, df, diet, keys, event='',
+def averagetrace(f, gs, gsx, gsy, df, diet, keys, keys_lats, event='',
                  color=[almost_black, 'xkcd:bluish grey'],
                  errorcolors=['xkcd:silver', 'xkcd:silver']):
     
-#    keys = [[session + '_cas_licks_forced'],
-#            [session + '_malt_licks_forced']]
-                
+    inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[gsx,gsy],
+                                             wspace=0.05, hspace=0.2,
+                                             height_ratios=[1,7])    
+   
     df = df.xs(diet, level=1)
-
-    jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
-    jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
+    
+    ax1 = f.add_subplot(inner[1,0])
+    
+    jmfig.shadedError(ax1, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
+    jmfig.shadedError(ax1, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
     
     #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
-    ax.axis('off')
+    ax1.axis('off')
     
-    arrow_y = ax.get_ylim()[1]
-    ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
-    ax.annotate(event, xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+    arrow_y = ax1.get_ylim()[1]
+    ax1.plot([100], [arrow_y], 'v', color='xkcd:silver')
+    ax1.annotate(event, xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
                 ha='center', va='bottom')
 
-    y = [y for y in ax.get_yticks() if y>0][:2]
+    y = [y for y in ax1.get_yticks() if y>0][:2]
     l = y[1] - y[0]
     scale_label = '{0:.0f}% \u0394F'.format(l*100)
-    ax.plot([50,50], [y[0], y[1]], c=almost_black)
-    ax.text(40, y[0]+(l/2), scale_label, va='center', ha='right')
+    ax1.plot([50,50], [y[0], y[1]], c=almost_black)
+    ax1.text(40, y[0]+(l/2), scale_label, va='center', ha='right')
    
-    y = ax.get_ylim()[0]
-    ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
-    ax.annotate('5 s', xy=(276,y), xycoords='data',
+    y = ax1.get_ylim()[0]
+    ax1.plot([251,300], [y, y], c=almost_black, linewidth=2)
+    ax1.annotate('5 s', xy=(276,y), xycoords='data',
                 xytext=(0,-5), textcoords='offset points',
                 ha='center',va='top')
+    
+    ax_lats = f.add_subplot(inner[0,0])
+    
+    lat_data = []
+    for key in keys_lats:
+        lat_data.append(jmf.flatten_list(df[key]))
+        
+    stats = jmfig.get_violinstats(lat_data, points=200)
+    
+    x=stats[0]['coords']
+    y=stats[0]['vals']
+    
+    x2=stats[1]['coords']
+    y2=-stats[1]['vals']
+    
+    ax_lats.fill_between(x, y, color=color[0])
+    ax_lats.fill_between(x2, y2, color=color[1])
+    ax_lats.set_xlim([-10, 20])
+    jmfig.invisible_axes(ax_lats)
+    
+#    arrow_y = ax_lats.get_ylim()[1]
+#    ax_lats.plot([0], [arrow_y], 'v', color='xkcd:silver')
+#    ax_lats.annotate(event, xy=(0, arrow_y), xytext=(0,5), textcoords='offset points',
+#                ha='center', va='bottom')
+    ax_lats.annotate('Latencies', xy=(0,0), ha='right', va='center')
 
 def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='w'):
     
@@ -358,6 +386,7 @@ def peakbargraph(ax, df, diet, keys, bar_colors=['xkcd:silver', 'w'], sc_color='
 
 def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,1], [0,1]],
                  keys_traces = ['cas1_licks_forced', 'malt1_licks_forced'],
+                 keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
                  keys_bars = ['cas1_licks_peak', 'malt1_licks_peak'],
                  event='sipper',
                  dietswitch=False):
@@ -376,11 +405,9 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
     reptracesFig(f, df_reptraces, ['NR_cas', 'NR_malt'], session, gs, 0, 0, title=True, color=rowcolors[0][0])
     heatmapFig(f, df_heatmap, gs, 0, 2, session, 'PPP1-7', clims=clims[0])
 #    # average traces NR cas v malt
-    ax3 = f.add_subplot(gs[0,4])
+#    ax3 = f.add_subplot(gs[0,4])
     
-    print(event)
-    
-    averagetrace(ax3, df_photo, 'NR', keys_traces, event=event, color=rowcolors[0])
+    averagetrace(f, gs, 0, 4, df_photo, 'NR', keys_traces, keys_lats, event=event, color=rowcolors[0])
 
     ax7 = f.add_subplot(gs[0,6]) 
     peakbargraph(ax7, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
@@ -390,8 +417,8 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
     heatmapFig(f, df_heatmap, gs, 1, 2, session, 'PPP1-4', clims=clims[1])
 #    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
 #    # average traces NR cas v malt
-    ax6 = f.add_subplot(gs[1,4])
-    averagetrace(ax6, df_photo, 'PR', keys_traces, event=event, color=rowcolors[1])
+#    ax6 = f.add_subplot(gs[1,4])
+    averagetrace(f, gs, 1, 4, df_photo, 'PR', keys_traces, keys_lats, event=event, color=rowcolors[1])
 
     ax8 = f.add_subplot(gs[1,6])
     peakbargraph(ax8, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
