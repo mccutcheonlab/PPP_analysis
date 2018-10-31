@@ -88,8 +88,8 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-behav_figs=False
-photo_sip_figs=True
+behav_figs=True
+photo_sip_figs=False
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
@@ -103,17 +103,17 @@ photo_sip_figs=True
 if behav_figs:
     fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
     fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
-    pppfig.forcedandfreelicksandchoice(ax, df_behav, df_photo, prefsession=1)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=1)
     fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
     
     fflicks_pref2_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
     fflicks_pref2_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
-    pppfig.forcedandfreelicksandchoice(ax, df_behav, df_photo, prefsession=2, dietswitch=True)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True)
     fflicks_pref2_fig.savefig(savefolder + 'pref2_behav.eps')
     
     fflicks_pref3_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
     fflicks_pref3_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
-    pppfig.forcedandfreelicksandchoice(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
     fflicks_pref3_fig.savefig(savefolder + 'pref3_behav.eps')
 
 clims = [[-0.15,0.20], [-0.11,0.17]]

@@ -102,7 +102,7 @@ def cond_licks_fig(ax, df, diet):
              ax=ax)
     ax.set_title(title)
 
-def forcedandfreelicksandchoice(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
+def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
