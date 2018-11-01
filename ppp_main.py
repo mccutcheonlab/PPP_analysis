@@ -82,7 +82,7 @@ if assemble_cond2:
                   makefigs=makefigs)
 
 if assemble_pref:
-    assemble_sessions(ppp_sessions,
+    sessions = assemble_sessions(ppp_sessions,
                   rats_to_include = [],
                   rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
                   sessions_to_include = ['s10', 's11', 's16'],
@@ -95,7 +95,7 @@ if assemble_single:
     sessions_to_add = assemble_sessions(ppp_sessions,
                   rats_to_include = ['PPP3-8'],
                   rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
-                  sessions_to_include = ['s6'],
+                  sessions_to_include = ['s10'],
                   outputfile=picklefolder + 'ppp_test.pickle',
                   savefile=savefile,
                   makefigs=makefigs)
