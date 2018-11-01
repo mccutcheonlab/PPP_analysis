@@ -117,7 +117,7 @@ if behav_figs:
     pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
     fflicks_pref3_fig.savefig(savefolder + 'pref3_behav.eps')
 
-clims = [[-0.15,0.20], [-0.11,0.17]]
+clims = [[-0.15,0.20], [-0.11,0.15]]
 
 if photo_sip_figs:
     photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,
@@ -132,7 +132,8 @@ if photo_licks_figs:
     
     photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'])
+                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
     
     photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
 ##

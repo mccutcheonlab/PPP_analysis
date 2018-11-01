@@ -292,7 +292,7 @@ def makeheatmap(ax, data, ylabel='Trials'):
     
     return ax, mesh
 
-def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
+def heatmapFig(f, df, gs, gsx, gsy, session, event, rat, clims=[0,1]):
     
     data_cas = df[session+'_cas'][rat]
     data_malt = df[session+'_malt'][rat]
@@ -308,6 +308,9 @@ def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
     ax2 = f.add_subplot(inner[1,0], sharex=ax1)
     ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt. trials')
     mesh.set_clim(clims)
+    
+    if event == 'Sipper':
+        print(event)
     
     cbar_ax = f.add_subplot(inner[:,1])   
     cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
@@ -446,7 +449,9 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
 
     # Non-restricted figures, row 0
     reptracesFig(f, df_reptraces, ['NR_cas', 'NR_malt'], session, gs, 0, 0, title=True, color=rowcolors[0][0])
-    heatmapFig(f, df_heatmap, gs, 0, 2, session, 'PPP1-7', clims=clims[0])
+    
+    heatmapFig(f, df_heatmap, gs, 0, 2, session, event, 'PPP1-7', clims=clims[0])
+
 #    # average traces NR cas v malt
 #    ax3 = f.add_subplot(gs[0,4])
     if event == 'Sipper':
@@ -460,7 +465,7 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
 #   
 #    # Protein-restricted figures, row 1
     reptracesFig(f, df_reptraces, ['PR_cas', 'PR_malt'], session, gs, 1, 0, color=rowcolors[1][0])
-    heatmapFig(f, df_heatmap, gs, 1, 2, session, 'PPP1-4', clims=clims[1])
+    heatmapFig(f, df_heatmap, gs, 1, 2, session, event, 'PPP1-4', clims=clims[1])
 #    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
 #    # average traces NR cas v malt
 #    ax6 = f.add_subplot(gs[1,4])
