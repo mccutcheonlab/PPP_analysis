@@ -188,11 +188,16 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
     ax[3].set_ylabel('Choices (out of 20)')
     ax[3].set_yticks([0, 10, 20])
 
-def lickplot(ax, licks, ylabel=True, style='raster'):        
+def lickplot(ax, licks, sipper,
+             ylabel=True,
+             style='raster',
+             showsipper=True,
+             text_offset=30,
+             lick_pos=3.5,
+             sip_pos=1):        
     # Removes axes and spines
     jmfig.invisible_axes(ax)
 
- 
     licks_x = [(x+10)*10 for x in licks]
     if style == 'histo':
         hist, bins = np.histogram(licks_x, bins=30, range=(0,300))
@@ -201,14 +206,21 @@ def lickplot(ax, licks, ylabel=True, style='raster'):
         ax.bar(center, hist, align='center', width=width, color='xkcd:silver')
     
     if style == 'raster':
-        yvals = [1]*len(licks)
+        yvals = [lick_pos]*len(licks)
         ax.plot(licks_x,yvals,linestyle='None',marker='|',markersize=5, color='xkcd:silver')
         
     else:
         print('Not a valid style for plotting licks')
 
+    if showsipper == True:
+        sipper_x = (sipper+10)*10
+        ax.plot(sipper_x, sip_pos, 'v', color='xkcd:silver')
+
     if ylabel == True:
-        ax.annotate('Licks', xy=(90,1), va='center', ha='right')
+        ax.annotate('Licks', xy=(licks_x[0]-text_offset,lick_pos), va='center', ha='right')
+        ax.annotate('Sipper', xy=(sipper_x-text_offset, sip_pos), xytext=(0,5), textcoords='offset points',
+                    ha='right', va='top')
+    ax.set_ylim([min([lick_pos, sip_pos])-1, max([lick_pos, sip_pos])+1])
 
 
 def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, xscale=True, legend=False):
@@ -250,7 +262,7 @@ def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, x
 def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_black):
     
     inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
-                                             wspace=0.05, hspace=0.00,
+                                             wspace=0.05, hspace=0,
                                              height_ratios=[1,8])    
     ax1 = f.add_subplot(inner[1,0])
     repFig(ax1, df.loc[index[0]], session, color=color, xscale=False)
@@ -258,9 +270,9 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
     repFig(ax2, df.loc[index[1]], session, color=color, yscale=False, legend=True)
 
     ax3 = f.add_subplot(inner[0,0], sharex=ax1)
-    lickplot(ax3, df.loc[index[0]][session+'_licks'])
+    lickplot(ax3, df.loc[index[0]][session+'_licks'], df.loc[index[0]][session+'_sipper'][0])
     ax4 = f.add_subplot(inner[0,1], sharey=ax3, sharex=ax2)
-    lickplot(ax4, df.loc[index[1]][session+'_licks'], ylabel=False)
+    lickplot(ax4, df.loc[index[1]][session+'_licks'], df.loc[index[1]][session+'_sipper'][0], ylabel=False)
     
     if title == True:
         ax3.set_title('Casein')
@@ -307,26 +319,31 @@ def heatmapFig(f, df, gs, gsx, gsy, session, rat, clims=[0,1]):
 def averagetrace(ax, df, diet, keys, event='',
                  color=[almost_black, 'xkcd:bluish grey'],
                  errorcolors=['xkcd:silver', 'xkcd:silver']):
-                
+
+# Selects diet group to plot                
     df = df.xs(diet, level=1)
 
+# Plots casein and maltodextrin shaded erros
     jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
     jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
     
     #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
     ax.axis('off')
-    
+
+# Marks location of event on graph with arrow    
     arrow_y = ax.get_ylim()[1]
-    ax.plot([100], [arrow_y], 'v', color='xkcd:silver')
-    ax.annotate(event, xy=(100, arrow_y), xytext=(0,5), textcoords='offset points',
+    ax.plot([100, 150], [arrow_y, arrow_y], color='xkcd:silver', linewidth=3)
+    ax.annotate(event, xy=(125, arrow_y), xytext=(0,5), textcoords='offset points',
                 ha='center', va='bottom')
 
+# Adds y scale bar
     y = [y for y in ax.get_yticks() if y>0][:2]
     l = y[1] - y[0]
     scale_label = '{0:.0f}% \u0394F'.format(l*100)
     ax.plot([50,50], [y[0], y[1]], c=almost_black)
     ax.text(40, y[0]+(l/2), scale_label, va='center', ha='right')
-   
+
+# Adds x scale bar   
     y = ax.get_ylim()[0]
     ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
     ax.annotate('5 s', xy=(276,y), xycoords='data',

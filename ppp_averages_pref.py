@@ -210,6 +210,7 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
     df_reptraces[pref + '_photo_blue'] = ""
     df_reptraces[pref + '_photo_uv'] = ""
     df_reptraces[pref + '_licks'] = ""
+    df_reptraces[pref + '_sipper'] = ""
     
     for group, rat, trace in zip(groups, rats, traces):
         
@@ -219,12 +220,15 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
             trial = x.cas[event]    
             run = x.cas['lickdata']['rStart'][trace]
             all_licks = x.cas['licks']
+            all_sips = x.cas['sipper']
         elif 'malt' in group:
             trial = x.malt[event]    
             run = x.malt['lickdata']['rStart'][trace]
             all_licks = x.malt['licks']
+            all_sips = x.malt['sipper']
         
-        df_reptraces.at[group, pref + '_licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
+        df_reptraces.at[group, pref + '_licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]
+        df_reptraces.at[group, pref + '_sipper'] = [sip-run for sip in all_sips if (sip-run<0.01) and (sip-run>-10)]
         df_reptraces.at[group, pref + '_photo_blue'] = trial['blue'][trace]
         df_reptraces.at[group, pref + '_photo_uv'] = trial['uv'][trace]
 
@@ -250,7 +254,7 @@ groups = ['NR_cas', 'NR_malt', 'PR_cas', 'PR_malt']
 rats = ['PPP1-7', 'PPP1-7', 'PPP1-4', 'PPP1-4']
 pref_list = ['pref1', 'pref2', 'pref3']
 
-traces_list = [[15, 18, 6, 3],
+traces_list = [[16, 14, 13, 5],
           [6, 3, 19, 14],
           [13, 13, 13, 9]]
 
@@ -266,21 +270,25 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
     df_reptraces_sip[pref + '_photo_blue'] = ""
     df_reptraces_sip[pref + '_photo_uv'] = ""
     df_reptraces_sip[pref + '_licks'] = ""
+    df_reptraces_sip[pref + '_sipper'] = ""
     
     for group, rat, trace in zip(groups, rats, traces):
         
         x = pref_sessions[rat + '_' + s]
         
         if 'cas' in group:
-            trial = x.cas[event]    
-            run = x.cas['lickdata']['rStart'][trace]
+            trial = x.cas[event]
+            sip = x.cas['sipper'][trace]
             all_licks = x.cas['licks']
+            all_sips = x.cas['sipper']
         elif 'malt' in group:
-            trial = x.malt[event]    
-            run = x.malt['lickdata']['rStart'][trace]
+            trial = x.malt[event]
+            sip = x.malt['sipper'][trace]
             all_licks = x.malt['licks']
+            all_sips = x.malt['sipper']
         
-        df_reptraces_sip.at[group, pref + '_licks'] = [l-run for l in all_licks if (l>run-10) and (l<run+20)]    
+        df_reptraces_sip.at[group, pref + '_licks'] = [l-sip for l in all_licks if (l>sip-10) and (l<sip+20)]
+        df_reptraces_sip.at[group, pref + '_sipper'] = [s-sip for s in all_sips if (s-sip<0.01) and (s-sip>-10)]
         df_reptraces_sip.at[group, pref + '_photo_blue'] = trial['blue'][trace]
         df_reptraces_sip.at[group, pref + '_photo_uv'] = trial['uv'][trace]
 
