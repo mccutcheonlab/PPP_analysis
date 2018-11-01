@@ -63,7 +63,15 @@ def makemeansnips(snips, noiseindex):
 def removenoise(snipdata):
     # returns blue snips with noisey ones removed
     new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
+    print(len(new_snips))
     return new_snips
+
+def getsipper(snipdata):
+    
+    sipper = [lat for (lat, noise) in zip(snipdata['latency'], snipdata['noise']) if not noise]  
+    print(snipdata['noise'])
+    print(len(sipper))
+    return sipper
 
 # Looks for existing data and if not there loads pickled file
 try:
@@ -247,6 +255,10 @@ for s, pref in zip(['s10', 's11', 's16'],
         
         df_heatmap.at[rat, pref + '_cas'] = removenoise(x.cas[event])
         df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event])
+#        df_heatmap.at[rat, pref + '_cas_event'] = getsipper(x.cas[event])
+#        df_heatmap.at[rat, pref + '_malt_event'] = getsipper(x.malt[event])
+#        print(len(removenoise(x.cas[event])))
+#        print(len(getsipper(x.cas[event])))
 
 # Assembles dataframe for reptraces     for SIPPER TRIALS    
 
@@ -307,6 +319,16 @@ for s, pref in zip(['s10', 's11', 's16'],
         
         df_heatmap_sip.at[rat, pref + '_cas'] = removenoise(x.cas[event])
         df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
+        
+#        df_heatmap_sip.at[rat, pref + '_cas'] = removenoise(x.cas[event])
+#        df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
+        
+
+        
+#def getfirstlick(noiseindex):
+#    # returns blue snips with noisey ones removed
+#    new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
+#    return new_snips
 
 
 
