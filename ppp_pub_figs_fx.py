@@ -278,7 +278,7 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
         ax3.set_title('Casein')
         ax4.set_title('Maltodextrin')
 
-def makeheatmap(ax, data, ylabel='Trials'):
+def makeheatmap(ax, data, events=None, ylabel='Trials'):
     ntrials = np.shape(data)[0]
     xvals = np.linspace(-9.9,20,300)
     yvals = np.arange(1, ntrials+2)
@@ -290,28 +290,43 @@ def makeheatmap(ax, data, ylabel='Trials'):
     ax.set_xticks([])
     ax.invert_yaxis()
     
+    if events:
+        ax.vlines(events, yvals[:-1], yvals[1:], color='w')
+    else:
+        print('No events')
+    
     return ax, mesh
 
-def heatmapFig(f, df, gs, gsx, gsy, session, event, rat, clims=[0,1]):
+def heatmapFig(f, df, gs, gsx, gsy, session, event, rat,
+               reverse=False,
+               clims=[0,1]):
     
     data_cas = df[session+'_cas'][rat]
     data_malt = df[session+'_malt'][rat]
+    event_cas = df[session+'_cas_event'][rat]
+    event_malt = df[session+'_malt_event'][rat]
+    
+    if reverse:
+            event_cas = [-event for event in event_cas]
+            event_malt = [-event for event in event_malt]
 
     inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
                                              width_ratios=[12,1],
                                              wspace=0.05)
     ax1 = f.add_subplot(inner[0,0])
-    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein trials')
+    ax, mesh = makeheatmap(ax1, data_cas, events=event_cas,
+                           ylabel='Casein trials')
     mesh.set_clim(clims)
     ax1.plot([0], [-1], 'v', color='xkcd:silver')
     
     ax2 = f.add_subplot(inner[1,0], sharex=ax1)
-    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt. trials')
+    ax, mesh = makeheatmap(ax2, data_malt, events=event_malt,
+                           ylabel='Malt. trials')
     mesh.set_clim(clims)
     
-    if event == 'Sipper':
-        print(event)
-    
+    for ax in [ax1, ax2]:
+        ax.set_xlim([-10,20])
+
     cbar_ax = f.add_subplot(inner[:,1])   
     cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
     cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
@@ -450,28 +465,25 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
     # Non-restricted figures, row 0
     reptracesFig(f, df_reptraces, ['NR_cas', 'NR_malt'], session, gs, 0, 0, title=True, color=rowcolors[0][0])
     
-    heatmapFig(f, df_heatmap, gs, 0, 2, session, event, 'PPP1-7', clims=clims[0])
-
-#    # average traces NR cas v malt
-#    ax3 = f.add_subplot(gs[0,4])
     if event == 'Sipper':
+        heatmapFig(f, df_heatmap, gs, 0, 2, session, event, 'PPP1-7', clims=clims[0])
         averagetrace_sipper(f, gs, 0, 4, df_photo, 'NR', keys_traces, keys_lats, event=event, color=rowcolors[0])
     else:
+        heatmapFig(f, df_heatmap, gs, 0, 2, session, event, 'PPP1-7', reverse=True, clims=clims[0])
         ax3 = f.add_subplot(gs[0,4])
         averagetrace(ax3, df_photo, 'NR', keys_traces, event=event, color=rowcolors[0])
         
     ax7 = f.add_subplot(gs[0,6]) 
     peakbargraph(ax7, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
-#   
+   
 #    # Protein-restricted figures, row 1
     reptracesFig(f, df_reptraces, ['PR_cas', 'PR_malt'], session, gs, 1, 0, color=rowcolors[1][0])
-    heatmapFig(f, df_heatmap, gs, 1, 2, session, event, 'PPP1-4', clims=clims[1])
-#    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
-#    # average traces NR cas v malt
-#    ax6 = f.add_subplot(gs[1,4])
+
     if event == 'Sipper':
+            heatmapFig(f, df_heatmap, gs, 1, 2, session, event, 'PPP1-4', clims=clims[1])
             averagetrace_sipper(f, gs, 1, 4, df_photo, 'PR', keys_traces, keys_lats, event=event, color=rowcolors[1])
     else:
+        heatmapFig(f, df_heatmap, gs, 1, 2, session, event, 'PPP1-4', reverse=True, clims=clims[1])
         ax6 = f.add_subplot(gs[1,4])
         averagetrace(ax6, df_photo, 'PR', keys_traces, event=event, color=rowcolors[1])
             

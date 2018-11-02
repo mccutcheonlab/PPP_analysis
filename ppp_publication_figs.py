@@ -30,12 +30,13 @@ import dill
 # Looks for existing data and if not there loads pickled file
 try:
     pickle_folder = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\'
+    pickle_folder = 'C:\\Data\\PPP_combined\\'
     
-    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
-    df_sacc_behav = dill.load(pickle_in)
-    
-    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
-    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
+#    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
+#    df_sacc_behav = dill.load(pickle_in)
+#    
+#    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+#    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip = dill.load(pickle_in)
@@ -88,7 +89,7 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-behav_figs=True
+behav_figs=False
 photo_sip_figs=True
 photo_licks_figs=True
 
