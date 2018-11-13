@@ -476,6 +476,48 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
      
     return f
 
+def reduced_photofig(df_photo, df_behav, session='pref2', event='Licks', dietswitch=True):
+    
+    keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced']
+    keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak']
+    
+    rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
+    rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
+    
+    if dietswitch == True:
+        rowcolors.reverse()
+        rowcolors_bar.reverse()
+    
+    gs_main = gridspec.GridSpec(2, 1, hspace=0.4, left=0.04, right=0.98)
+    f = plt.figure(figsize=(7.2,5))
+        
+    behav_panel = gridspec.GridSpecFromSubplotSpec(1, 4, subplot_spec=gs_main[0,0],
+                                         wspace=0.65)    
+    
+    axes = []
+    for i, ax in enumerate(behav_panel):
+        axes.append(f.add_subplot(ax))
+
+    pref_behav_fig(axes, df_behav, df_photo, prefsession=2, dietswitch=False)
+    
+    barpanelwidth=0.25
+    
+    photo_panel = gridspec.GridSpecFromSubplotSpec(1, 4, subplot_spec=gs_main[1,0],
+                                         width_ratios=[1, barpanelwidth, 1, barpanelwidth],
+                                         wspace=0.5)
+    
+    ax1 = f.add_subplot(photo_panel[0,0])
+    averagetrace(ax1, df_photo, 'NR', keys_traces, event=event, color=rowcolors[0])
+    
+    ax2 = f.add_subplot(photo_panel[0,1])
+    peakbargraph(ax2, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color=almost_black)
+    
+    ax3 = f.add_subplot(photo_panel[0,2])
+    averagetrace(ax3, df_photo, 'PR', keys_traces, event=event, color=rowcolors[1])
+    
+    ax4 = f.add_subplot(photo_panel[0,3])
+    peakbargraph(ax4, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+
 # To make summary figure
 
 def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):

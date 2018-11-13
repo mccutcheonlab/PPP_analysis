@@ -91,7 +91,8 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 behav_figs=False
 photo_sip_figs=False
 photo_licks_figs=False
-summary_fig=True
+pref2_fig=True
+summary_fig=False
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
@@ -137,6 +138,9 @@ if photo_licks_figs:
                                           keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
     
     photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
+    
+if pref2_fig:
+    reduced_photofig(df_photo, df_behav)
 ##
 ##photo_pref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
 ##                                     session='pref2',
