@@ -26,7 +26,7 @@ except NameError:
         pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'rb')
     except FileNotFoundError:
         print('Cannot access pickled file')
-    df_behav, df_photo = dill.load(pickle_in)
+    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip = dill.load(pickle_in)
 
 usr = jmf.getuserhome()
 
@@ -65,11 +65,28 @@ def ppp_ttest_unpaired(df, index1, index2, key):
     print(key, result, '\n')
     return result
 
+def ppp_full_ttests(df, keys, verbose=True):
+    
+    if verbose: print('t-test for NON-RESTRICTED, casein vs. malt')
+    ppp_ttest_paired(df, 'NR', keys[0], keys[1])
+    
+    if verbose: print('t-test for PROTEIN RESTRICTED, casein vs. malt')
+    ppp_ttest_paired(df, 'PR', keys[0], keys[1])
+    
+    if verbose: print('t-test for CASEIN, NR vs. PR')
+    ppp_ttest_unpaired(df, 'NR', 'PR', keys[0])
+    
+    if verbose: print('t-test for MALTODEXTRIN, NR vs. PR')
+    ppp_ttest_unpaired(df, 'NR', 'PR', keys[1])
+    
 def stats_pref_behav(prefsession='1', verbose=True):
     if verbose: print('\nAnalysis of preference session ' + prefsession)
         
     forcedkeys = ['pref' + prefsession + '_cas_forced',
-                  'pref' + prefsession + '_malt_forced'] 
+                  'pref' + prefsession + '_malt_forced']
+    
+    latkeys = ['pref' + str(prefsession) + '_cas_lats_fromsip',
+               'pref' + str(prefsession) + '_malt_lats_fromsip']
     
     freekeys = ['pref' + prefsession + '_cas_free',
                 'pref' + prefsession + '_malt_free']
@@ -81,44 +98,31 @@ def stats_pref_behav(prefsession='1', verbose=True):
     ppp_licksANOVA(df_behav,
                    forcedkeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_forc_licks.csv')
+   
+    if verbose: print('\ANOVA on LATENCIES on forced lick trials')
+    ppp_licksANOVA(df_photo,
+                   latkeys,
+                   usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_forc_licks.csv')
+
+    ppp_full_ttests(df_photo, latkeys)
     
     if verbose: print('\nANOVA on FREE LICK trials\n')
     ppp_licksANOVA(df_behav,
                    freekeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_free_licks.csv')
     
-    if verbose: print('t-test for NON-RESTRICTED, casein vs. malt')
-    ppp_ttest_paired(df_behav, 'NR', freekeys[0], freekeys[1])
-    
-    if verbose: print('t-test for PROTEIN RESTRICTED, casein vs. malt')
-    ppp_ttest_paired(df_behav, 'PR', freekeys[0], freekeys[1])
-    
-    if verbose: print('t-test for CASEIN, NR vs. PR')
-    ppp_ttest_unpaired(df_behav, 'NR', 'PR', freekeys[0])
-    
-    if verbose: print('t-test for MALTODEXTRIN, NR vs. PR')
-    ppp_ttest_unpaired(df_behav, 'NR', 'PR', freekeys[1])
+    ppp_full_ttests(df_behav, freekeys)
 
     if verbose: print('\nANOVA of CHOICE data\n')
     ppp_licksANOVA(df_behav,
                    choicekeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_choice.csv')
     
-    if verbose: print('t-test for NON-RESTRICTED, casein vs. malt')
-    ppp_ttest_paired(df_behav, 'NR', choicekeys[0], choicekeys[1])
-    
-    if verbose: print('t-test for PROTEIN RESTRICTED, casein vs. malt')
-    ppp_ttest_paired(df_behav, 'PR', choicekeys[0], choicekeys[1])
-    
-    if verbose: print('t-test for CASEIN, NR vs. PR')
-    ppp_ttest_unpaired(df_behav, 'NR', 'PR', choicekeys[0])
-    
-    if verbose: print('t-test for MALTODEXTRIN, NR vs. PR')
-    ppp_ttest_unpaired(df_behav, 'NR', 'PR', choicekeys[1])
+    ppp_full_ttests(df_behav, choicekeys)
 
-#stats_pref_behav()
-#stats_pref_behav(prefsession='2')
-#stats_pref_behav(prefsession='3')
+stats_pref_behav()
+stats_pref_behav(prefsession='2')
+stats_pref_behav(prefsession='3')
 
 
 def stats_pref_photo(prefsession='1', verbose=True):
@@ -133,17 +137,7 @@ def stats_pref_photo(prefsession='1', verbose=True):
                    forcedkeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref'+ prefsession+ '_forc_licks.csv')
     
-    if verbose: print('t-test for NON-RESTRICTED, casein vs. malt')
-    ppp_ttest_paired(df_photo, 'NR', forcedkeys[0], forcedkeys[1])
-    
-    if verbose: print('t-test for PROTEIN RESTRICTED, casein vs. malt')
-    ppp_ttest_paired(df_photo, 'PR', forcedkeys[0], forcedkeys[1])
-    
-    if verbose: print('t-test for CASEIN, NR vs. PR')
-    ppp_ttest_unpaired(df_photo, 'NR', 'PR', forcedkeys[0])
-    
-    if verbose: print('t-test for MALTODEXTRIN, NR vs. PR')
-    ppp_ttest_unpaired(df_photo, 'NR', 'PR', forcedkeys[1])
+    ppp_full_ttests(df_photo, forcedkeys)
     
 
 stats_pref_photo()
