@@ -63,15 +63,23 @@ def makemeansnips(snips, noiseindex):
 def removenoise(snipdata):
     # returns blue snips with noisey ones removed
     new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
-    print(len(new_snips))
     return new_snips
 
 def getsipper(snipdata):
     
-    sipper = [lat for (lat, noise) in zip(snipdata['latency'], snipdata['noise']) if not noise]  
-    print(snipdata['noise'])
-    print(len(sipper))
+    sipper = [lat for (lat, noise) in zip(snipdata['latency'], snipdata['noise']) if not noise]
     return sipper
+
+def getfirstlick(side, event):
+    sipper = side['sipper']
+    licks = side['licks']
+    firstlicks=[]
+    for sip in sipper:
+        firstlicks.append([l-sip for l in licks if l-sip>0][0])
+        
+    lats = [lat for (lat, noise) in zip(firstlicks, side[event]['noise']) if not noise]
+    lats = [lat if (lat<20) else np.nan for lat in lats]
+    return lats
 
 # Looks for existing data and if not there loads pickled file
 try:
@@ -249,16 +257,16 @@ for s, pref in zip(['s10', 's11', 's16'],
 
     df_heatmap[pref + '_cas'] = ""
     df_heatmap[pref + '_malt'] = ""
+    df_heatmap[pref + '_cas_event'] = ""
+    df_heatmap[pref + '_malt_event'] = ""
     
     for rat in rats:
         x = pref_sessions[rat + '_' + s]
         
         df_heatmap.at[rat, pref + '_cas'] = removenoise(x.cas[event])
+        df_heatmap.at[rat, pref + '_cas_event'] = getsipper(x.cas[event])        
         df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event])
-#        df_heatmap.at[rat, pref + '_cas_event'] = getsipper(x.cas[event])
-#        df_heatmap.at[rat, pref + '_malt_event'] = getsipper(x.malt[event])
-#        print(len(removenoise(x.cas[event])))
-#        print(len(getsipper(x.cas[event])))
+        df_heatmap.at[rat, pref + '_malt_event'] = getsipper(x.malt[event])
 
 # Assembles dataframe for reptraces     for SIPPER TRIALS    
 
@@ -308,29 +316,24 @@ rats = np.unique(rats)
 df_heatmap_sip = pd.DataFrame(rats, columns=['rat'])
 df_heatmap_sip.set_index(['rat'], inplace=True)
 
+
+
 for s, pref in zip(['s10', 's11', 's16'],
                            pref_list):
 
     df_heatmap_sip[pref + '_cas'] = ""
     df_heatmap_sip[pref + '_malt'] = ""
+    df_heatmap_sip[pref + '_cas_event'] = ""
+    df_heatmap_sip[pref + '_malt_event'] = ""
     
     for rat in rats:
         x = pref_sessions[rat + '_' + s]
         
         df_heatmap_sip.at[rat, pref + '_cas'] = removenoise(x.cas[event])
+        df_heatmap_sip.at[rat, pref + '_cas_event'] = getfirstlick(x.cas, event)
         df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
-        
-#        df_heatmap_sip.at[rat, pref + '_cas'] = removenoise(x.cas[event])
-#        df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
-        
-
-        
-#def getfirstlick(noiseindex):
-#    # returns blue snips with noisey ones removed
-#    new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
-#    return new_snips
-
-
+        df_heatmap_sip.at[rat, pref + '_malt_event'] = getfirstlick(x.malt, event)
+        print(getfirstlick(x.malt, event))
 
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
 dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip], pickle_out)
