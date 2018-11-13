@@ -452,8 +452,6 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
     
     heatmapFig(f, df_heatmap, gs, 0, 2, session, event, 'PPP1-7', clims=clims[0])
 
-#    # average traces NR cas v malt
-#    ax3 = f.add_subplot(gs[0,4])
     if event == 'Sipper':
         averagetrace_sipper(f, gs, 0, 4, df_photo, 'NR', keys_traces, keys_lats, event=event, color=rowcolors[0])
     else:
@@ -462,13 +460,11 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
         
     ax7 = f.add_subplot(gs[0,6]) 
     peakbargraph(ax7, df_photo, 'NR', keys_bars, bar_colors=rowcolors_bar[0], sc_color='w')
-#   
-#    # Protein-restricted figures, row 1
+   
+    # Protein-restricted figures, row 1
     reptracesFig(f, df_reptraces, ['PR_cas', 'PR_malt'], session, gs, 1, 0, color=rowcolors[1][0])
     heatmapFig(f, df_heatmap, gs, 1, 2, session, event, 'PPP1-4', clims=clims[1])
-#    heatmapFig(f, gs, 1, 2, 's10', 'PPP1.3', clims=clim_pr)
-#    # average traces NR cas v malt
-#    ax6 = f.add_subplot(gs[1,4])
+
     if event == 'Sipper':
             averagetrace_sipper(f, gs, 1, 4, df_photo, 'PR', keys_traces, keys_lats, event=event, color=rowcolors[1])
     else:
@@ -480,94 +476,108 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
      
     return f
 
+# To make summary figure
 
+def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
+    dietmsk = df.diet == 'NR'
+    
 
+    a = [df[keys[0]], df[keys[1]]]
+    x = jmf.data2obj1D(a)
+    
+    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
+          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
 
+    x = data2obj2D(a)
+    if dietswitch == True:
+        cols = [green, light_green, 'xkcd:silver', 'w']
+    else:        
+        cols = ['xkcd:silver', 'w', green, light_green]
+    
+    jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scattersize = 100,
+                 ax=ax)
+    ax.set_xticks([])
+    
+    for x,label in enumerate(xlabels):
+        ax.text(x+1, -0.0175, label, ha='center')
+    
+    ax.set_ylim([-.02, 0.135])
+    yticks = [0, 0.05, 0.1]
+    ax.set_yticks(yticks)
+    
+    if ylabels == True:
+        yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
+        ax.set_yticklabels(yticklabels)
+        ax.set_ylabel('\u0394F', rotation=0)
+    else:
+        ax.set_yticklabels([])
 
-
-
-
-
-
-
-
-
-
-#
-#
-#
-#
-#
-#
-#
-#
-## To make summary figure
-#
-#
-#def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
-#    dietmsk = df.diet == 'NR'
-#    
-#    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
-#          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
-#
-#    x = data2obj2D(a)
-#    if dietswitch == True:
-#        cols = [green, light_green, 'xkcd:silver', 'w']
-#    else:        
-#        cols = ['xkcd:silver', 'w', green, light_green]
-#    
-#    jmfig.barscatter(x, paired=True,
-#                 barfacecoloroption = 'individual',
-#                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
-#                 scatteredgecolor = [almost_black],
-#                 scatterlinecolor = almost_black,
-#                 scattersize = 100,
-#                 ax=ax)
+def summary_subfig(ax, df, keys):
+    
+    df_NR = df.xs('NR', level=1)
+    df_PR = df.xs('PR', level=1)
+    
+    a = [[df_NR[keys[0]], df_NR[keys[1]], df_NR[keys[2]]],
+          [df_PR[keys[0]], df_PR[keys[1]], df_PR[keys[2]]]]
+    
+    x = jmf.data2obj2D(a)
+    
+    cols = ['xkcd:silver', green]
+    
+    xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
+    
+    jmfig.barscatter(x, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scattersize = 60,
+                 grouplabel = xlabels,
+                 ax=ax)
+    
 #    ax.set_xticks([])
-#    
+#    yval = ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])/20
+#    xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
 #    for x,label in enumerate(xlabels):
-#        ax.text(x+1, -0.0175, label, ha='center')
-#    
-#    ax.set_ylim([-.02, 0.135])
-#    yticks = [0, 0.05, 0.1]
-#    ax.set_yticks(yticks)
-#    
-#    if ylabels == True:
-#        yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
-#        ax.set_yticklabels(yticklabels)
-#        ax.set_ylabel('\u0394F', rotation=0)
-#    else:
-#        ax.set_yticklabels([])
-#
-#
-#
-#def makesummaryFig2(df_pref, df_photo):
-#    gs = gridspec.GridSpec(1, 2, wspace=0.5)
-#    mpl.rcParams['figure.subplot.left'] = 0.10
-#    mpl.rcParams['figure.subplot.top'] = 0.85
-#    mpl.rcParams['axes.labelpad'] = 4
-#    f = plt.figure(figsize=(5,2))
-#    
-#    ax0 = f.add_subplot(gs[0])
-#    choicefig(df_pref, ['pref1', 'pref2', 'pref3'], ax0)
-#    ax0.set_ylabel('Casein preference')
-#    ax0.set_yticks([0, 0.5, 1.0]) 
-#    ax0.set_yticklabels(['0', '0.5', '1'])
-#    ax0.set_title('Behaviour')
-#    ax1 = f.add_subplot(gs[1])
-#    choicefig(df_photo, ['pref1_peak_delta', 'pref2_peak_delta', 'pref3_peak_delta'], ax1)
-#    ax1.set_ylabel('\u0394F (Casein - Malt.)')
-#    
-#    ax1.set_ylim([-0.035, 0.09])
-#    ax1.set_yticks([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
-#    ax1.set_yticklabels([-0.02, 0, 0.02, 0.04, 0.06, 0.08])
-#    ax1.set_title('Photometry')
-#
-#    return f
-#
-#
-#
-#
+#        ax.text(x+1, yval, label, ha='center')
+
+def makesummaryFig(df_behav, df_photo):
+    gs = gridspec.GridSpec(1, 2, wspace=0.5)
+    mpl.rcParams['figure.subplot.left'] = 0.10
+    mpl.rcParams['figure.subplot.top'] = 0.85
+    mpl.rcParams['axes.labelpad'] = 4
+    f = plt.figure(figsize=(5,2))
+    
+    ax0 = f.add_subplot(gs[0])
+    summary_subfig(ax0, df_behav, ['pref1', 'pref2', 'pref3'])
+    ax0.set_ylabel('Casein preference')
+    ax0.set_ylim([-0.1, 1.1])
+    ax0.set_yticks([0, 0.5, 1.0]) 
+    ax0.set_yticklabels(['0', '0.5', '1'])
+    ax0.set_title('Behaviour')
+
+    ax0.plot(ax0.get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
+    
+    ax1 = f.add_subplot(gs[1])
+    summary_subfig(ax1, df_photo, ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta'])
+    ax1.set_ylabel('%\u0394F (Casein - Malt.)')
+    
+    ax1.set_ylim([-0.035, 0.11])
+    ax1.set_yticks([0, 0.05, 0.1])
+    ax1.set_yticklabels(['0', '5', '10'])
+    ax1.set_title('Photometry')
+
+    return f
+
+
+
+
+
 #def peakresponsebargraph(df, keys, ax):
 #    dietmsk = df.diet == 'NR'
 #    

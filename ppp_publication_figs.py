@@ -88,9 +88,10 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-behav_figs=True
-photo_sip_figs=True
-photo_licks_figs=True
+behav_figs=False
+photo_sip_figs=False
+photo_licks_figs=False
+summary_fig=True
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
@@ -152,9 +153,9 @@ if photo_licks_figs:
 ##photo_pref3_fig.savefig(savefolder + 'pref3_photo.pdf')
 
 
-
-#summaryFig = pppfig.makesummaryFig2(df_behav, df_photo)
-#summaryFig.savefig('R:/DA_and_Reward/es334/PPP1/figures/MMiN/summary.pdf')
+if summary_fig:
+    summaryFig = pppfig.makesummaryFig(df_behav, df_photo)
+    summaryFig.savefig(savefolder + 'summaryfig.pdf')
 
 # Fig for Preference Test 1
 #keys_choicebars = ['ncas1', 'nmalt1']
