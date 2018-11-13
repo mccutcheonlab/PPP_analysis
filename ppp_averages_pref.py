@@ -333,7 +333,6 @@ for s, pref in zip(['s10', 's11', 's16'],
         df_heatmap_sip.at[rat, pref + '_cas_event'] = getfirstlick(x.cas, event)
         df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
         df_heatmap_sip.at[rat, pref + '_malt_event'] = getfirstlick(x.malt, event)
-        print(getfirstlick(x.malt, event))
 
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
 dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip], pickle_out)
