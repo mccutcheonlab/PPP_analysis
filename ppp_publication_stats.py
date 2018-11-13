@@ -52,6 +52,22 @@ def ppp_licksANOVA(df, cols, csvfile):
     print(result.returncode, result.stderr, result.stdout)
     return result
 
+def ppp_summaryANOVA_2way(df, cols, csvfile):
+    df = extractandstack(df, cols, new_cols=['rat', 'diet', 'prefsession', 'value'])
+    df.to_csv(csvfile)
+    result = run([Rscriptpath, "--vanilla", "ppp_summaryANOVA_2way.R", csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    print(result.returncode, result.stderr, result.stdout)
+    return result
+
+def ppp_summaryANOVA_1way(df, cols, csvfile, dietgroup):
+    
+    df = df.xs(dietgroup, level=1)    
+    df = extractandstack(df, cols, new_cols=['rat', 'prefsession', 'value'])
+    df.to_csv(csvfile)
+    result = run([Rscriptpath, "--vanilla", "ppp_summaryANOVA_1way.R", csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    print(result.returncode, result.stderr, result.stdout)
+    return result
+
 def ppp_ttest_paired(df, subset, key1, key2):
     df = df.xs(subset, level=1)
     result = stats.ttest_rel(df[key1], df[key2])
@@ -78,6 +94,19 @@ def ppp_full_ttests(df, keys, verbose=True):
     
     if verbose: print('t-test for MALTODEXTRIN, NR vs. PR')
     ppp_ttest_unpaired(df, 'NR', 'PR', keys[1])
+
+def ppp_summary_ttests(df, keys, dietgroup, verbose=True):
+    if verbose: print('t-test for session 1 vs session 2')
+    result = ppp_ttest_paired(df, dietgroup, keys[0], keys[1])
+    print('Bonferroni corrected p-value = ', result[1]*3)
+    
+    if verbose: print('t-test for session 1 vs session 3')
+    result = ppp_ttest_paired(df, dietgroup, keys[0], keys[2])
+    print('Bonferroni corrected p-value = ', result[1]*3)
+    
+    if verbose: print('t-test for session 2 vs session 3')
+    result = ppp_ttest_paired(df, dietgroup, keys[1], keys[2])
+    print('Bonferroni corrected p-value = ', result[1]*3)
     
 def stats_pref_behav(prefsession='1', verbose=True):
     if verbose: print('\nAnalysis of preference session ' + prefsession)
@@ -120,10 +149,6 @@ def stats_pref_behav(prefsession='1', verbose=True):
     
     ppp_full_ttests(df_behav, choicekeys)
 
-stats_pref_behav()
-stats_pref_behav(prefsession='2')
-stats_pref_behav(prefsession='3')
-
 
 def stats_pref_photo(prefsession='1', verbose=True):
     
@@ -138,8 +163,59 @@ def stats_pref_photo(prefsession='1', verbose=True):
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref'+ prefsession+ '_forc_licks.csv')
     
     ppp_full_ttests(df_photo, forcedkeys)
-    
 
-stats_pref_photo()
-stats_pref_photo(prefsession='2')
-stats_pref_photo(prefsession='3')
+def stats_summary_behav(verbose=True):
+    if verbose: print('\nAnalysis of summary data - BEHAVIOUR')
+    
+    choicekeys = ['pref1', 'pref2', 'pref3']
+    
+    ppp_summaryANOVA_2way(df_behav,
+                   choicekeys,
+                   usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_behav.csv')
+    
+    if verbose: print('\nOne-way ANOVA on NR-PR rats')
+    ppp_summaryANOVA_1way(df_behav,
+               choicekeys,
+               usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_behav_NR.csv',
+               'NR')
+    
+    ppp_summary_ttests(df_behav, choicekeys, 'NR')
+    
+    if verbose: print('\nOne-way ANOVA on PR-NR rats')
+    ppp_summaryANOVA_1way(df_behav,
+               choicekeys,
+               usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_behav_PR.csv',
+               'PR')
+
+def stats_summary_photo(verbose=True):
+    if verbose: print('\nAnalysis of summary data - PHOTOMETRY')
+    
+    photokeys = ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta']
+    
+    ppp_summaryANOVA_2way(df_photo,
+                   photokeys,
+                   usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_photo.csv')
+    
+    if verbose: print('\nOne-way ANOVA on NR-PR rats')
+    ppp_summaryANOVA_1way(df_photo,
+               photokeys,
+               usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_photo_NR.csv',
+               'NR')
+    
+    if verbose: print('\nOne-way ANOVA on PR-NR rats')
+    ppp_summaryANOVA_1way(df_photo,
+               photokeys,
+               usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_photo_PR.csv',
+               'PR')
+
+#
+#stats_pref_behav()
+#stats_pref_behav(prefsession='2')
+#stats_pref_behav(prefsession='3')
+#
+#stats_pref_photo()
+#stats_pref_photo(prefsession='2')
+#stats_pref_photo(prefsession='3')
+
+stats_summary_behav()
+#stats_summary_photo()
