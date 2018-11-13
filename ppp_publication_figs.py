@@ -88,11 +88,12 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
-behav_figs=False
-photo_sip_figs=False
-photo_licks_figs=False
-pref2_fig=True
-summary_fig=False
+make_behav_figs=False
+make_photo_sip_figs=False
+make_photo_licks_figs=False
+make_pref2_fig=True
+make_pref3_fig=True
+make_summary_fig=False
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
@@ -103,25 +104,25 @@ summary_fig=False
 #pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
 #ax[0].set_ylabel('Licks')
 
-if behav_figs:
+if make_behav_figs:
     fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
     fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
     pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=1)
     fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
     
-    fflicks_pref2_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
-    fflicks_pref2_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True)
-    fflicks_pref2_fig.savefig(savefolder + 'pref2_behav.eps')
-    
-    fflicks_pref3_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
-    fflicks_pref3_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
-    fflicks_pref3_fig.savefig(savefolder + 'pref3_behav.eps')
+#    fflicks_pref2_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
+#    fflicks_pref2_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+#    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True)
+#    fflicks_pref2_fig.savefig(savefolder + 'pref2_behav.eps')
+#    
+#    fflicks_pref3_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
+#    fflicks_pref3_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+#    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
+#    fflicks_pref3_fig.savefig(savefolder + 'pref3_behav.eps')
 
 clims = [[-0.15,0.20], [-0.11,0.15]]
 
-if photo_sip_figs:
+if make_photo_sip_figs:
     photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,
                                                  keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
                                                  keys_bars = ['pref1_cas_sip_peak', 'pref1_malt_sip_peak'],
@@ -130,7 +131,7 @@ if photo_sip_figs:
     
     photo_pref1_sipper_fig.savefig(savefolder + 'pref1_sip_photo.pdf')
 
-if photo_licks_figs:
+if make_photo_licks_figs:
     
     photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
@@ -139,8 +140,16 @@ if photo_licks_figs:
     
     photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
     
-if pref2_fig:
-    reduced_photofig(df_photo, df_behav)
+if make_pref2_fig:
+    pref2_fig = pppfig.reduced_photofig(df_photo, df_behav)
+    pref2_fig.savefig(savefolder + 'pref2_licks_fig.pdf')
+    
+
+if make_pref3_fig:
+    pref3_fig = pppfig.reduced_photofig(df_photo, df_behav, session=3,
+                     keys_traces = ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'],
+                     keys_bars = ['pref3_cas_licks_peak', 'pref3_malt_licks_peak'])
+    pref3_fig.savefig(savefolder + 'pref3_licks_fig.pdf')
 ##
 ##photo_pref2_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo,
 ##                                     session='pref2',
@@ -157,7 +166,7 @@ if pref2_fig:
 ##photo_pref3_fig.savefig(savefolder + 'pref3_photo.pdf')
 
 
-if summary_fig:
+if make_summary_fig:
     summaryFig = pppfig.makesummaryFig(df_behav, df_photo)
     summaryFig.savefig(savefolder + 'summaryfig.pdf')
 

@@ -476,10 +476,11 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
      
     return f
 
-def reduced_photofig(df_photo, df_behav, session='pref2', event='Licks', dietswitch=True):
+def reduced_photofig(df_photo, df_behav, session=2, event='Licks', dietswitch=True,
+                     keys_traces = ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
+                     keys_bars = ['pref2_cas_licks_peak', 'pref2_malt_licks_peak']):
     
-    keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced']
-    keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak']
+   
     
     rowcolors = [[almost_black, 'xkcd:bluish grey'], [green, light_green]]
     rowcolors_bar = [['xkcd:silver', 'w'], [green, light_green]]
@@ -498,7 +499,7 @@ def reduced_photofig(df_photo, df_behav, session='pref2', event='Licks', dietswi
     for i, ax in enumerate(behav_panel):
         axes.append(f.add_subplot(ax))
 
-    pref_behav_fig(axes, df_behav, df_photo, prefsession=2, dietswitch=False)
+    pref_behav_fig(axes, df_behav, df_photo, prefsession=session, dietswitch=dietswitch)
     
     barpanelwidth=0.25
     
@@ -517,47 +518,10 @@ def reduced_photofig(df_photo, df_behav, session='pref2', event='Licks', dietswi
     
     ax4 = f.add_subplot(photo_panel[0,3])
     peakbargraph(ax4, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
+    
+    return f
 
 # To make summary figure
-
-def peakresponsebargraph(ax, df, keys, ylabels=True, dietswitch=False, xlabels=[]):
-    dietmsk = df.diet == 'NR'
-    
-
-    a = [df[keys[0]], df[keys[1]]]
-    x = jmf.data2obj1D(a)
-    
-    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
-          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
-
-    x = data2obj2D(a)
-    if dietswitch == True:
-        cols = [green, light_green, 'xkcd:silver', 'w']
-    else:        
-        cols = ['xkcd:silver', 'w', green, light_green]
-    
-    jmfig.barscatter(x, paired=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
-                 scatteredgecolor = [almost_black],
-                 scatterlinecolor = almost_black,
-                 scattersize = 100,
-                 ax=ax)
-    ax.set_xticks([])
-    
-    for x,label in enumerate(xlabels):
-        ax.text(x+1, -0.0175, label, ha='center')
-    
-    ax.set_ylim([-.02, 0.135])
-    yticks = [0, 0.05, 0.1]
-    ax.set_yticks(yticks)
-    
-    if ylabels == True:
-        yticklabels = ['{0:.0f}%'.format(x*100) for x in yticks]
-        ax.set_yticklabels(yticklabels)
-        ax.set_ylabel('\u0394F', rotation=0)
-    else:
-        ax.set_yticklabels([])
 
 def summary_subfig(ax, df, keys):
     
