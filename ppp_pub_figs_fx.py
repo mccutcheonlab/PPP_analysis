@@ -539,12 +539,6 @@ def summary_subfig(ax, df, keys):
                  scattersize = 60,
                  grouplabel = xlabels,
                  ax=ax)
-    
-#    ax.set_xticks([])
-#    yval = ax.get_ylim()[0] - (ax.get_ylim()[1]-ax.get_ylim()[0])/20
-#    xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
-#    for x,label in enumerate(xlabels):
-#        ax.text(x+1, yval, label, ha='center')
 
 def makesummaryFig(df_behav, df_photo):
     gs = gridspec.GridSpec(1, 2, wspace=0.5)
@@ -575,30 +569,6 @@ def makesummaryFig(df_behav, df_photo):
     return f
 
 
-
-
-
-#def peakresponsebargraph(df, keys, ax):
-#    dietmsk = df.diet == 'NR'
-#    
-#    a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
-#          [df[keys[0]][~dietmsk], df[keys[1]][~dietmsk]]]
-#
-#    x = data2obj2D(a)
-#    
-#    cols = ['xkcd:silver', 'w', 'xkcd:kelly green', 'xkcd:light green']
-#    
-#    ax, x, _, _ = jmfig.barscatter(x, paired=True,
-#                 barfacecoloroption = 'individual',
-#                 barfacecolor = [cols[0], cols[1], cols[2], cols[3]],
-#                 scatteredgecolor = ['xkcd:charcoal'],
-#                 scatterlinecolor = 'xkcd:charcoal',
-#                 grouplabel=['NR', 'PR'],
-#                 scattersize = 100,
-#                 ax=ax)
-#    ax.set_ylim([-.02, 0.15])
-#    ax.set_yticks([0, 0.05, 0.1, 0.15])
-##    ax.set_ylabel('\u0394F')
 #
 #def behav_vs_photoFig(ax, xdata, ydata, diet):
 #    for x, y, d in zip(xdata, ydata, diet):
@@ -608,43 +578,4 @@ def makesummaryFig(df_behav, df_photo):
 #            color = 'g'
 #        ax.scatter(x, y, c=color)
 #
-#
-#def makesummaryFig():
-#    gs = gridspec.GridSpec(1, 2, width_ratios=[1,3], wspace=0.3)
-#    mpl.rcParams['figure.subplot.left'] = 0.10
-#    mpl.rcParams['figure.subplot.top'] = 0.90
-#    mpl.rcParams['axes.labelpad'] = 4
-#    f = plt.figure(figsize=(inch(300), inch(120)))
-#    
-#    adjust = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0],
-#                                             wspace=0.05,
-#                                             height_ratios=[18,1])
-#    
-#    ax0 = f.add_subplot(adjust[0])
-#    choicefig(df1, ['pref1', 'pref2', 'pref3'], ax0)
-#    ax0.set_ylabel('Casein preference')
-#    plt.yticks([0, 0.5, 1.0])
-#    ax_ = f.add_subplot(adjust[1])
-#    jmfig.invisible_axes(ax_)
-#    
-#    inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1],
-#                                             wspace=0.15)
-#    ax1 = f.add_subplot(inner[0])
-#    ax2 = f.add_subplot(inner[1])
-#    ax3 = f.add_subplot(inner[2])
-#    
-#    peakresponsebargraph(ax1, df4, ['cas1_licks_peak', 'malt1_licks_peak'],
-#                         xlabels=['NR', 'PR'])
-#    peakresponsebargraph(ax2, df4, ['cas2_licks_peak', 'malt2_licks_peak'],
-#                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
-#                         ylabels=False, dietswitch=True)
-#    peakresponsebargraph(ax3, df4, ['cas3_licks_peak', 'malt3_licks_peak'],
-#                         xlabels=['NR \u2192 PR', 'PR \u2192 NR'],
-#                         ylabels=False, dietswitch=True)
-#    
-#    titles = ['Preference test 1', 'Preference test 2', 'Preference test 3']
-#    for ax, title in zip([ax1, ax2, ax3], titles):
-#        ax.set_title(title)
-#    
-#    return f
-#
+
