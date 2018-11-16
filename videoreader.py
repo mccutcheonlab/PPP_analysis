@@ -76,7 +76,7 @@ trialLength=35
 # Code to choose rat/session and events
 x = rats['PPP1.7'].sessions['s10']
 all_events = x.left['sipper']
-videofile = 'R:\\DA_and_Reward\\es334\PPP1\\Tanks\\Eelke-171027-111329\\PPP1-171017-081744_Eelke-171027-111329_Cam2.avi'
+videofile = 'R:\\DA_and_Reward\\es334\PPP1\\tdtfiles\\Eelke-171027-111329\\PPP1-171017-081744_Eelke-171027-111329_Cam2.avi'
 all_data = jmf.mastersnipper(x, x.left['sipper'], preTrial=preTrial, trialLength=trialLength, bins=bins)
 all_licks = np.concatenate((x.left['lickdata']['licks'], x.right['lickdata']['licks']), axis=0)
 
