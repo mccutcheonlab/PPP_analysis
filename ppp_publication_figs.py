@@ -90,10 +90,10 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 
 make_behav_figs=False
 make_photo_sip_figs=False
-make_photo_licks_figs=False
+make_photo_licks_figs=True
 make_pref2_fig=False
 make_pref3_fig=False
-make_summary_fig=True
+make_summary_fig=False
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 

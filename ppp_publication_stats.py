@@ -218,4 +218,4 @@ def stats_summary_photo(verbose=True):
 #stats_pref_photo(prefsession='3')
 
 stats_summary_behav()
-#stats_summary_photo()
+stats_summary_photo()

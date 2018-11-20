@@ -231,6 +231,10 @@ def repFig(ax, df, session, plot_licks=False, color=almost_black, yscale=True, x
     
     uv_color = jmfig.lighten_color(color, amount=0.3)
     
+    #lines for blue/violet style
+    uv_color='xkcd:azure'
+    color='xkcd:amethyst'
+    
     ax.plot(datauv, c=uv_color)
     ax.plot(datablue, c=color)
        
@@ -352,6 +356,10 @@ def averagetrace(ax, df, diet, keys, event='',
     ax.annotate('5 s', xy=(276,y), xycoords='data',
                 xytext=(0,-5), textcoords='offset points',
                 ha='center',va='top')
+    
+# Adds legend
+    ax.annotate('Casein', xy=(100,100), xycoords='axes fraction',
+                ha='right', va='center')
 
 def averagetrace_sipper(f, gs, gsx, gsy, df, diet, keys, keys_lats, event='',
                  color=[almost_black, 'xkcd:bluish grey'],
