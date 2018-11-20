@@ -523,7 +523,7 @@ def reduced_photofig(df_photo, df_behav, session=2, event='Licks', dietswitch=Tr
 
 # To make summary figure
 
-def summary_subfig(ax, df, keys):
+def summary_subfig_bars(ax, df, keys):
     
     df_NR = df.xs('NR', level=1)
     df_PR = df.xs('PR', level=1)
@@ -546,15 +546,40 @@ def summary_subfig(ax, df, keys):
                  grouplabel = xlabels,
                  ax=ax)
 
+def summary_subfig_correl(ax, df_behav, df_photo, diet):
+    
+    dfy = df_behav.xs(diet, level=1)
+    dfx = df_photo.xs(diet, level=1)
+        
+    yvals = [dfy['pref1'], dfy['pref2'], dfy['pref3']]
+    xvals = [dfx['pref1_licks_peak_delta'],
+             dfx['pref2_licks_peak_delta'],
+             dfx['pref3_licks_peak_delta']]
+    
+    ax.plot(xvals, yvals, c='grey')
+    ax.scatter(xvals, yvals, marker='o', c=['w', 'grey', 'k'], edgecolors='k')
+    
+    ax.set_ylabel('Casein preference')
+    ax.set_ylim([-0.1, 1.1])
+    ax.set_yticks([0, 0.5, 1.0]) 
+    ax.set_yticklabels(['0', '0.5', '1'])
+    ax.plot([-0.11, 0.11], [0.5, 0.5], linestyle='dashed',color='k', alpha=0.2)
+    
+    ax.set_xlabel('%\u0394F (Casein - Malt.)')
+    ax.set_xlim([-0.11, 0.11])
+    ax.set_xticks([-0.1, 0, 0.1])
+    ax.set_xticklabels(['-10', '0', '10'])
+    ax.plot([0, 0], [-0.1, 1.1], linestyle='dashed',color='k', alpha=0.2)
+    
 def makesummaryFig(df_behav, df_photo):
-    gs = gridspec.GridSpec(1, 2, wspace=0.5)
+    gs = gridspec.GridSpec(2, 2, wspace=0.5)
     mpl.rcParams['figure.subplot.left'] = 0.10
     mpl.rcParams['figure.subplot.top'] = 0.85
     mpl.rcParams['axes.labelpad'] = 4
-    f = plt.figure(figsize=(5,2))
+    f = plt.figure(figsize=(5,4))
     
-    ax0 = f.add_subplot(gs[0])
-    summary_subfig(ax0, df_behav, ['pref1', 'pref2', 'pref3'])
+    ax0 = f.add_subplot(gs[0, 0])
+    summary_subfig_bars(ax0, df_behav, ['pref1', 'pref2', 'pref3'])
     ax0.set_ylabel('Casein preference')
     ax0.set_ylim([-0.1, 1.1])
     ax0.set_yticks([0, 0.5, 1.0]) 
@@ -563,14 +588,20 @@ def makesummaryFig(df_behav, df_photo):
 
     ax0.plot(ax0.get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
     
-    ax1 = f.add_subplot(gs[1])
-    summary_subfig(ax1, df_photo, ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta'])
+    ax1 = f.add_subplot(gs[0, 1])
+    summary_subfig_bars(ax1, df_photo, ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta'])
     ax1.set_ylabel('%\u0394F (Casein - Malt.)')
     
     ax1.set_ylim([-0.035, 0.11])
     ax1.set_yticks([0, 0.05, 0.1])
     ax1.set_yticklabels(['0', '5', '10'])
     ax1.set_title('Photometry')
+    
+    ax2 = f.add_subplot(gs[1,0])
+    summary_subfig_correl(ax2, df_behav, df_photo, 'NR')
+    
+    ax3 = f.add_subplot(gs[1,1])
+    summary_subfig_correl(ax3, df_behav, df_photo, 'PR')
 
     return f
 
