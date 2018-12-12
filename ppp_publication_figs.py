@@ -34,11 +34,12 @@ try:
 #    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
 #    df_sacc_behav = dill.load(pickle_in)
 #    
-#    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
-#    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
+    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip = dill.load(pickle_in)
+
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
 
@@ -87,22 +88,54 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 #plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 #plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
+make_sacc_figs=False
+
+make_cond_figs=True
 
 make_behav_figs=False
 make_photo_sip_figs=False
-make_photo_licks_figs=True
+make_photo_licks_figs=False
 make_pref2_fig=False
 make_pref3_fig=False
 make_summary_fig=False
 
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
+if make_cond_figs:
+    cond1_behav_fig, ax = plt.subplots(figsize=(4,3), ncols=2, sharey=True)
+    
+    pppfig.cond_licks_fig(ax[0], df_cond1_behav, 'NR')
+    pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
+    ax[0].set_ylabel('Licks')
 
-#fig, ax = plt.subplots(figsize=(4,3), ncols=2, sharey=True)
-#
-#pppfig.cond_licks_fig(ax[0], df_cond1_behav, 'NR')
-#pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
-#ax[0].set_ylabel('Licks')
+    keys=[['cond1_cas1_sip', 'cond1_cas2_sip'],
+         ['cond1_malt1_sip', 'cond1_malt2_sip'],
+         ['cond1_cas1_licks', 'cond1_cas2_licks'],
+         ['cond1_malt1_licks', 'cond1_malt2_licks']]
+    
+    keysbars = [[['cond1_cas1_sip_peak', 'cond1_cas2_sip_peak'], ['cond1_malt1_sip_peak', 'cond1_malt2_sip_peak']],
+                [['cond1_cas1_licks_peak', 'cond1_cas2_licks_peak'], ['cond1_malt1_licks_peak', 'cond1_malt2_licks_peak']]]
+    
+    cond1_photo_sip__fig, ax = plt.subplots(figsize=(6,4), ncols=3, nrows=2)
+
+    pppfig.cond_photo_fig(ax[0][0], df_cond1_photo, 'NR', keys[0], event='Sipper')
+    pppfig.cond_photo_fig(ax[0][1], df_cond1_photo, 'NR', keys[1], event='Sipper')
+    pppfig.cond_photobar_fig(ax[0][2], df_cond1_photo, 'NR', keysbars[0])
+    
+    pppfig.cond_photo_fig(ax[1][0], df_cond1_photo, 'PR', keys[0], event='Sipper')
+    pppfig.cond_photo_fig(ax[1][1], df_cond1_photo, 'PR', keys[1], event='Sipper')
+    pppfig.cond_photobar_fig(ax[1][2], df_cond1_photo, 'PR', keysbars[0])
+    
+    
+    cond1_photo_lick_fig, ax = plt.subplots(figsize=(6,4), ncols=3, nrows=2)
+
+    pppfig.cond_photo_fig(ax[0][0], df_cond1_photo, 'NR', keys[2], event='Licks')
+    pppfig.cond_photo_fig(ax[0][1], df_cond1_photo, 'NR', keys[3], event='Licks')
+    pppfig.cond_photobar_fig(ax[0][2], df_cond1_photo, 'NR', keysbars[1])
+    
+    pppfig.cond_photo_fig(ax[1][0], df_cond1_photo, 'PR', keys[2], event='Licks')
+    pppfig.cond_photo_fig(ax[1][1], df_cond1_photo, 'PR', keys[3], event='Licks')
+    pppfig.cond_photobar_fig(ax[1][2], df_cond1_photo, 'PR', keysbars[1])
 
 if make_behav_figs:
     fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)

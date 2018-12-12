@@ -86,8 +86,8 @@ def cond_licks_fig(ax, df, diet):
         cols = [col['lp_cas'], col['lp_cas'], col['lp_malt'], col['lp_malt']]
         title = 'Protein restricted'
 
-    x = [[df.xs(diet, level=1)['cond1-cas1'], df.xs(diet, level=1)['cond1-cas2']],
-     [df.xs(diet, level=1)['cond1-malt1'], df.xs(diet, level=1)['cond1-malt2']]]
+    x = [[df.xs(diet, level=1)['cond1-cas1-licks'], df.xs(diet, level=1)['cond1-cas2-licks']],
+     [df.xs(diet, level=1)['cond1-malt1-licks'], df.xs(diet, level=1)['cond1-malt2-licks']]]
 
     jmfig.barscatter(x, paired=True, unequal=True,
              barfacecoloroption = 'individual',
@@ -101,6 +101,67 @@ def cond_licks_fig(ax, df, diet):
 #             ylim=[-5,50],
              ax=ax)
     ax.set_title(title)
+
+def cond_photo_fig(ax, df, diet, keys, event='',
+                 color=[almost_black, 'xkcd:bluish grey'],
+                 errorcolors=['xkcd:silver', 'xkcd:silver'],
+                 yerror=True):
+
+    df = df.xs(diet, level=1)
+    
+    # Plots casein and maltodextrin shaded erros
+    jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
+    jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
+    
+    #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
+    ax.axis('off')
+
+# Marks location of event on graph with arrow    
+    arrow_y = ax.get_ylim()[1]
+    ax.plot([100, 150], [arrow_y, arrow_y], color='xkcd:silver', linewidth=3)
+    ax.annotate(event, xy=(125, arrow_y), xytext=(0,5), textcoords='offset points',
+                ha='center', va='bottom')
+
+# Adds y scale bar
+    if yerror:
+        y = [y for y in ax.get_yticks() if y>0][:2]
+        l = y[1] - y[0]
+        scale_label = '{0:.0f}% \u0394F'.format(l*100)
+        ax.plot([50,50], [y[0], y[1]], c=almost_black)
+        ax.text(40, y[0]+(l/2), scale_label, va='center', ha='right')
+
+# Adds x scale bar   
+    y = ax.get_ylim()[0]
+    ax.plot([251,300], [y, y], c=almost_black, linewidth=2)
+    ax.annotate('5 s', xy=(276,y), xycoords='data',
+                xytext=(0,-5), textcoords='offset points',
+                ha='center',va='top')
+    
+def cond_photobar_fig(ax, df, diet, keys):
+    
+    scattersize = 50
+    
+    if diet == 'NR':
+        cols = [col['np_cas'], col['np_cas'], col['np_malt'], col['np_malt']]
+        title = 'Non-restricted'
+    else:
+        cols = [col['lp_cas'], col['lp_cas'], col['lp_malt'], col['lp_malt']]
+        title = 'Protein restricted'
+    
+    x = [[df.xs(diet, level=1)[keys[0][0]], df.xs(diet, level=1)[keys[0][1]]],
+          [df.xs(diet, level=1)[keys[1][0]], df.xs(diet, level=1)[keys[1][1]]]]
+    
+    jmfig.barscatter(x, paired=True, unequal=True,
+         barfacecoloroption = 'individual',
+         barfacecolor = cols,
+         scatteredgecolor = ['xkcd:charcoal'],
+         scatterlinecolor = 'xkcd:charcoal',
+         grouplabel=['Cas', 'Malt'],
+         barlabels=['1', '2', '1', '2'],
+         scattersize = scattersize,
+         
+#             ylim=[-5,50],
+         ax=ax)
 
 def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
 
