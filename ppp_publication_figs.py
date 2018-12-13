@@ -90,7 +90,7 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 
 make_sacc_figs=False
 
-make_cond_figs=True
+make_cond_figs=False
 
 make_behav_figs=False
 make_photo_sip_figs=False
@@ -107,6 +107,8 @@ if make_cond_figs:
     pppfig.cond_licks_fig(ax[0], df_cond1_behav, 'NR')
     pppfig.cond_licks_fig(ax[1], df_cond1_behav, 'PR')
     ax[0].set_ylabel('Licks')
+    
+    cond1_behav_fig.savefig(savefolder + 'cond1_behav.pdf')
 
     keys=[['cond1_cas1_sip', 'cond1_cas2_sip'],
          ['cond1_malt1_sip', 'cond1_malt2_sip'],
@@ -116,7 +118,7 @@ if make_cond_figs:
     keysbars = [[['cond1_cas1_sip_peak', 'cond1_cas2_sip_peak'], ['cond1_malt1_sip_peak', 'cond1_malt2_sip_peak']],
                 [['cond1_cas1_licks_peak', 'cond1_cas2_licks_peak'], ['cond1_malt1_licks_peak', 'cond1_malt2_licks_peak']]]
     
-    cond1_photo_sip__fig, ax = plt.subplots(figsize=(6,4), ncols=3, nrows=2)
+    cond1_photo_sip_fig, ax = plt.subplots(figsize=(6,4), ncols=3, nrows=2)
 
     pppfig.cond_photo_fig(ax[0][0], df_cond1_photo, 'NR', keys[0], event='Sipper')
     pppfig.cond_photo_fig(ax[0][1], df_cond1_photo, 'NR', keys[1], event='Sipper')
@@ -136,6 +138,9 @@ if make_cond_figs:
     pppfig.cond_photo_fig(ax[1][0], df_cond1_photo, 'PR', keys[2], event='Licks')
     pppfig.cond_photo_fig(ax[1][1], df_cond1_photo, 'PR', keys[3], event='Licks')
     pppfig.cond_photobar_fig(ax[1][2], df_cond1_photo, 'PR', keysbars[1])
+    
+    cond1_photo_sip_fig.savefig(savefolder + 'cond1_photo_sip.pdf')
+    cond1_photo_lick_fig.savefig(savefolder + 'cond1_photo_lick.pdf')
 
 if make_behav_figs:
     fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)

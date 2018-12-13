@@ -107,6 +107,15 @@ def cond_photo_fig(ax, df, diet, keys, event='',
                  errorcolors=['xkcd:silver', 'xkcd:silver'],
                  yerror=True):
 
+    if diet == 'NR':
+        color=[almost_black, 'xkcd:bluish grey']
+        errorcolors=['xkcd:silver', 'xkcd:silver']
+        title = 'Non-restricted'
+    else:
+        color=[green, light_green]
+        errorcolors=['xkcd:silver', 'xkcd:silver']
+        title = 'Protein restricted'
+    
     df = df.xs(diet, level=1)
     
     # Plots casein and maltodextrin shaded erros
@@ -544,6 +553,14 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
     peakbargraph(ax8, df_photo, 'PR', keys_bars, bar_colors=rowcolors_bar[1], sc_color=almost_black)
      
     return f
+
+def fabphotofig(df_heatmap, df_photo,
+                 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced'],
+                 keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
+                 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak'],
+                 event='Licks'):
+    
+    print('Hi')
 
 def reduced_photofig(df_photo, df_behav, session=2, event='Licks', dietswitch=True,
                      keys_traces = ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
