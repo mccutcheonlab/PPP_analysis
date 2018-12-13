@@ -23,6 +23,7 @@ import matplotlib.lines as mlines
 import JM_general_functions as jmf
 import JM_custom_figs as jmfig
 import ppp_pub_figs_fx as pppfig
+import ppp_pub_figs_fx2 as pppfig2
 from ppp_pub_figs_fx import almost_black
 
 import dill
@@ -99,6 +100,8 @@ make_pref2_fig=False
 make_pref3_fig=False
 make_summary_fig=False
 
+make_new_pref_fig=True
+
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
 if make_cond_figs:
@@ -143,10 +146,10 @@ if make_cond_figs:
     cond1_photo_lick_fig.savefig(savefolder + 'cond1_photo_lick.pdf')
 
 if make_behav_figs:
-    fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
-    fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
+    fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 1.75), ncols=4, sharey=False, sharex=False)
+    fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.15, wspace=0.65)
     pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=1)
-    fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.eps')
+    fflicks_pref1_fig.savefig(savefolder + 'pref1_behav.pdf')
     
 #    fflicks_pref2_fig, ax = plt.subplots(figsize=(7.2, 2.5), ncols=4, sharey=False, sharex=False)
 #    fflicks_pref2_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, wspace=0.65)
@@ -159,6 +162,21 @@ if make_behav_figs:
 #    fflicks_pref3_fig.savefig(savefolder + 'pref3_behav.eps')
 
 clims = [[-0.15,0.20], [-0.11,0.15]]
+
+
+if make_new_pref_fig:
+    photo_pref1_NR_fig = pppfig2.fabphotofig(df_heatmap, df_photo, 'NR', 'pref1', clims=clims[0],
+                                          keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
+    
+    photo_pref1_PR_fig = pppfig2.fabphotofig(df_heatmap, df_photo, 'PR', 'pref1', clims=clims[1],
+                                          keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
+    
+    photo_pref1_NR_fig.savefig(savefolder + 'photo_pref1_NR.pdf')
+    photo_pref1_PR_fig.savefig(savefolder + 'photo_pref1_PR.pdf')
 
 if make_photo_sip_figs:
     photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,

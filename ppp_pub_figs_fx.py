@@ -2,9 +2,6 @@
 """
 Created on Mon Mar  5 13:16:41 2018
 
-NEED TO RUN ppp1_grouped.py first to load data and certain functions into memory.
-Trying to do this using import statement - but at the moment not importing modules.
-
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
@@ -121,6 +118,8 @@ def cond_photo_fig(ax, df, diet, keys, event='',
     # Plots casein and maltodextrin shaded erros
     jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
     jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
+    
+    
     
     #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
     ax.axis('off')
@@ -554,13 +553,6 @@ def mainphotoFig(df_reptraces, df_heatmap, df_photo, session='pref1', clims=[[0,
      
     return f
 
-def fabphotofig(df_heatmap, df_photo,
-                 keys_traces = ['cas1_licks_forced', 'malt1_licks_forced'],
-                 keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
-                 keys_bars = ['cas1_licks_peak', 'malt1_licks_peak'],
-                 event='Licks'):
-    
-    print('Hi')
 
 def reduced_photofig(df_photo, df_behav, session=2, event='Licks', dietswitch=True,
                      keys_traces = ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
