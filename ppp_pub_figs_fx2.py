@@ -188,3 +188,5 @@ def fabphotofig(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
     peakbargraph(ax, df_photo, diet, keys_bars)
     
     return f
+
+print('test line')
