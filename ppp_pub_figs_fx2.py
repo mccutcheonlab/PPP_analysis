@@ -31,13 +31,19 @@ col['np_malt'] = 'white'
 col['lp_cas'] = 'xkcd:kelly green'
 col['lp_malt'] = 'xkcd:light green'
 
-def makeheatmap(ax, data, ylabel='Trials'):
+def makeheatmap(ax, data, events=None, ylabel='Trials'):
     ntrials = np.shape(data)[0]
     xvals = np.linspace(-9.9,20,300)
     yvals = np.arange(1, ntrials+2)
     xx, yy = np.meshgrid(xvals, yvals)
     
-    mesh = ax.pcolormesh(xx, yy, data, cmap='copper', shading = 'flat')
+    mesh = ax.pcolormesh(xx, yy, data, cmap='summer', shading = 'flat')
+    
+    if events:
+        ax.vlines(events, yvals[:-1], yvals[1:], color='w')
+    else:
+        print('No events')
+        
     ax.set_ylabel(ylabel)
     ax.set_yticks([1, ntrials])
     ax.set_xticks([])
@@ -45,7 +51,7 @@ def makeheatmap(ax, data, ylabel='Trials'):
     
     return ax, mesh
 
-def heatmapFig(f, df, gs, diet, session, rat, event='', clims=[0,1]):
+def heatmapFig(f, df, gs, diet, session, rat, event='', reverse=False, clims=[0,1]):
     
     if diet == 'NR':
         color = [almost_black, 'xkcd:bluish grey']
@@ -56,21 +62,30 @@ def heatmapFig(f, df, gs, diet, session, rat, event='', clims=[0,1]):
    
     data_cas = df[session+'_cas'][rat]
     data_malt = df[session+'_malt'][rat]
+    event_cas = df[session+'_cas_event'][rat]
+    event_malt = df[session+'_malt_event'][rat]
+    
+    if reverse:
+            event_cas = [-event for event in event_cas]
+            event_malt = [-event for event in event_malt]
 
     inner = gridspec.GridSpecFromSubplotSpec(3,2,subplot_spec=gs[:,0],
                                              width_ratios=[12,1],
                                              wspace=0.05)
     ax1 = f.add_subplot(inner[0,0])
-    ax, mesh = makeheatmap(ax1, data_cas, ylabel='Casein trials')
+    ax, mesh = makeheatmap(ax1, data_cas, events=event_cas, ylabel='Casein trials')
     mesh.set_clim(clims)
     ax1.plot([0], [-1], 'v', color='xkcd:silver')
     
     ax2 = f.add_subplot(inner[1,0], sharex=ax1)
-    ax, mesh = makeheatmap(ax2, data_malt, ylabel='Malt. trials')
+    ax, mesh = makeheatmap(ax2, data_malt, events=event_malt, ylabel='Malt. trials')
     mesh.set_clim(clims)
     
     if event == 'Sipper':
         print(event)
+        
+    for ax in [ax1, ax2]:
+        ax.set_xlim([-10,20])
     
     cbar_ax = f.add_subplot(inner[0,1])   
     cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
@@ -160,7 +175,7 @@ def peakbargraph(ax, df, diet, keys, sc_color='w'):
 
     ax.set_ylabel('Peak (\u0394F)')
 #    ax.set_ylim([-0.04, 0.14])
-    plt.yticks([0,0.05, 0.1], ['0%', '5%', '10%'])
+    plt.yticks([-0.05,0,0.05, 0.1], ['5%', '0%', '5%', '10%'])
 
 def fabphotofig(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
                  keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
@@ -176,7 +191,7 @@ def fabphotofig(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
     gs = gridspec.GridSpec(2, 2, wspace=0.7, hspace=0.6, left=0.12, right=0.98)
     f = plt.figure(figsize=(3.2,3.2))
     
-    heatmapFig(f, df_heatmap, gs, diet, session, 'PPP1-7', event=event, clims=clims)
+    heatmapFig(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=True)
     
     if event == 'Sipper':
         pppfig.averagetrace_sipper(f, gs, 0, 1, df_photo, diet, keys_traces, keys_lats, event=event)
@@ -186,7 +201,6 @@ def fabphotofig(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
         
     ax = f.add_subplot(gs[1,1]) 
     peakbargraph(ax, df_photo, diet, keys_bars)
+    ax.set_ylim([-0.06,0.1])
     
     return f
-
-print('test line')

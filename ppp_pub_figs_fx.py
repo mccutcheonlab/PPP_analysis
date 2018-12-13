@@ -351,13 +351,19 @@ def reptracesFig(f, df, index, session, gs, gsx, gsy, title=False, color=almost_
         ax3.set_title('Casein')
         ax4.set_title('Maltodextrin')
 
-def makeheatmap(ax, data, ylabel='Trials'):
+def makeheatmap(ax, data, events=None, ylabel='Trials'):
     ntrials = np.shape(data)[0]
     xvals = np.linspace(-9.9,20,300)
     yvals = np.arange(1, ntrials+2)
     xx, yy = np.meshgrid(xvals, yvals)
     
     mesh = ax.pcolormesh(xx, yy, data, cmap='YlGnBu', shading = 'flat')
+    
+    if events:
+        ax.vlines(events, yvals[:-1], yvals[1:], color='w')
+    else:
+        print('No events')
+        
     ax.set_ylabel(ylabel)
     ax.set_yticks([1, ntrials])
     ax.set_xticks([])
@@ -365,10 +371,16 @@ def makeheatmap(ax, data, ylabel='Trials'):
     
     return ax, mesh
 
-def heatmapFig(f, df, gs, gsx, gsy, session, event, rat, clims=[0,1]):
+def heatmapFig(f, df, gs, gsx, gsy, session, event, rat, reverse=False, clims=[0,1]):
     
     data_cas = df[session+'_cas'][rat]
     data_malt = df[session+'_malt'][rat]
+    event_cas = df[session+'_cas_event'][rat]
+    event_malt = df[session+'_malt_event'][rat]
+    
+    if reverse:
+            event_cas = [-event for event in event_cas]
+            event_malt = [-event for event in event_malt]
 
     inner = gridspec.GridSpecFromSubplotSpec(2,2,subplot_spec=gs[gsx,gsy],
                                              width_ratios=[12,1],
@@ -384,6 +396,9 @@ def heatmapFig(f, df, gs, gsx, gsy, session, event, rat, clims=[0,1]):
     
     if event == 'Sipper':
         print(event)
+        
+    for ax in [ax1, ax2]:
+        ax.set_xlim([-10,20])
     
     cbar_ax = f.add_subplot(inner[:,1])   
     cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
