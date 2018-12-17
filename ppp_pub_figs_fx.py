@@ -171,7 +171,7 @@ def cond_photobar_fig(ax, df, diet, keys):
 #             ylim=[-5,50],
          ax=ax)
 
-def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, figdims=1):
+def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'

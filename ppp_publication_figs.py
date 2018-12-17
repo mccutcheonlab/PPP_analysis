@@ -56,7 +56,7 @@ savefolder = usr + '\Dropbox\Publications in Progress\PPP Paper\Figs\\'
 mpl.rcParams['figure.figsize'] = (4.8, 3.2)
 mpl.rcParams['figure.dpi'] = 100
 
-mpl.rcParams['font.size'] = 12.0
+mpl.rcParams['font.size'] = 8.0
 mpl.rcParams['axes.labelsize'] = 'medium'
 mpl.rcParams['ytick.labelsize'] = 'small'
 mpl.rcParams['figure.subplot.bottom'] = 0.05
@@ -69,11 +69,11 @@ mpl.rcParams['axes.spines.top']=False
 mpl.rcParams['axes.spines.right']=False
 
 
-mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=8, labelpad=4)
+mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=6, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
-mpl.rc('font', family='Arial', size=8)
+mpl.rc('font', family='Arial', size=6)
 for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
-    mpl.rc(tick, color=almost_black, labelsize=8)
+    mpl.rc(tick, color=almost_black, labelsize=6)
     mpl.rc(subtick, width=1)
 mpl.rc('legend', fontsize=8)
 mpl.rcParams['figure.subplot.left'] = 0.05
@@ -83,11 +83,11 @@ mpl.rcParams['figure.subplot.top'] = 0.95
 make_sacc_figs=False
 make_cond_figs=False
 
-make_fig1_behav=True
-make_fig1_photo=True
+make_fig1_behav=False
+make_fig1_photo=False
 
 make_fig2_behav=True
-make_fig2_photo=True
+make_fig2_photo=False
 
 make_photo_sip_figs=False
 make_photo_licks_figs=False
@@ -163,13 +163,13 @@ if make_fig1_photo:
 if make_fig2_behav:
     pref2_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
     pref2_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, figdims=2)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True)
     pref2_behav_fig.savefig(savefolder + 'fig2_pref2_behav.pdf')
 
 
     pref3_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
     pref3_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, figdims=2)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
     pref3_behav_fig.savefig(savefolder + 'fig2_pref3_behav.pdf')
     
     

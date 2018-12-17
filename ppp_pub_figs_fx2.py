@@ -51,9 +51,9 @@ def makeheatmap(ax, data, events=None, ylabel='Trials'):
     
     return ax, mesh
 
-def heatmapCol(f, df, gs, diet, session, rat, event='', reverse=False, clims=[0,1]):
+def heatmapCol(f, df, gs, diet, session, rat, event='', reverse=False, clims=[0,1], colorgroup='control'):
     
-    if diet == 'NR':
+    if colorgroup == 'control':
         color = [almost_black, 'xkcd:bluish grey']
         errorcolors = ['xkcd:silver', 'xkcd:silver']
     else:
@@ -114,9 +114,9 @@ def heatmapCol(f, df, gs, diet, session, rat, event='', reverse=False, clims=[0,
                 xytext=(0,-5), textcoords='offset points',
                 ha='center',va='top')
 
-def averagetrace(ax, df, diet, keys, event='', fullaxis=False):
+def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='control', ylabel=True):
     
-    if diet == 'NR':
+    if colorgroup == 'control':
         color=[almost_black, 'xkcd:bluish grey']
         errorcolors=['xkcd:silver', 'xkcd:silver']
     else:
@@ -154,15 +154,18 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=False):
         ax.set_xticklabels(['-10', '0', '10', '20'])
         ax.set_xlabel('Time from first lick (s)')
         
+    if ylabel:
+        ax.set_ylabel('\u0394F (%)')
+        
 # Marks location of event on graph with arrow    
     arrow_y = ax.get_ylim()[1]
     ax.plot([100, 150], [arrow_y, arrow_y], color='xkcd:silver', linewidth=3)
     ax.annotate(event, xy=(125, arrow_y), xytext=(0,5), textcoords='offset points',
                 ha='center', va='bottom')
 
-def peakbargraph(ax, df, diet, keys, sc_color='w'):
+def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=True):
     
-    if diet == 'NR':
+    if colorgroup == 'control':
         bar_colors=['xkcd:silver', 'w']
     else:
         bar_colors=[green, light_green]
@@ -181,20 +184,27 @@ def peakbargraph(ax, df, diet, keys, sc_color='w'):
                  scattersize = 50,
                  ax=ax)
 
-    ax.set_ylabel('Peak (\u0394F)')
     ax.set_yticks([-0.05,0,0.05, 0.1])
     ax.set_yticklabels(['5%', '0%', '5%', '10%'])
+    
+    if ylabel:
+        ax.set_ylabel('Peak (\u0394F)')
 
 def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event=''):
     
     inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[:,1])
     
+    if diet == 'NR':
+        colors = 'control'
+    else:
+        colors = 'exptl'
+    
     ax1 = f.add_subplot(inner[0,0])
-    averagetrace(ax1, df_photo, diet, keys_traces, event=event, fullaxis=True)
+    averagetrace(ax1, df_photo, diet, keys_traces, event=event, fullaxis=True, colorgroup=colors)
     
     ax2 = f.add_subplot(gs[1,1]) 
-    peakbargraph(ax2, df_photo, diet, keys_bars)
-    ax2.set_ylim([-0.06,0.1])
+    peakbargraph(ax2, df_photo, diet, keys_bars, colorgroup=colors)
+    ax2.set_ylim([-0.04,0.12])
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
                  keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
@@ -204,13 +214,15 @@ def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
     
     if diet == 'NR':
         rat='PPP1-7'
+        colors = 'control'
     else:
         rat='PPP1-4'
+        colors = 'exptl'
     
     gs = gridspec.GridSpec(2, 2, wspace=0.7, width_ratios=[1, 0.8], hspace=0.6, left=0.12, right=0.98)
     f = plt.figure(figsize=(3.2,3.2))
     
-    heatmapCol(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=True)
+    heatmapCol(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=True, colorgroup=colors)
     
     averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event=event)
         
@@ -225,16 +237,19 @@ def fig2_photo(df_photo,
     f = plt.figure(figsize=(3.2,3.2))
     
     ax1 = f.add_subplot(gs[0,0])
-    averagetrace(ax1, df_photo, 'NR', keys_traces, event=event, fullaxis=True)
+    averagetrace(ax1, df_photo, 'NR', keys_traces, event=event, colorgroup='exptl')
     
     ax2 = f.add_subplot(gs[0,1], sharey=ax1)
-    averagetrace(ax2, df_photo, 'PR', keys_traces, event=event, fullaxis=True)
+    averagetrace(ax2, df_photo, 'PR', keys_traces, event=event, ylabel=False)
+    
+    ax2.set_ylim([-0.06, 0.12])
     
     ax3 = f.add_subplot(gs[1,0]) 
-    peakbargraph(ax3, df_photo, 'NR', keys_bars)
+    peakbargraph(ax3, df_photo, 'NR', keys_bars, colorgroup='exptl')
     
     ax4 = f.add_subplot(gs[1,1], sharey=ax3) 
-    peakbargraph(ax4, df_photo, 'PR', keys_bars)
+    peakbargraph(ax4, df_photo, 'PR', keys_bars, ylabel=False)
+    ax4.set_ylim([-0.03, 0.11])
 
     return f
     
