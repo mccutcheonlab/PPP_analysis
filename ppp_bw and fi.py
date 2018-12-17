@@ -38,6 +38,9 @@ df.set_index('rat', inplace=True)
 
 df.drop('cage', axis=1, inplace=True)
 
+df.drop(['PPP1.8'], inplace=True)
+df.drop(['PPP3.1'], inplace=True)
+df.drop(['PPP3.6'], inplace=True)
 df.drop(['PPP3.7'], inplace=True)
 
 df_days = df.loc[:,'d0':'d14']
