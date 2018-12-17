@@ -286,7 +286,7 @@ def assemble_sessions(sessions,
                         try:
                             timelock_events = [licks for licks in side['lickdata']['rStart'] if licks in side['licks-forced']]
                             latency_events = side['sipper']
-                            side['snips_licks_forced'] = jmf.mastersnipper(x, timelock_events, peak_between_time=[0, 5],
+                            side['snips_licks_forced'] = jmf.mastersnipper(x, timelock_events, peak_between_time=[0, 2],
                                                                             latency_events=latency_events, latency_direction='pre')
                         except KeyError:
                             pass

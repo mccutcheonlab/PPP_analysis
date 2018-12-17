@@ -171,7 +171,7 @@ def cond_photobar_fig(ax, df, diet, keys):
 #             ylim=[-5,50],
          ax=ax)
 
-def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
+def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, figdims=1):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
@@ -183,7 +183,11 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
     lat_malt_key = 'pref' + str(prefsession) + '_malt_lats_fromsip'
     
     scattersize = 50
- 
+
+    if ax.ndim > 1:
+        print('Reshaping axis array')
+        ax = ax.flatten()
+
     if dietswitch == True:
         grouplabel=['NR \u2192 PR', 'PR \u2192 NR']
         barfacecolor = [col['lp_cas'], col['lp_malt'], col['np_cas'], col['np_malt']]
@@ -222,6 +226,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
                  ylim=[-0.5,10],
                  ax=ax[1])
     ax[1].set_ylabel('Latency (s)')
+    ax[1].set_yticks([0, 2, 4, 6, 8, 10])
 
 #panel 2 - free choice licks
     x = [[df_behav.xs('NR', level=1)[free_cas_key], df_behav.xs('NR', level=1)[free_malt_key]],
