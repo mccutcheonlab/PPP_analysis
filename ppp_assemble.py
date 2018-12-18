@@ -48,9 +48,13 @@ class Session(object):
     def loadmatfile(self):
         a = sio.loadmat(self.matlabfile, squeeze_me=True, struct_as_record=False) 
         self.output = a['output']
+        
+        # moves data streams and fs into more easily accesible variables
         self.fs = self.output.fs
         self.data = self.output.blue
         self.dataUV = self.output.uv
+        self.data_filt = self.output.bluefilt
+        self.dataUV_filt = self.output.uvfilt
         
     def setticks(self):
         try:
@@ -259,6 +263,9 @@ def assemble_sessions(sessions,
                 x.check4events()
     
                 x.setbottlecolors()
+                
+                delattr(x, 'output') # removes output attribute to save space
+                
                 try:
                     x.left['lickdata'] = jmf.lickCalc(x.left['licks'],
                                       offset = x.left['licks_off'],

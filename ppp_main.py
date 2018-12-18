@@ -48,11 +48,11 @@ ppp_sessions = {**ppp1_sessions, **ppp3_sessions}
 assemble_sacc = False
 assemble_cond1 = False
 assemble_cond2 = False
-assemble_pref = True
-assemble_single = False
+assemble_pref = False
+assemble_single = True
 
 savefile=True
-makefigs=False
+makefigs=True
 
 if assemble_sacc:
     sessions = assemble_sessions(ppp_sessions,
