@@ -171,7 +171,7 @@ def cond_photobar_fig(ax, df, diet, keys):
 #             ylim=[-5,50],
          ax=ax)
 
-def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
+def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barlabeloffset=[]):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
@@ -184,6 +184,9 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
     
     scattersize = 50
 
+    if len(barlabeloffset) < 4:
+        barlabeloffset = [0.025, 0.025, 0.025, 0.025]
+        
     if ax.ndim > 1:
         print('Reshaping axis array')
         ax = ax.flatten()
@@ -205,6 +208,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
                  scatterlinecolor = 'xkcd:charcoal',
                  grouplabel=grouplabel,
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 barlabeloffset=barlabeloffset[0],
                  scattersize = scattersize,
                  ylim=[-50,1050],
                  ax=ax[0])
@@ -222,6 +226,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
                  scatterlinecolor = 'xkcd:charcoal',
                  grouplabel=grouplabel,
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 barlabeloffset=barlabeloffset[1],
                  scattersize = scattersize,
                  ylim=[-0.5,10],
                  ax=ax[1])
@@ -238,6 +243,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
                  scatterlinecolor = 'xkcd:charcoal',
                  grouplabel = grouplabel,
                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 barlabeloffset=barlabeloffset[2],
                  scattersize = scattersize,
                  ylim=[-50, 800],
                  ax=ax[2])
@@ -255,6 +261,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False):
              scatterlinecolor = 'xkcd:charcoal',
              grouplabel = grouplabel,
              barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+             barlabeloffset=barlabeloffset[3],
              scattersize = scattersize,
              ylim=[-2,22],
              ax=ax[3])

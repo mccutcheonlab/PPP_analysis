@@ -163,7 +163,8 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
     ax.annotate(event, xy=(125, arrow_y), xytext=(0,5), textcoords='offset points',
                 ha='center', va='bottom')
 
-def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=True):
+def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=True,
+                 ylim=[-0.05, 0.1], grouplabeloffset=0):
     
     if colorgroup == 'control':
         bar_colors=['xkcd:silver', 'w']
@@ -181,11 +182,13 @@ def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=
                  scatterlinecolor = almost_black,
                  scatterfacecolor = [sc_color],
                  grouplabel=['Cas', 'Malt'],
+                 grouplabeloffset=grouplabeloffset,
                  scattersize = 50,
                  ax=ax)
 
     ax.set_yticks([-0.05,0,0.05, 0.1])
     ax.set_yticklabels(['5%', '0%', '5%', '10%'])
+    ax.set_ylim(ylim)
     
     if ylabel:
         ax.set_ylabel('Peak (\u0394F)')
@@ -203,8 +206,7 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event='
     averagetrace(ax1, df_photo, diet, keys_traces, event=event, fullaxis=True, colorgroup=colors)
     
     ax2 = f.add_subplot(gs[1,1]) 
-    peakbargraph(ax2, df_photo, diet, keys_bars, colorgroup=colors)
-    ax2.set_ylim([-0.04,0.12])
+    peakbargraph(ax2, df_photo, diet, keys_bars, colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.12)
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
                  keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
@@ -241,15 +243,15 @@ def fig2_photo(df_photo,
     
     ax2 = f.add_subplot(gs[0,1], sharey=ax1)
     averagetrace(ax2, df_photo, 'PR', keys_traces, event=event, ylabel=False)
-    
     ax2.set_ylim([-0.06, 0.12])
     
     ax3 = f.add_subplot(gs[1,0]) 
-    peakbargraph(ax3, df_photo, 'NR', keys_bars, colorgroup='exptl')
+    peakbargraph(ax3, df_photo, 'NR', keys_bars, colorgroup='exptl',
+                 grouplabeloffset=0.1)
     
     ax4 = f.add_subplot(gs[1,1], sharey=ax3) 
-    peakbargraph(ax4, df_photo, 'PR', keys_bars, ylabel=False)
-    ax4.set_ylim([-0.03, 0.11])
+    peakbargraph(ax4, df_photo, 'PR', keys_bars, ylabel=False,
+                 ylim=[-0.03, 0.11], grouplabeloffset=0.1)
 
     return f
     

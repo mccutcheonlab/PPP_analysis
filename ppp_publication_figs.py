@@ -86,8 +86,8 @@ make_cond_figs=False
 make_fig1_behav=False
 make_fig1_photo=False
 
-make_fig2_behav=True
-make_fig2_photo=False
+make_fig2_behav=False
+make_fig2_photo=True
 
 make_photo_sip_figs=False
 make_photo_licks_figs=False
@@ -140,7 +140,8 @@ if make_cond_figs:
 if make_fig1_behav:
     fflicks_pref1_fig, ax = plt.subplots(figsize=(7.2, 1.75), ncols=4, sharey=False, sharex=False)
     fflicks_pref1_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.15, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=1)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=1,
+                          barlabeloffset=[0.025, 0.035, 0.045, 0.07])
     fflicks_pref1_fig.savefig(savefolder + 'fig1_behav.pdf')
 
 clims = [[-0.15,0.20], [-0.11,0.15]]
@@ -163,13 +164,15 @@ if make_fig1_photo:
 if make_fig2_behav:
     pref2_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
     pref2_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True,
+                          barlabeloffset=[0.03, 0.06, 0.045, 0.07])
     pref2_behav_fig.savefig(savefolder + 'fig2_pref2_behav.pdf')
 
 
     pref3_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
     pref3_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
-    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True)
+    pppfig.pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True,
+                          barlabeloffset=[0.02, 0.04, 0.045, 0.07])
     pref3_behav_fig.savefig(savefolder + 'fig2_pref3_behav.pdf')
     
     
