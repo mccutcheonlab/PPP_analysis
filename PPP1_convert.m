@@ -6,7 +6,7 @@ folder = 'R:\DA_and_Reward\es334\PPP1\'
 tankfolder = strcat(folder, 'tdtfiles\');
 savefolder = strcat(folder, 'matfiles\');
 
-skipfiles = 1;
+skipfiles = 0;
 processfiles = 0;
 nboxes = 2;
 
@@ -15,7 +15,7 @@ sheet = 'metafile';
 [~,~,a] = xlsread(metafile,sheet);
 
 TDTmasterconvert(a, tankfolder, savefolder,...
-     skipfiles, processfiles, nboxes);
+     skipfiles, processfiles);
 
 %%%
 % for testing

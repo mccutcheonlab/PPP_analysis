@@ -18,12 +18,12 @@ sheet = 'PPP3_metafile';
 [~,~,a] = xlsread(metafile,sheet);
 
 header = a(1,:);
-input = a(27,:);
+input = a(81,:);
 
 b = cat(1,header,input);
 
 TDTmasterconvert(b, tankfolder, savefolder,...
-     skipfiles, processfiles, nboxes);
+     skipfiles, processfiles);
 
 %%%
 % for testing
