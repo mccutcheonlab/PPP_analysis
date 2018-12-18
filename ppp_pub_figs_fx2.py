@@ -146,16 +146,14 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
         ax.annotate('5 s', xy=(276,y), xycoords='data',
                     xytext=(0,-5), textcoords='offset points',
                     ha='center',va='top')
+
     else:
-        ax.set_yticks([-0.05, 0, 0.05, 0.1])
-        ax.set_yticklabels(['-5%', '0', '5%', '10%'])
-        
         ax.set_xticks([0, 100, 200, 300])
         ax.set_xticklabels(['-10', '0', '10', '20'])
         ax.set_xlabel('Time from first lick (s)')
         
     if ylabel:
-        ax.set_ylabel('\u0394F (%)')
+        ax.set_ylabel('Z-Score')
         
 # Marks location of event on graph with arrow    
     arrow_y = ax.get_ylim()[1]
@@ -204,6 +202,7 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event='
     
     ax1 = f.add_subplot(inner[0,0])
     averagetrace(ax1, df_photo, diet, keys_traces, event=event, fullaxis=True, colorgroup=colors)
+    ax1.set_ylim([-1.5, 3.5])
     
     ax2 = f.add_subplot(gs[1,1]) 
     peakbargraph(ax2, df_photo, diet, keys_bars, colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.12)
@@ -243,7 +242,7 @@ def fig2_photo(df_photo,
     
     ax2 = f.add_subplot(gs[0,1], sharey=ax1)
     averagetrace(ax2, df_photo, 'PR', keys_traces, event=event, ylabel=False)
-    ax2.set_ylim([-0.06, 0.12])
+    ax2.set_ylim([-1.5, 2.5])
     
     ax3 = f.add_subplot(gs[1,0]) 
     peakbargraph(ax3, df_photo, 'NR', keys_bars, colorgroup='exptl',

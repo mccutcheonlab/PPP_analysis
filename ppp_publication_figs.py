@@ -68,7 +68,7 @@ mpl.rcParams['savefig.transparent'] = True
 mpl.rcParams['axes.spines.top']=False
 mpl.rcParams['axes.spines.right']=False
 
-
+mpl.rc('lines', linewidth=0.5)
 mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=6, labelpad=4)
 mpl.rc('patch', linewidth=1, edgecolor=almost_black)
 mpl.rc('font', family='Arial', size=6)
@@ -84,7 +84,7 @@ make_sacc_figs=False
 make_cond_figs=False
 
 make_fig1_behav=False
-make_fig1_photo=False
+make_fig1_photo=True
 
 make_fig2_behav=False
 make_fig2_photo=True

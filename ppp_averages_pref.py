@@ -151,10 +151,10 @@ for j, c_sip_diff, m_sip_diff, c_licks_diff, m_licks_diff in zip(included_sessio
                              ['pref1_cas_licks', 'pref2_cas_licks', 'pref3_cas_licks'],
                              ['pref1_malt_licks', 'pref2_malt_licks', 'pref3_malt_licks']):
 
-    df_photo[c_sip_diff] = [np.mean(pref_sessions[x].cas['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_sip_diff] = [np.mean(pref_sessions[x].malt['snips_sipper']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j] 
-    df_photo[c_licks_diff] = [np.mean(pref_sessions[x].cas['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_diff] = [np.mean(pref_sessions[x].malt['snips_licks']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_sip_diff] = [np.mean(pref_sessions[x].cas['snips_sipper']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_sip_diff] = [np.mean(pref_sessions[x].malt['snips_sipper']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j] 
+    df_photo[c_licks_diff] = [np.mean(pref_sessions[x].cas['snips_licks']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_diff] = [np.mean(pref_sessions[x].malt['snips_licks']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
 # adds licks and lanetcies - all values
 for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip, m_lats_forc_fromsip in zip(included_sessions,
@@ -164,8 +164,8 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
                            ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all'],
                            ['pref1_cas_lats_all_fromsip', 'pref2_cas_lats_all_fromsip', 'pref3_cas_lats_all_fromsip'],
                            ['pref1_malt_lats_all_fromsip', 'pref2_malt_lats_all_fromsip', 'pref3_malt_lats_all_fromsip']):
-    df_photo[c_licks_forc] = [pref_sessions[x].cas['snips_licks_forced']['diff'] for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_forc] = [pref_sessions[x].malt['snips_licks_forced']['diff'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_licks_forc] = [pref_sessions[x].cas['snips_licks_forced']['blue_z'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_forc] = [pref_sessions[x].malt['snips_licks_forced']['blue_z'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc] = [pref_sessions[x].cas['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc] = [pref_sessions[x].malt['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc_fromsip] = [pref_sessions[x].cas['lats'] for x in pref_sessions if pref_sessions[x].session == j]
@@ -179,8 +179,8 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
                            ['pref1_malt_lats', 'pref2_malt_lats', 'pref3_malt_lats'],
                            ['pref1_cas_lats_fromsip', 'pref2_cas_lats_fromsip', 'pref3_cas_lats_fromsip'],
                            ['pref1_malt_lats_fromsip', 'pref2_malt_lats_fromsip', 'pref3_malt_lats_fromsip']):
-    df_photo[c_licks_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['diff'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_licks_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
@@ -203,6 +203,15 @@ for j, c_licks_peak, m_licks_peak, delta_licks_peak in zip(included_sessions,
     df_photo[c_licks_peak] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_peak] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[delta_licks_peak] = df_photo[c_licks_peak] - df_photo[m_licks_peak]
+    
+for j, c_licks_auc, m_licks_auc, delta_licks_auc in zip(included_sessions,
+                           ['pref1_cas_licks_auc', 'pref2_cas_licks_auc', 'pref3_cas_licks_auc'],
+                           ['pref1_malt_licks_auc', 'pref2_malt_licks_auc', 'pref3_malt_licks_auc'],
+                           ['pref1_licks_auc_delta', 'pref2_licks_auc_delta', 'pref3_licks_auc_delta']):
+    
+    df_photo[c_licks_auc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_auc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['peak'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[delta_licks_auc] = df_photo[c_licks_auc] - df_photo[m_licks_auc]
 
 # Assembles dataframe for reptraces
 
