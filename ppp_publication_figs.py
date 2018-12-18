@@ -149,12 +149,12 @@ clims = [[-0.15,0.20], [-0.11,0.15]]
 if make_fig1_photo:
     fig1_photo_NR = pppfig2.fig1_photo(df_heatmap, df_photo, 'NR', 'pref1', clims=clims[0],
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+                                          keys_bars = ['pref1_cas_licks_auc', 'pref1_malt_licks_auc'],
                                           keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
     
     fig1_photo_PR = pppfig2.fig1_photo(df_heatmap, df_photo, 'PR', 'pref1', clims=clims[1],
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+                                          keys_bars = ['pref1_cas_licks_auc', 'pref1_malt_licks_auc'],
                                           keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
     
     fig1_photo_NR.savefig(savefolder + 'fig1_photo_NR.pdf')

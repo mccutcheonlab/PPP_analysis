@@ -184,9 +184,9 @@ def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=
                  scattersize = 50,
                  ax=ax)
 
-    ax.set_yticks([-0.05,0,0.05, 0.1])
-    ax.set_yticklabels(['5%', '0%', '5%', '10%'])
-    ax.set_ylim(ylim)
+#    ax.set_yticks([-0.05,0,0.05, 0.1])
+#    ax.set_yticklabels(['5%', '0%', '5%', '10%'])
+#    ax.set_ylim(ylim)
     
     if ylabel:
         ax.set_ylabel('Peak (\u0394F)')
@@ -210,7 +210,7 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event='
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
                  keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
                  keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
-                 keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+                 keys_bars = ['pref1_cas_licks_auc', 'pref1_malt_licks_auc'],
                  event='Licks'):
     
     if diet == 'NR':
