@@ -138,35 +138,7 @@ class Session(object):
             phlicks = jmf.findphantomlicks(self.right['licks'], self.trialsR, delay=3)
             self.right['licks'] = np.delete(self.right['licks'], phlicks)
             self.right['licks_off'] = np.delete(self.right['licks_off'], phlicks)
-            
-    def sessionFig(self, ax):
-        ax.plot(self.data, color='blue')
-        try:
-            ax.plot(self.dataUV, color='m')
-        except:
-            print('No UV data.')
-        ax.set_xticks(np.multiply([0, 10, 20, 30, 40, 50, 60],60*self.fs))
-        ax.set_xticklabels(['0', '10', '20', '30', '40', '50', '60'])
-        ax.set_xlabel('Time (min)')
-        ax.set_title('Rat ' + self.rat + ': Session ' + self.session)
         
-    def makephotoTrials(self, bins, events, threshold=10):
-        bgMAD = jmf.findnoise(self.data, self.randomevents,
-                              t2sMap = self.t2sMap, fs = self.fs, bins=bins,
-                              method='sum')          
-        blueTrials, self.pps = jmf.snipper(self.data, events,
-                                            t2sMap = self.t2sMap, fs = self.fs, bins=bins)        
-        UVTrials, self.pps = jmf.snipper(self.dataUV, events,
-                                            t2sMap = self.t2sMap, fs = self.fs, bins=bins)
-        sigSum = [np.sum(abs(i)) for i in blueTrials]
-        sigSD = [np.std(i) for i in blueTrials]
-        noiseindex = [i > bgMAD*threshold for i in sigSum]
-
-        return blueTrials, UVTrials, noiseindex
-    
-
-    #    ax.set_title('Rat ' + self.rat + ': Session ' + self.session)
-
     def setbottlecolors(self):
         casein_color = 'xkcd:pale purple'
         malt_color = 'xkcd:sky blue'

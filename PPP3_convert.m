@@ -10,7 +10,7 @@ tankfolder = strcat(folder, 'tdtfiles\');
 savefolder = strcat(folder, 'matfiles\');
 
 skipfiles = 1;
-processfiles = 0;
+processfiles = 1;
 nboxes = 2;
 
 metafile = 'R:\DA_and_Reward\gc214\PPP3\PPP3.xlsx'
@@ -18,9 +18,16 @@ sheet = 'PPP3_metafile';
 [~,~,a] = xlsread(metafile,sheet);
 
 TDTmasterconvert(a, tankfolder, savefolder,...
-     skipfiles, processfiles, nboxes);
+     skipfiles, processfiles);
 
-%%%
+% This is a quick script that processes blue and UV signals using Vaibhav's
+% procedure without having to reload all original 
+if processfiles == 1
+    TDTquickprocess(a, savefolder)
+end
+
+
+    %%%
 % for testing
 % tic
 % clear all; close all;

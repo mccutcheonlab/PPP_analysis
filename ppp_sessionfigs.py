@@ -9,8 +9,11 @@ PPP1 session figs, for individual rats when assembling data
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import JM_custom_figs as jmfig
 import numpy as np
+
+mpl.rc('lines', linewidth=0.5)
 
 def makeBehavFigs(x, pdf_pages):
     # Initialize figure
@@ -60,16 +63,39 @@ def sessionlicksFig(x, ax):
     ax.set_xticklabels(['0', '10', '20', '30', '40', '50', '60'])
     ax.set_xlabel('Time (min)')
     ax.set_ylabel('Licks per min')
+ 
+def sessionFig(x, ax, filtered=True):
+    if filtered:
+        ax.plot(x.data_filt, color='blue', linewidth=0.1)
+        try:
+            ax.plot(x.dataUV_filt, color='m', linewidth=0.1)
+        except:
+            print('No UV data.')
+        ax.set_ylim([-100, 100])
+    else:
+        ax.plot(x.data, color='blue', linewidth=0.1)
+        try:
+            ax.plot(x.dataUV, color='m', linewidth=0.1)
+        except:
+            print('No UV data.')
+            
+    ax.set_xticks(np.multiply([0, 10, 20, 30, 40, 50, 60],60*x.fs))
+    ax.set_xticklabels(['0', '10', '20', '30', '40', '50', '60'])
+    ax.set_xlabel('Time (min)')
+    ax.set_title('Rat ' + x.rat + ': Session ' + x.session)
 
 def makePhotoFigs(x, pdf_pages):
     # Initialize photometry figure
     photoFig = plt.figure(figsize=(8.27, 11.69), dpi=100)
-    gs1 = gridspec.GridSpec(6, 2)
+    gs1 = gridspec.GridSpec(7, 4)
     gs1.update(left=0.125, right= 0.9, wspace=0.4, hspace = 0.8)
     plt.suptitle('Rat ' + x.rat + ': Session ' + x.session)
 
     ax = plt.subplot(gs1[0, :])
-    x.sessionFig(ax)
+    sessionFig(x, ax, filtered=False)
+    
+    ax = plt.subplot(gs1[1, :])
+    sessionFig(x, ax)
 
     if x.left['exist'] == True:
         photoFigsCol(gs1, 0, x.pps,
@@ -77,18 +103,18 @@ def makePhotoFigs(x, pdf_pages):
                      x.left['snips_licks'])
 
     if x.right['exist'] == True:
-        photoFigsCol(gs1, 1, x.pps,
+        photoFigsCol(gs1, 2, x.pps,
                      x.right['snips_sipper'],
                      x.right['snips_licks'])
         
     if x.left['exist'] == True and x.right['exist'] == True:
-        ax = plt.subplot(gs1[5, 0])
+        ax = plt.subplot(gs1[6, 0])
         jmfig.trialsMultShadedFig(ax, [x.left['snips_sipper']['diff'], x.right['snips_sipper']['diff']],
                                   x.pps,
                                   linecolor=[x.left['color'], x.right['color']],
                                   eventText = 'Sipper')
 
-        ax = plt.subplot(gs1[5, 1])
+        ax = plt.subplot(gs1[6, 2])
         jmfig.trialsMultShadedFig(ax, [x.left['snips_licks']['diff'], x.right['snips_licks']['diff']],
                                   x.pps,
                                   linecolor=[x.left['color'], x.right['color']],
@@ -98,23 +124,29 @@ def makePhotoFigs(x, pdf_pages):
     pdf_pages.savefig(photoFig)
     
 def photoFigsCol(gs1, col, pps, snips_sipper, snips_licks):
-    ax = plt.subplot(gs1[1, col])
+    ax = plt.subplot(gs1[2, col])
     jmfig.trialsFig(ax, snips_sipper['blue'], pps, noiseindex = snips_sipper['noise'],
                     eventText = 'Sipper',
                     ylabel = 'Delta F / F0')
     
-    ax = plt.subplot(gs1[2, col])
+    ax = plt.subplot(gs1[3, col])
     jmfig.trialsMultShadedFig(ax, [snips_sipper['uv'], snips_sipper['blue']],
                               pps, noiseindex = snips_sipper['noise'],
                               eventText = 'Sipper')
     
-    ax = plt.subplot(gs1[3, col])
+    ax = plt.subplot(gs1[2, col+1])
+    jmfig.shadedError(ax, snips_sipper['blue_z'])
+    
+    ax = plt.subplot(gs1[4, col])
     jmfig.trialsFig(ax, snips_licks['blue'], pps, noiseindex=snips_licks['noise'],
                     eventText = 'First Lick',
                     ylabel = 'Delta F / F0')
     
-    ax = plt.subplot(gs1[4, col])
+    ax = plt.subplot(gs1[5, col])
     jmfig.trialsMultShadedFig(ax, [snips_licks['uv'], snips_licks['blue']],
                               pps, noiseindex=snips_licks['noise'],
                               eventText = 'First Lick')
+    
+    ax = plt.subplot(gs1[4, col+1])
+    jmfig.shadedError(ax, snips_licks['blue_z'])
     
