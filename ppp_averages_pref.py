@@ -81,6 +81,15 @@ def getfirstlick(side, event):
     lats = [lat if (lat<20) else np.nan for lat in lats]
     return lats
 
+def average_without_noise(snips, key='blue_z'):
+    no_noise_snips = [trial for trial, noise in zip(snips[key], snips['noise']) if not noise]
+    try:
+        result = np.mean(no_noise_snips, axis=0)
+        return result
+    except:
+        print('Problem averaging snips')
+        return
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(sessions)
@@ -182,8 +191,8 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
                            ['pref1_cas_licks_auc', 'pref2_cas_licks_auc', 'pref3_cas_licks_auc'],
                            ['pref1_malt_licks_auc', 'pref2_malt_licks_auc', 'pref3_malt_licks_auc'],
                            ['pref1_licks_auc_delta', 'pref2_licks_auc_delta', 'pref3_licks_auc_delta']):
-    df_photo[c_licks_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_licks_forc] = [average_without_noise(pref_sessions[x].cas['snips_licks_forced']) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_forc] = [average_without_noise(pref_sessions[x].malt['snips_licks_forced']) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]

@@ -15,67 +15,33 @@ import JM_general_functions as jmf
 
 from scipy import signal
 
-def FPfftfilt(blue, uv):
-    [c,d]=signal.butter(9,0.012,btype='low',output='ba')
-    
-    pt = len(blue)
-    X = np.fft.fft(blue,pt)
-    Y = np.fft.fft(uv,pt)
-    Ynet = Y-X
-    
-    blue_new = np.fft.ifft(Ynet)
-    blue_filt = signal.filtfilt(c, d, np.real(blue_new))
-  
-    return(np.real(blue_filt))
+import pandas as pd
     
 
 
-x = sessions_to_add['PPP3-8_s10']
-
-#type(x.left['licks-forced'])
+snips = x.cas['snips_licks_forced']
 
 
+z = snips['blue_z']
+noise = snips['noise']
+
+df = pd.DataFrame()
+
+df['no_noise'] = [trial for trial, n in zip(z, noise) if not n]
 
 
+def average_without_noise(snips, key='blue_z'):
+    no_noise_snips = [trial for trial, noise in zip(snips[key], snips['noise') if not n]
+    try:
+        result = np.mean(no_noise_snips, axis=0)
+        return result
+    except:
+        print('Problem averaging snips')
+        return
 
-#end = len(x.t2sMap)-60000
-#
-#datarange = range(60000, end)
-#
-#xdata = x.t2sMap[datarange]
-#ydata = x.data[datarange]
-#ydataUV = x.dataUV[datarange]
-#
-#blue_filt = FPfftfilt(ydata,ydataUV)
+df['no_noise'] = [average_without_noise(pref_sessions[x].cas['snips_licks_forced']) for x in pref_sessions if pref_sessions[x].session == j]
 
-#timelock = x.left['sipper']
-#timelock_events = [licks for licks in x.left['lickdata']['rStart'] if licks in x.left['licks-forced']]
-#
-#blue_filt_trials,_ =  jmf.snipper(blue_filt, timelock_events, fs = x.fs, t2sMap = x.t2sMap, preTrial=10, trialLength=30,
-#                 adjustBaseline = True,
-#                 bins = 300)
-
-f, ax = plt.subplots()
-jmfig.shadedError(ax, x.right['snips_sipper']['blue_z'])
-
-    
-
-    
+# [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['blue_z'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
 
-
-#
-#coefs, stats = poly.polyfit(xdata, ydata, 2, full=True)
-#
-#print(coefs)
-#print(stats)
-#
-#fitted = poly.Polynomial.fit(xdata, ydata, 2)
-#
-#print(fitted.coef)
-
-
-#fit = np.polynomial.polynomial.Polynomial.fit(x.t2sMap[datarange], x.data[datarange], 2)
-#
-#np.polynomial.polynomial.Polynomial.fit(xdata, ydataUV, 2)
 
