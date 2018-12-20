@@ -5,6 +5,16 @@ Created on Thu Dec 20 16:11:25 2018
 @author: James Rig
 """
 
+import matplotlib.gridspec as gridspec
+import matplotlib.lines as mlines
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+import numpy as np
+
+import JM_custom_figs as jmfig
+import JM_general_functions as jmf
+
 from ppp_pub_figs_settings import *
 
 def sacc_behav_fig(df):
@@ -67,6 +77,7 @@ def cond_licks_fig(ax, df, diet):
              
 #             ylim=[-5,50],
              ax=ax)
+    ax.set_yticks([0,1000,2000,3000,4000])
     ax.set_title(title)
 
 def cond_photo_fig(ax, df, diet, keys, event='',
