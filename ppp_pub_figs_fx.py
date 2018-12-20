@@ -632,7 +632,7 @@ def summary_subfig_bars(ax, df, keys):
     
     df_NR = df.xs('NR', level=1)
     df_PR = df.xs('PR', level=1)
-    
+       
     a = [[df_NR[keys[0]], df_NR[keys[1]], df_NR[keys[2]]],
           [df_PR[keys[0]], df_PR[keys[1]], df_PR[keys[2]]]]
     
@@ -675,8 +675,21 @@ def summary_subfig_correl(ax, df_behav, df_photo, diet):
     ax.set_xticks([-0.1, 0, 0.1])
     ax.set_xticklabels(['-10', '0', '10'])
     ax.plot([0, 0], [-0.1, 1.1], linestyle='dashed',color='k', alpha=0.2)
+
+def find_delta(df, keys_in, epoch=[100,199]):
     
-def makesummaryFig(df_behav, df_photo):
+    epochrange = range(epoch[0], epoch[1])
+    
+    keys_out = ['delta_1', 'delta_2', 'delta_3']
+        
+    for k_in, k_out in zip(keys_in, keys_out):
+        cas_auc = [np.trapz(x[epochrange]) for x in df[k_in[0]]]
+        malt_auc = [np.trapz(x[epochrange]) for x in df[k_in[1]]]
+        df[k_out] = [c-m for c, m in zip(cas_auc, malt_auc)]
+    
+    return df
+
+def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 119]):
     gs = gridspec.GridSpec(2, 2, wspace=0.5)
     mpl.rcParams['figure.subplot.left'] = 0.10
     mpl.rcParams['figure.subplot.top'] = 0.85
@@ -685,7 +698,7 @@ def makesummaryFig(df_behav, df_photo):
     
     ax0 = f.add_subplot(gs[0, 0])
     summary_subfig_bars(ax0, df_behav, ['pref1', 'pref2', 'pref3'])
-    ax0.set_ylabel('Casein preference')
+    ax0.set_ylabel('Protein preference')
     ax0.set_ylim([-0.1, 1.1])
     ax0.set_yticks([0, 0.5, 1.0]) 
     ax0.set_yticklabels(['0', '0.5', '1'])
@@ -694,19 +707,25 @@ def makesummaryFig(df_behav, df_photo):
     ax0.plot(ax0.get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
     
     ax1 = f.add_subplot(gs[0, 1])
-    summary_subfig_bars(ax1, df_photo, ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta'])
-    ax1.set_ylabel('%\u0394F (Casein - Malt.)')
     
-    ax1.set_ylim([-0.035, 0.11])
-    ax1.set_yticks([0, 0.05, 0.1])
-    ax1.set_yticklabels(['0', '5', '10'])
+    summary_photo_keys = [['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+                          ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
+                          ['pref3_cas_licks_forced', 'pref3_malt_licks_forced']]
+    
+    df_delta = find_delta(df_photo, summary_photo_keys, epoch=epoch)
+    
+    summary_subfig_bars(ax1, df_delta, ['delta_1', 'delta_2', 'delta_3'])
+    ax1.set_ylabel('Diff. in z-score (Casein - Malt.)')
+    
+#    ax1.set_ylim([-0.035, 0.11])
+    ax1.set_yticks([-20, 0, 20, 40])
     ax1.set_title('Photometry')
     
-    ax2 = f.add_subplot(gs[1,0])
-    summary_subfig_correl(ax2, df_behav, df_photo, 'NR')
-    
-    ax3 = f.add_subplot(gs[1,1])
-    summary_subfig_correl(ax3, df_behav, df_photo, 'PR')
+#    ax2 = f.add_subplot(gs[1,0])
+#    summary_subfig_correl(ax2, df_behav, df_photo, 'NR')
+#    
+#    ax3 = f.add_subplot(gs[1,1])
+#    summary_subfig_correl(ax3, df_behav, df_photo, 'PR')
 
     return f
 

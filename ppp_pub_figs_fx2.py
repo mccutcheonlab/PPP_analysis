@@ -270,4 +270,6 @@ def fig2_photo(df_photo, peaktype='average', epoch=[100,119],
     ax4.set_ylim([-25, 100])
 
     return f
+
+
     

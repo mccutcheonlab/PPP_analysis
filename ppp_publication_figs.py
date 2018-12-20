@@ -84,14 +84,15 @@ make_sacc_figs=False
 make_cond_figs=False
 
 make_fig1_behav=False
-make_fig1_photo=True
+make_fig1_photo=False
 
 make_fig2_behav=False
-make_fig2_photo=True
+make_fig2_photo=False
+
+make_fig3_summary=True
 
 make_photo_sip_figs=False
 make_photo_licks_figs=False
-make_summary_fig=False
 
 peaktype='auc'
 epoch=[100,119]
@@ -208,8 +209,8 @@ if make_photo_licks_figs:
     photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
 
 
-if make_summary_fig:
-    summaryFig = pppfig.makesummaryFig(df_behav, df_photo)
+if make_fig3_summary:
+    summaryFig = pppfig.makesummaryFig(df_behav, df_photo, peaktype=peaktype, epoch=epoch)
     summaryFig.savefig(savefolder + 'summaryfig.pdf')
 
 #if savefigs == True:
