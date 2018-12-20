@@ -651,31 +651,6 @@ def summary_subfig_bars(ax, df, keys):
                  grouplabel = xlabels,
                  ax=ax)
 
-def summary_subfig_correl(ax, df_behav, df_photo, diet):
-    
-    dfy = df_behav.xs(diet, level=1)
-    dfx = df_photo.xs(diet, level=1)
-        
-    yvals = [dfy['pref1'], dfy['pref2'], dfy['pref3']]
-    xvals = [dfx['pref1_licks_peak_delta'],
-             dfx['pref2_licks_peak_delta'],
-             dfx['pref3_licks_peak_delta']]
-    
-    ax.plot(xvals, yvals, c='grey')
-    ax.scatter(xvals, yvals, marker='o', c=['w', 'grey', 'k'], edgecolors='k')
-    
-    ax.set_ylabel('Casein preference')
-    ax.set_ylim([-0.1, 1.1])
-    ax.set_yticks([0, 0.5, 1.0]) 
-    ax.set_yticklabels(['0', '0.5', '1'])
-    ax.plot([-0.11, 0.11], [0.5, 0.5], linestyle='dashed',color='k', alpha=0.2)
-    
-    ax.set_xlabel('%\u0394F (Casein - Malt.)')
-    ax.set_xlim([-0.11, 0.11])
-    ax.set_xticks([-0.1, 0, 0.1])
-    ax.set_xticklabels(['-10', '0', '10'])
-    ax.plot([0, 0], [-0.1, 1.1], linestyle='dashed',color='k', alpha=0.2)
-
 def find_delta(df, keys_in, epoch=[100,199]):
     
     epochrange = range(epoch[0], epoch[1])
@@ -689,8 +664,37 @@ def find_delta(df, keys_in, epoch=[100,199]):
     
     return df
 
+def summary_subfig_correl(ax, df_behav, df_photo, diet):
+    
+    dfy = df_behav.xs(diet, level=1)
+    dfx = df_photo.xs(diet, level=1)
+        
+    yvals = [dfy['pref1'], dfy['pref2'], dfy['pref3']]
+    xvals = [dfx['delta_1'], dfx['delta_2'], dfx['delta_3']]
+    
+    yvals_mean = np.mean(yvals, axis=1)
+    xvals_mean = np.mean(xvals, axis=1)
+    
+    ax.plot(xvals, yvals, color='k', alpha=0.2)
+    
+    ax.plot(xvals_mean, yvals_mean, c=almost_black, linewidth=1, zorder=-1)
+    ax.scatter(xvals_mean, yvals_mean, marker='o', c=['w', 'grey', 'k'], edgecolors='k')
+    
+    ax.set_ylabel('Protein preference')
+    ax.set_ylim([-0.1, 1.1])
+    ax.set_yticks([0, 0.5, 1.0]) 
+    ax.set_yticklabels(['0', '0.5', '1'])
+    
+    ax.plot([-21, 21], [0.5, 0.5], linestyle='dashed',color='k', alpha=0.2)
+    
+    ax.set_xlabel('Diff. in z-score (Casein - Malt.)')
+    ax.set_xlim([-21, 21])
+    ax.set_xticks([-20, -10, 0, 10, 20])
+    
+    ax.plot([0, 0], [-0.1, 1.1], linestyle='dashed',color='k', alpha=0.2)
+
 def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 119]):
-    gs = gridspec.GridSpec(2, 2, wspace=0.5)
+    gs = gridspec.GridSpec(2, 2, wspace=0.5, hspace=0.3, bottom=0.1)
     mpl.rcParams['figure.subplot.left'] = 0.10
     mpl.rcParams['figure.subplot.top'] = 0.85
     mpl.rcParams['axes.labelpad'] = 4
@@ -721,11 +725,11 @@ def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 119]):
     ax1.set_yticks([-20, 0, 20, 40])
     ax1.set_title('Photometry')
     
-#    ax2 = f.add_subplot(gs[1,0])
-#    summary_subfig_correl(ax2, df_behav, df_photo, 'NR')
-#    
-#    ax3 = f.add_subplot(gs[1,1])
-#    summary_subfig_correl(ax3, df_behav, df_photo, 'PR')
+    ax2 = f.add_subplot(gs[1,0])
+    summary_subfig_correl(ax2, df_behav, df_delta, 'NR')
+    
+    ax3 = f.add_subplot(gs[1,1])
+    summary_subfig_correl(ax3, df_behav, df_delta, 'PR')
 
     return f
 
