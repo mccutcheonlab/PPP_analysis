@@ -161,7 +161,8 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
     ax.annotate(event, xy=(125, arrow_y), xytext=(0,5), textcoords='offset points',
                 ha='center', va='bottom')
 
-def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=True,
+def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
+                 sc_color='w', colorgroup='control', ylabel=True,
                  ylim=[-0.05, 0.1], grouplabeloffset=0):
     
     if colorgroup == 'control':
@@ -169,8 +170,21 @@ def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=
     else:
         bar_colors=[green, light_green]
     
+    epochrange = range(epoch[0], epoch[1])
+    
     df = df.xs(diet, level=1)
-    a = [df[keys[0]], df[keys[1]]]
+    
+    if peaktype == 'average':
+        a1 = [np.mean(rat[epochrange]) for rat in df[keys[0]]]
+        a2 = [np.mean(rat[epochrange]) for rat in df[keys[1]]]
+        ylab = 'Mean Z-Score'
+        
+    if peaktype == 'auc':
+        a1 = [np.trapz(rat[epochrange]) for rat in df[keys[0]]]
+        a2 = [np.trapz(rat[epochrange]) for rat in df[keys[1]]]
+        ylab = 'AUC'
+        
+    a = [a1, a2]
     x = jmf.data2obj1D(a)
     
     ax, x, _, _ = jmfig.barscatter(x, paired=True,
@@ -189,9 +203,9 @@ def peakbargraph(ax, df, diet, keys, sc_color='w', colorgroup='control', ylabel=
 #    ax.set_ylim(ylim)
     
     if ylabel:
-        ax.set_ylabel('Peak (\u0394F)')
+        ax.set_ylabel(ylab)
 
-def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event=''):
+def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average', epoch=[100,119], event=''):
     
     inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[:,1])
     
@@ -205,12 +219,14 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event='
     ax1.set_ylim([-1.5, 3.5])
     
     ax2 = f.add_subplot(gs[1,1]) 
-    peakbargraph(ax2, df_photo, diet, keys_bars, colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.12)
+    peakbargraph(ax2, df_photo, diet, keys_traces, peaktype=peaktype, epoch=epoch,
+                 colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.07)
+    ax2.set_ylim([-25, 105])
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
+                 peaktype='average', epoch=[100,119],
                  keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
                  keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
-                 keys_bars = ['pref1_cas_licks_auc', 'pref1_malt_licks_auc'],
                  event='Licks'):
     
     if diet == 'NR':
@@ -225,13 +241,12 @@ def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
     
     heatmapCol(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=True, colorgroup=colors)
     
-    averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, keys_bars, event=event)
+    averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype=peaktype, epoch=epoch,  event=event)
         
     return f
 
-def fig2_photo(df_photo,
+def fig2_photo(df_photo, peaktype='average', epoch=[100,119],
                keys_traces = ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
-               keys_bars = ['pref2_cas_licks_peak', 'pref2_malt_licks_peak'],
                event='Licks'):
     
     gs = gridspec.GridSpec(2, 2, hspace=0.6, wspace=0.7, left=0.20, right=0.98)
@@ -245,12 +260,14 @@ def fig2_photo(df_photo,
     ax2.set_ylim([-1.5, 2.5])
     
     ax3 = f.add_subplot(gs[1,0]) 
-    peakbargraph(ax3, df_photo, 'NR', keys_bars, colorgroup='exptl',
+    peakbargraph(ax3, df_photo, 'NR', keys_traces, peaktype=peaktype, epoch=epoch,
+                 colorgroup='exptl',
                  grouplabeloffset=0.1)
     
     ax4 = f.add_subplot(gs[1,1], sharey=ax3) 
-    peakbargraph(ax4, df_photo, 'PR', keys_bars, ylabel=False,
-                 ylim=[-0.03, 0.11], grouplabeloffset=0.1)
+    peakbargraph(ax4, df_photo, 'PR', keys_traces, peaktype=peaktype, epoch=epoch,
+                 ylabel=False, grouplabeloffset=0.1)
+    ax4.set_ylim([-25, 100])
 
     return f
     

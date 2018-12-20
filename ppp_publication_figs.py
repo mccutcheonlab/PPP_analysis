@@ -93,6 +93,9 @@ make_photo_sip_figs=False
 make_photo_licks_figs=False
 make_summary_fig=False
 
+peaktype='auc'
+epoch=[100,119]
+
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
 
 if make_cond_figs:
@@ -148,13 +151,13 @@ clims = [[-0.15,0.20], [-0.11,0.15]]
 
 if make_fig1_photo:
     fig1_photo_NR = pppfig2.fig1_photo(df_heatmap, df_photo, 'NR', 'pref1', clims=clims[0],
+                                          peaktype=peaktype, epoch=epoch,
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_bars = ['pref1_cas_licks_auc', 'pref1_malt_licks_auc'],
                                           keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
     
     fig1_photo_PR = pppfig2.fig1_photo(df_heatmap, df_photo, 'PR', 'pref1', clims=clims[1],
+                                          peaktype=peaktype, epoch=epoch,
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_bars = ['pref1_cas_licks_auc', 'pref1_malt_licks_auc'],
                                           keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
     
     fig1_photo_NR.savefig(savefolder + 'fig1_photo_NR.pdf')
@@ -177,12 +180,11 @@ if make_fig2_behav:
     
     
 if make_fig2_photo:
-    fig2_pref2_photo = pppfig2.fig2_photo(df_photo)
+    fig2_pref2_photo = pppfig2.fig2_photo(df_photo, peaktype=peaktype, epoch=epoch)
     fig2_pref2_photo.savefig(savefolder + 'fig2_pref2_photo.pdf')
     
-    fig2_pref3_photo = pppfig2.fig2_photo(df_photo,
-                                          keys_traces = ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'],
-                                          keys_bars = ['pref3_cas_licks_peak', 'pref3_malt_licks_peak'],)
+    fig2_pref3_photo = pppfig2.fig2_photo(df_photo, peaktype=peaktype, epoch=epoch,
+                                          keys_traces = ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'])
     fig2_pref3_photo.savefig(savefolder + 'fig2_pref3_photo.pdf')
 
 
