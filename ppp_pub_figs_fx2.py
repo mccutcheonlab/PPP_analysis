@@ -179,7 +179,7 @@ def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
         a2 = [np.mean(rat[epochrange]) for rat in df[keys[1]]]
         ylab = 'Mean Z-Score'
         
-    if peaktype == 'auc':
+    elif peaktype == 'auc':
         a1 = [np.trapz(rat[epochrange]) for rat in df[keys[0]]]
         a2 = [np.trapz(rat[epochrange]) for rat in df[keys[1]]]
         ylab = 'AUC'

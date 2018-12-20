@@ -11,6 +11,7 @@ import dill
 import pandas as pd
 
 from scipy import stats
+import numpy as np
 
 from subprocess import PIPE, run
 
@@ -44,7 +45,7 @@ def extractandstack(df, cols_to_stack, new_cols=[]):
             
     return new_df
 
-def ppp_licksANOVA(df, cols, csvfile):
+def ppp_2wayANOVA(df, cols, csvfile):
     
     df = extractandstack(df, cols, new_cols=['rat', 'diet', 'substance', 'licks'])
     df.to_csv(csvfile)
@@ -124,45 +125,45 @@ def stats_pref_behav(prefsession='1', verbose=True):
                   'pref' + str(prefsession) + '_nmalt']
 
     if verbose: print('\nANOVA on FORCED LICK trials\n')
-    ppp_licksANOVA(df_behav,
+    ppp_2wayANOVA(df_behav,
                    forcedkeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_forc_licks.csv')
    
     if verbose: print('\ANOVA on LATENCIES on forced lick trials')
-    ppp_licksANOVA(df_photo,
+    ppp_2wayANOVA(df_photo,
                    latkeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_forc_licks.csv')
 
     ppp_full_ttests(df_photo, latkeys)
     
     if verbose: print('\nANOVA on FREE LICK trials\n')
-    ppp_licksANOVA(df_behav,
+    ppp_2wayANOVA(df_behav,
                    freekeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_free_licks.csv')
     
     ppp_full_ttests(df_behav, freekeys)
 
     if verbose: print('\nANOVA of CHOICE data\n')
-    ppp_licksANOVA(df_behav,
+    ppp_2wayANOVA(df_behav,
                    choicekeys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_choice.csv')
     
     ppp_full_ttests(df_behav, choicekeys)
 
 
-def stats_pref_photo(prefsession='1', verbose=True):
-    
+def stats_pref_photo(df, prefsession='1', verbose=True):
+        
+    keys = ['pref' + prefsession + '_auc_cas',
+            'pref' + prefsession + '_auc_malt']
+
     if verbose: print('\nAnalysis of preference session ' + prefsession)
-    
-    forcedkeys = ['pref' + prefsession + '_cas_licks_peak',
-                  'pref' + prefsession + '_malt_licks_peak']
 
     if verbose: print('\nANOVA of photometry data, casein vs. maltodextrin\n')
-    ppp_licksANOVA(df_photo,
-                   forcedkeys,
+    ppp_2wayANOVA(df_photo,
+                   keys,
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref'+ prefsession+ '_forc_licks.csv')
     
-    ppp_full_ttests(df_photo, forcedkeys)
+    ppp_full_ttests(df_photo, keys)
 
 def stats_summary_behav(verbose=True):
     if verbose: print('\nAnalysis of summary data - BEHAVIOUR')
@@ -190,7 +191,7 @@ def stats_summary_behav(verbose=True):
 def stats_summary_photo(verbose=True):
     if verbose: print('\nAnalysis of summary data - PHOTOMETRY')
     
-    photokeys = ['pref1_licks_peak_delta', 'pref2_licks_peak_delta', 'pref3_licks_peak_delta']
+    photokeys = ['pref1_delta', 'pref2_delta', 'pref3_delta']
     
     ppp_summaryANOVA_2way(df_photo,
                    photokeys,
@@ -208,14 +209,35 @@ def stats_summary_photo(verbose=True):
                usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_photo_PR.csv',
                'PR')
 
+def make_stats_df(df, key_suffixes, prefsession='1', epoch=[100, 119]):
+    epochrange = range(epoch[0], epoch[1])
+    
+    keys_in, keys_out = [], []
+    for suffix, short_suffix in zip(key_suffixes, ['cas', 'malt']):
+        keys_in.append('pref' + prefsession + suffix)
+        keys_out.append('pref' + prefsession + '_auc_' + short_suffix)
+
+    for key_in, key_out in zip(keys_in, keys_out):
+        df_photo[key_out] = [np.trapz(rat[epochrange]) for rat in df[key_in]]
+
+    df['pref' + prefsession + '_delta'] = [cas-malt for cas, malt in zip(df[keys_out[0]], df[keys_out[1]])]
+    
+    return df
+
+epoch = [100,119]
+keys = ['_cas_licks_forced', '_malt_licks_forced']
+
+for session in [1, 2, 3]:
+    df_photo = make_stats_df(df_photo, keys, prefsession=str(session), epoch=epoch)
+
 #
 #stats_pref_behav()
 #stats_pref_behav(prefsession='2')
 #stats_pref_behav(prefsession='3')
-#
-#stats_pref_photo()
-#stats_pref_photo(prefsession='2')
-#stats_pref_photo(prefsession='3')
+
+#stats_pref_photo(df_photo)
+#stats_pref_photo(df_photo, prefsession='2')
+#stats_pref_photo(df_photo, prefsession='3')
 
 stats_summary_behav()
 stats_summary_photo()
