@@ -89,6 +89,13 @@ def average_without_noise(snips, key='blue_z'):
     except:
         print('Problem averaging snips')
         return
+    
+def convert_events(events, t2sMap):
+    events_convert=[]
+    for x in events:
+        events_convert.append(np.searchsorted(t2sMap, x, side="left"))
+    
+    return events_convert
 
 # Looks for existing data and if not there loads pickled file
 try:
@@ -325,8 +332,59 @@ for s, pref in zip(['s10', 's11', 's16'],
         df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
         df_heatmap_sip.at[rat, pref + '_malt_event'] = getfirstlick(x.malt, event)
 
+
+rat = 'PPP1-7'
+n = 16    # 3 16 22
+padding = 20 * x.fs
+pre = 5
+post = 10
+
+x = pref_sessions[rat + '_s10']
+
+blue_sig = x.data_filt
+uv_sig = x.dataUV_filt
+
+all_licks = np.concatenate((x.cas['licks'], x.malt['licks']))
+all_licks_convert = convert_events(all_licks, x.t2sMap)
+
+all_events = np.concatenate((x.cas['sipper'], x.malt['sipper']))
+all_events = np.sort(all_events)
+
+all_events_convert = convert_events(all_events, x.t2sMap)
+
+start = int(all_events_convert[n-1]-padding)
+stop = int(all_events_convert[n+1]+padding)
+longtrace['fs'] = x.fs
+
+datarange = range(start, stop)
+
+longtrace = {}
+longtrace['blue'] = blue_sig[datarange]
+longtrace['uv'] = uv_sig[datarange]
+longtrace['all_licks'] = [lick-start for lick in all_licks_convert if (lick>start) and (lick<stop)]
+longtrace['all_events'] = []
+longtrace['start'] = start
+longtrace['stop'] = stop
+longtrace['pre'] = pre
+longtrace['post'] = post
+
+for eventN, event in zip([n-1, n, n+1],
+                         ['event1', 'event2', 'event3']):
+    event_time = all_events[eventN]
+    longtrace['all_events'].append(convert_events([event_time], x.t2sMap)[0] - start)
+
+    trace_start = int(convert_events([event_time-pre], x.t2sMap)[0])
+    trace_stop = int(convert_events([event_time+post], x.t2sMap)[0])
+    
+    tracerange = range(trace_start, trace_stop)
+    
+    longtrace[event]={}
+    longtrace[event]['blue'] = blue_sig[tracerange]
+    longtrace[event]['uv'] = uv_sig[tracerange]
+    longtrace[event]['licks'] = [lick-event_time for lick in all_licks if (lick > event_time-pre) and (lick < event_time+post)]
+
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
-dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip], pickle_out)
+dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace], pickle_out)
 pickle_out.close()
 
 ## to find rep traces

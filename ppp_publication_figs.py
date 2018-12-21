@@ -29,10 +29,12 @@ make_fig3_summary=False
 make_bwfood_figs=False
 
 make_sacc_figs=False
-make_cond_figs=True
+make_cond_figs=False
 
 make_photo_sip_figs=False
 make_photo_licks_figs=False
+
+supp_rep_trace = True
 
 peaktype='auc'
 epoch=[100,119]
@@ -135,7 +137,13 @@ if make_cond_figs:
 #    cond1_photo_sip_fig.savefig(savefolder + 'cond1_photo_sip.pdf')
 #    cond1_photo_lick_fig.savefig(savefolder + 'cond1_photo_lick.pdf')
 
+if supp_rep_trace:
 
+    
+    figS2_rep_photo = figS2_rep(longtrace)
+
+    #
+    #figS2_rep_photo.savefig()
 
 
 if make_photo_sip_figs:

@@ -7,6 +7,7 @@ Created on Thu Dec 20 16:11:25 2018
 
 import matplotlib.gridspec as gridspec
 import matplotlib.lines as mlines
+import matplotlib.patches as patches
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -152,3 +153,71 @@ def cond_photobar_fig(ax, df, diet, keys):
 #             ylim=[-5,50],
          ax=ax)
 
+def longtracefig(f, gs, longtrace):
+    
+    inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0,:],
+                                             height_ratios=[1,8],
+                                             hspace=0.05)
+
+    ax1 = f.add_subplot(inner[1,0])    
+    ax1.axis('off')
+    
+    ax1.plot(longtrace['blue'], c='xkcd:azure')
+    ax1.plot(longtrace['uv'], c='xkcd:amethyst')
+    
+    w = (pre+post) * x.fs
+    h = ax1.get_ylim()[1] - ax1.get_ylim()[0]
+
+    for event in longtrace['all_events']:
+        start = event - (pre * x.fs)
+        rect = patches.Rectangle((start,ax1.get_ylim()[0]),w,h,
+                                 linewidth=1, linestyle='dashed', edgecolor='xkcd:silver', facecolor='none')
+        ax1.add_patch(rect)
+    old_ax = ax1.get_ylim()
+    ax1.set_ylim([old_ax[0]-30, old_ax[1]+30])
+        
+    ax2 = f.add_subplot(inner[0,0], sharex=ax1)
+    ax2.axis('off')
+
+def reptrace(f, gs, gsx, tracedata, ylabel=False):
+    
+    text_offset= 1 * x.fs
+    
+    inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[1,gsx],
+                                             height_ratios=[1,8],
+                                             hspace=0.05)
+    
+    ax1 = f.add_subplot(inner[1,0])
+    
+    ax1.axis('off')
+    ax1.plot(tracedata['blue'], c='xkcd:azure')
+    ax1.plot(tracedata['uv'], c='xkcd:amethyst')
+
+    ax2 = f.add_subplot(inner[0,0], sharex=ax1)
+    ax2.axis('off')
+    
+    sipper_x = pre * x.fs
+    ax2.plot(sipper_x, 1, 'v', color='xkcd:silver')
+    licks_x = [(lick+pre) * x.fs for lick in tracedata['licks']]
+    
+    yvals = [0]*len(licks_x)
+    ax2.plot(licks_x,yvals,linestyle='None',marker='|',markersize=5, color='xkcd:silver')
+    
+    if ylabel:
+        ax2.annotate('Licks', xy=(licks_x[0]-text_offset,0), va='center', ha='right')
+        ax2.annotate('Sipper', xy=(sipper_x-text_offset, 1), xytext=(0,5), textcoords='offset points',
+                    ha='right', va='top')
+
+def figS2_rep(longtrace):
+    gs = gridspec.GridSpec(2, 3, wspace=0.5, hspace=0.3, bottom=0.1)
+    f = plt.figure(figsize=(5,4))
+    
+    longtracefig(f, gs, longtrace)
+    
+    reptrace(f, gs, 0, longtrace['event1'], ylabel=True)
+    
+    reptrace(f, gs, 1, longtrace['event2'])
+    
+    reptrace(f, gs, 2, longtrace['event3'])
+    
+    return f
