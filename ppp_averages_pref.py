@@ -334,15 +334,15 @@ for s, pref in zip(['s10', 's11', 's16'],
 
 
 rat = 'PPP1-7'
-n = 16    # 3 16 22
-padding = 20 * x.fs
+n = 4   # for PPP1-4: 16, 27, 38   ; for PPP1-7: 3 16 22
+padding = 40 * x.fs
 pre = 5
 post = 10
 
 x = pref_sessions[rat + '_s10']
 
-blue_sig = x.data_filt
-uv_sig = x.dataUV_filt
+blue_sig = x.data
+uv_sig = x.dataUV
 
 all_licks = np.concatenate((x.cas['licks'], x.malt['licks']))
 all_licks_convert = convert_events(all_licks, x.t2sMap)
@@ -354,7 +354,6 @@ all_events_convert = convert_events(all_events, x.t2sMap)
 
 start = int(all_events_convert[n-1]-padding)
 stop = int(all_events_convert[n+1]+padding)
-longtrace['fs'] = x.fs
 
 datarange = range(start, stop)
 
@@ -367,6 +366,8 @@ longtrace['start'] = start
 longtrace['stop'] = stop
 longtrace['pre'] = pre
 longtrace['post'] = post
+longtrace['fs'] = x.fs
+longtrace['f0'] = [np.mean(longtrace['blue']), np.mean(longtrace['uv'])]
 
 for eventN, event in zip([n-1, n, n+1],
                          ['event1', 'event2', 'event3']):
@@ -383,9 +384,14 @@ for eventN, event in zip([n-1, n, n+1],
     longtrace[event]['uv'] = uv_sig[tracerange]
     longtrace[event]['licks'] = [lick-event_time for lick in all_licks if (lick > event_time-pre) and (lick < event_time+post)]
 
+
+
 pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
 dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace], pickle_out)
 pickle_out.close()
+
+#from ppp_publication_figs import *
+
 
 ## to find rep traces
 #x = pref_sessions['PPP1-4_s10']

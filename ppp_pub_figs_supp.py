@@ -158,55 +158,110 @@ def longtracefig(f, gs, longtrace):
     inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0,:],
                                              height_ratios=[1,8],
                                              hspace=0.05)
-
+    pre = longtrace['pre']
+    post = longtrace['post']
+    fs = longtrace['fs']
+    
+    blue_sig = longtrace['blue'] / longtrace['f0'][0]
+    uv_sig = longtrace['uv'] / longtrace['f0'][1]   
+    
     ax1 = f.add_subplot(inner[1,0])    
     ax1.axis('off')
     
-    ax1.plot(longtrace['blue'], c='xkcd:azure')
-    ax1.plot(longtrace['uv'], c='xkcd:amethyst')
+    ax1.plot(blue_sig, c='xkcd:azure', linewidth=1)
+    ax1.plot(uv_sig, c='xkcd:amethyst',linewidth=1)
     
-    w = (pre+post) * x.fs
+    w = (pre+post) * fs
     h = ax1.get_ylim()[1] - ax1.get_ylim()[0]
 
     for event in longtrace['all_events']:
-        start = event - (pre * x.fs)
+        start = event - (pre * fs)
         rect = patches.Rectangle((start,ax1.get_ylim()[0]),w,h,
                                  linewidth=1, linestyle='dashed', edgecolor='xkcd:silver', facecolor='none')
         ax1.add_patch(rect)
-    old_ax = ax1.get_ylim()
-    ax1.set_ylim([old_ax[0]-30, old_ax[1]+30])
         
-    ax2 = f.add_subplot(inner[0,0], sharex=ax1)
-    ax2.axis('off')
-
-def reptrace(f, gs, gsx, tracedata, ylabel=False):
+    old_ax = ax1.get_ylim()
+    ax1.set_ylim([old_ax[0]-0.005, old_ax[1]+0.001])
     
-    text_offset= 1 * x.fs
+    l = 0.03
+    yrange = ax1.get_ylim()[1] - ax1.get_ylim()[0]        
+    y1 = yrange * 0.6 + ax1.get_ylim()[0]
+    y2 = y1 + l        
+    scale_label = '{0:.0f}% \u0394F'.format(l*100)
+    ax1.plot([0, 0], [y1, y2], c=almost_black, linewidth=1.5)
+    ax1.text(-fs, y1 + (l/2), scale_label, va='center', ha='right')
+
+    y = ax1.get_ylim()[0]
+    xvals = [ax1.get_xlim()[1] - 10*fs, ax1.get_xlim()[1]]
+    ax1.plot(xvals, [y, y], c=almost_black, linewidth=2)
+    text_x = ((xvals[1]-xvals[0]) / 2) + xvals[0]
+    ax1.annotate('10 s', xy=(text_x,y), xycoords='data',
+                xytext=(0,-5), textcoords='offset points',
+                ha='center',va='top')
+        
+#    ax2 = f.add_subplot(inner[0,0], sharex=ax1)
+#    ax2.axis('off')
+
+def reptrace(f, gs, gsx, tracedata, yscale=False, xscale=False, event_text=False, ax_to_match=[]):
+    
+    pre = longtrace['pre']
+    post = longtrace['post']
+    fs = longtrace['fs']
+    
+    text_offset= 1 * fs
+    
+    blue_sig = tracedata['blue'] / longtrace['f0'][0]
+    uv_sig = tracedata['uv'] / longtrace['f0'][1]  
     
     inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[1,gsx],
                                              height_ratios=[1,8],
                                              hspace=0.05)
-    
-    ax1 = f.add_subplot(inner[1,0])
+    try:
+        ax1 = f.add_subplot(inner[1,0], sharey=ax_to_match)
+    except:
+        print('NO ax to match')
+        ax1 = f.add_subplot(inner[1,0])
     
     ax1.axis('off')
-    ax1.plot(tracedata['blue'], c='xkcd:azure')
-    ax1.plot(tracedata['uv'], c='xkcd:amethyst')
+    ax1.plot(blue_sig, c='xkcd:azure', linewidth=1)
+    ax1.plot(uv_sig, c='xkcd:amethyst', linewidth=1)
+    
+    if yscale:
+        l = 0.03
+        yrange = ax1.get_ylim()[1] - ax1.get_ylim()[0]        
+        y1 = yrange * 0.6 + ax1.get_ylim()[0]
+        y2 = y1 + l        
+        scale_label = '{0:.0f}% \u0394F'.format(l*100)
+        xvals = [0, 0]
+        ax1.plot(xvals, [y1, y2], c=almost_black, linewidth=1.5)
+        ax1.text(-fs, y1 + (l/2), scale_label, va='center', ha='right')
+    
+    # Adds x scale bar
+    if xscale:
+        y = ax1.get_ylim()[0]
+        xvals = [ax1.get_xlim()[1] - 2*fs, ax1.get_xlim()[1]]
+        ax1.plot(xvals, [y, y], c=almost_black, linewidth=1.5)
+        text_x = ((xvals[1]-xvals[0]) / 2) + xvals[0]
+        ax1.annotate('2 s', xy=(text_x,y), xycoords='data',
+                    xytext=(0,-5), textcoords='offset points',
+                    ha='center',va='top')
 
     ax2 = f.add_subplot(inner[0,0], sharex=ax1)
     ax2.axis('off')
     
-    sipper_x = pre * x.fs
+    sipper_x = pre * fs
     ax2.plot(sipper_x, 1, 'v', color='xkcd:silver')
-    licks_x = [(lick+pre) * x.fs for lick in tracedata['licks']]
+    licks_x = [(lick+pre) * fs for lick in tracedata['licks']]
     
     yvals = [0]*len(licks_x)
     ax2.plot(licks_x,yvals,linestyle='None',marker='|',markersize=5, color='xkcd:silver')
     
-    if ylabel:
-        ax2.annotate('Licks', xy=(licks_x[0]-text_offset,0), va='center', ha='right')
-        ax2.annotate('Sipper', xy=(sipper_x-text_offset, 1), xytext=(0,5), textcoords='offset points',
-                    ha='right', va='top')
+    if event_text:
+        ax2.annotate('Licks', xy=(sipper_x-text_offset,0), va='center', ha='right')
+        ax2.annotate('Sipper', xy=(sipper_x-text_offset, 1), xytext=(0,0), textcoords='offset points',
+                    ha='right', va='center')
+        
+    return ax1
 
 def figS2_rep(longtrace):
     gs = gridspec.GridSpec(2, 3, wspace=0.5, hspace=0.3, bottom=0.1)
@@ -214,10 +269,8 @@ def figS2_rep(longtrace):
     
     longtracefig(f, gs, longtrace)
     
-    reptrace(f, gs, 0, longtrace['event1'], ylabel=True)
-    
-    reptrace(f, gs, 1, longtrace['event2'])
-    
-    reptrace(f, gs, 2, longtrace['event3'])
+    ax_trace1 = reptrace(f, gs, 0, longtrace['event1'], yscale=True, event_text=True)    
+    ax_trace2 = reptrace(f, gs, 1, longtrace['event2'], ax_to_match=ax_trace1)    
+    ax_trace3 = reptrace(f, gs, 2, longtrace['event3'], xscale=True, ax_to_match=ax_trace1)
     
     return f

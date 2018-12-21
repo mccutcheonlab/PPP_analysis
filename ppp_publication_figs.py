@@ -140,10 +140,8 @@ if make_cond_figs:
 if supp_rep_trace:
 
     
-    figS2_rep_photo = figS2_rep(longtrace)
-
-    #
-    #figS2_rep_photo.savefig()
+    figS2_rep_photo = figS2_rep(longtrace)  
+    figS2_rep_photo.savefig(savefolder + 'figS2_rep_traces.pdf')
 
 
 if make_photo_sip_figs:
