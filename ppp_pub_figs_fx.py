@@ -127,10 +127,15 @@ def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
         rat='PPP1-4'
         colors = 'exptl'
     
-    gs = gridspec.GridSpec(2, 2, wspace=0.7, width_ratios=[1, 0.8], hspace=0.6, left=0.12, right=0.98)
+    if event == 'Sipper':
+        reverse = False
+    else:
+        reverse = True
+    
+    gs = gridspec.GridSpec(2, 2, wspace=0.8, width_ratios=[1, 0.8], hspace=0.3, left=0.12, right=0.98)
     f = plt.figure(figsize=(3.2,3.2))
     
-    heatmapCol(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=True, colorgroup=colors)
+    heatmapCol(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=reverse, colorgroup=colors)
     
     averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype=peaktype, epoch=epoch,  event=event)
         
@@ -199,33 +204,48 @@ def heatmapCol(f, df, gs, diet, session, rat, event='', reverse=False, clims=[0,
     if reverse:
             event_cas = [-event for event in event_cas]
             event_malt = [-event for event in event_malt]
-
-    inner = gridspec.GridSpecFromSubplotSpec(3,2,subplot_spec=gs[:,0],
+ 
+    col_gs = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[:,0],
+                                             height_ratios=[0.05,1],
+                                             hspace=0.0)
+    
+    plots_gs = gridspec.GridSpecFromSubplotSpec(3,2,subplot_spec=col_gs[1,0],
                                              width_ratios=[12,1],
                                              wspace=0.05)
-    ax1 = f.add_subplot(inner[0,0])
+    
+    marker_gs = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=col_gs[0,0],
+                                             width_ratios=[12,1],
+                                             wspace=0.05)
+
+    ax1 = f.add_subplot(plots_gs[0,0])
     ax, mesh = makeheatmap(ax1, data_cas, events=event_cas, ylabel='Casein trials')
     mesh.set_clim(clims)
-    ax1.plot([0], [-1], 'v', color='xkcd:silver')
     
-    ax2 = f.add_subplot(inner[1,0], sharex=ax1)
+    ax2 = f.add_subplot(plots_gs[1,0], sharex=ax1)
     ax, mesh = makeheatmap(ax2, data_malt, events=event_malt, ylabel='Malt. trials')
     mesh.set_clim(clims)
     
+    ax0 = f.add_subplot(marker_gs[0,0], sharex=ax1)
+    ax0.axis('off')
     if event == 'Sipper':
-        print(event)
+        ax0.plot(0,0, 'v', color='xkcd:silver')
+        ax0.annotate(event, xy=(0, 0), xytext=(0,5), textcoords='offset points',
+            ha='center', va='bottom')
+    elif event == 'Licks':
+        ax0.plot([0,5], [0,0], color='xkcd:silver', linewidth=3)
+        ax0.annotate(event, xy=(2.5, 0), xytext=(0,5), textcoords='offset points',
+            ha='center', va='bottom')
         
-    for ax in [ax1, ax2]:
-        ax.set_xlim([-10,20])
+    ax1.set_xlim([-10,20])
     
-    cbar_ax = f.add_subplot(inner[0,1])   
+    cbar_ax = f.add_subplot(plots_gs[0,1])   
     cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
     cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
                    '0% \u0394F',
                    '{0:.0f}%'.format(clims[1]*100)]
     cbar.ax.set_yticklabels(cbar_labels)
     
-    ax3 = f.add_subplot(inner[2,0])
+    ax3 = f.add_subplot(plots_gs[2,0])
  
     jmfig.shadedError(ax3, data_cas, linecolor=color[0], errorcolor=errorcolors[0])
     jmfig.shadedError(ax3, data_malt, linecolor=color[1], errorcolor=errorcolors[1])
@@ -285,12 +305,6 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
         
     if ylabel:
         ax.set_ylabel('Z-Score')
-        
-# Marks location of event on graph with arrow    
-    arrow_y = ax.get_ylim()[1]
-    ax.plot([100, 150], [arrow_y, arrow_y], color='xkcd:silver', linewidth=3)
-    ax.annotate(event, xy=(125, arrow_y), xytext=(0,5), textcoords='offset points',
-                ha='center', va='bottom')
 
 def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
                  sc_color='w', colorgroup='control', ylabel=True,
@@ -338,16 +352,29 @@ def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
 
 def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average', epoch=[100,119], event=''):
     
-    inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[:,1])
+    inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0,1],
+                                             height_ratios=[0.15,1],
+                                             hspace=0.0)
     
     if diet == 'NR':
         colors = 'control'
     else:
         colors = 'exptl'
     
-    ax1 = f.add_subplot(inner[0,0])
+    ax1 = f.add_subplot(inner[1,0])
     averagetrace(ax1, df_photo, diet, keys_traces, event=event, fullaxis=True, colorgroup=colors)
     ax1.set_ylim([-1.5, 3.5])
+    
+    ax0 = f.add_subplot(inner[0,0], sharex=ax1)
+    ax0.axis('off')
+    if event == 'Sipper':
+        ax0.plot(100,0, 'v', color='xkcd:silver')
+        ax0.annotate(event, xy=(100, 0), xytext=(0,5), textcoords='offset points',
+            ha='center', va='bottom')
+    elif event == 'Licks':
+        ax0.plot([100,150], [0,0], color='xkcd:silver', linewidth=3)
+        ax0.annotate(event, xy=(125, 0), xytext=(0,5), textcoords='offset points',
+            ha='center', va='bottom')
     
     ax2 = f.add_subplot(gs[1,1]) 
     peakbargraph(ax2, df_photo, diet, keys_traces, peaktype=peaktype, epoch=epoch,

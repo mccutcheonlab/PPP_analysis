@@ -34,7 +34,8 @@ make_cond_figs=False
 make_photo_sip_figs=False
 make_photo_licks_figs=False
 
-supp_rep_trace = True
+supp_rep_trace = False
+supp_heatmap = True
 
 peaktype='auc'
 epoch=[100,119]
@@ -143,6 +144,22 @@ if supp_rep_trace:
     figS2_rep_photo = figS2_rep(longtrace)  
     figS2_rep_photo.savefig(savefolder + 'figS2_rep_traces.pdf')
 
+if supp_heatmap:
+    print('Supp heatmap')
+    figS2_photo_NR = fig1_photo(df_heatmap_sip, df_photo, 'NR', 'pref1', clims=clims[0],
+                                          peaktype=peaktype, epoch=epoch,
+                                          keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
+                                          keys_lats = ['pref1_cas_lats_all_fromsip', 'pref1_malt_lats_all_fromsip'],
+                                          event='Sipper')
+    
+    figS2_photo_PR = fig1_photo(df_heatmap, df_photo, 'PR', 'pref1', clims=clims[1],
+                                          peaktype=peaktype, epoch=epoch,
+                                          keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
+                                          keys_lats = ['pref1_cas_lats_all_fromsip', 'pref1_malt_lats_all_fromsip'],
+                                          event='Sipper')
+    
+    figS2_photo_NR.savefig(savefolder + 'figS2_photo_NR.pdf')
+    figS2_photo_PR.savefig(savefolder + 'figS2_photo_PR.pdf')
 
 if make_photo_sip_figs:
     photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,

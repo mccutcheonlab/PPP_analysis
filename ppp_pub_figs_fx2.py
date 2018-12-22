@@ -16,22 +16,6 @@ import JM_general_functions as jmf
 
 from ppp_pub_figs_settings import *
 
-import timeit
-tic = timeit.default_timer()
-
-#Colors
-green = mpl.colors.to_rgb('xkcd:kelly green')
-light_green = mpl.colors.to_rgb('xkcd:light green')
-almost_black = mpl.colors.to_rgb('#262626')
-
-## Colour scheme
-col={}
-col['np_cas'] = 'xkcd:silver'
-col['np_malt'] = 'white'
-col['lp_cas'] = 'xkcd:kelly green'
-col['lp_malt'] = 'xkcd:light green'
-
-
 def lickplot(ax, licks, sipper,
              ylabel=True,
              style='raster',

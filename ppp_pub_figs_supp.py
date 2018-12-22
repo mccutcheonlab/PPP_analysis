@@ -219,7 +219,6 @@ def reptrace(f, gs, gsx, tracedata, yscale=False, xscale=False, event_text=False
     try:
         ax1 = f.add_subplot(inner[1,0], sharey=ax_to_match)
     except:
-        print('NO ax to match')
         ax1 = f.add_subplot(inner[1,0])
     
     ax1.axis('off')
