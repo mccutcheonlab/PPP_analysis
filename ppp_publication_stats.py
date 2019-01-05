@@ -82,6 +82,12 @@ def ppp_ttest_unpaired(df, index1, index2, key):
     print(key, result, '\n')
     return result
 
+def ppp_ttest_onesample(df, index, key):
+    df_new = df.xs(index, level=1)
+    result = stats.ttest_1samp(df_new[key], 0.5)
+    print(index, key, result, '\n')
+    return result
+
 def ppp_full_ttests(df, keys, verbose=True):
     
     if verbose: print('t-test for NON-RESTRICTED, casein vs. malt')
@@ -123,6 +129,8 @@ def stats_pref_behav(prefsession='1', verbose=True):
     
     choicekeys = ['pref' + str(prefsession) + '_ncas',
                   'pref' + str(prefsession) + '_nmalt']
+    
+    prefkey = ['pref' + str(prefsession)]
 
     if verbose: print('\nANOVA on FORCED LICK trials\n')
     ppp_2wayANOVA(df_behav,
@@ -149,7 +157,8 @@ def stats_pref_behav(prefsession='1', verbose=True):
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_choice.csv')
     
     ppp_full_ttests(df_behav, choicekeys)
-
+    ppp_ttest_onesample(df_behav, 'NR', prefkey)
+    ppp_ttest_onesample(df_behav, 'PR', prefkey)
 
 def stats_pref_photo(df, prefsession='1', verbose=True):
         
@@ -231,13 +240,13 @@ for session in [1, 2, 3]:
     df_photo = make_stats_df(df_photo, keys, prefsession=str(session), epoch=epoch)
 
 #
-#stats_pref_behav()
-#stats_pref_behav(prefsession='2')
-#stats_pref_behav(prefsession='3')
+stats_pref_behav()
+stats_pref_behav(prefsession='2')
+stats_pref_behav(prefsession='3')
 
 #stats_pref_photo(df_photo)
 #stats_pref_photo(df_photo, prefsession='2')
 #stats_pref_photo(df_photo, prefsession='3')
 
-stats_summary_behav()
-stats_summary_photo()
+#stats_summary_behav()
+#stats_summary_photo()
