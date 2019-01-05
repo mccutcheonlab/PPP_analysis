@@ -16,7 +16,7 @@ import JM_general_functions as jmf
 
 from ppp_pub_figs_settings import *
 
-def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barlabeloffset=[]):
+def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barlabeloffset=[], panel4='pref'):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
@@ -26,6 +26,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
     choice_malt_key = 'pref' + str(prefsession) + '_nmalt'
     lat_cas_key = 'pref' + str(prefsession) + '_cas_lats_fromsip'
     lat_malt_key = 'pref' + str(prefsession) + '_malt_lats_fromsip'
+    pref_key = 'pref' + str(prefsession)
     
     scattersize = 50
 
@@ -96,23 +97,41 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
     ax[2].set_ylabel('Licks')
     ax[2].set_yticks([0, 250, 500, 750])
 
-#panel 3 - free choice, choices   
-    x = [[df_behav.xs('NR', level=1)[choice_cas_key], df_behav.xs('NR', level=1)[choice_malt_key]],
-         [df_behav.xs('PR', level=1)[choice_cas_key], df_behav.xs('PR', level=1)[choice_malt_key]]]
-    jmfig.barscatter(x, paired=True, unequal=True,
-             barfacecoloroption = 'individual',
-             barfacecolor = barfacecolor,
-             scatteredgecolor = ['xkcd:charcoal'],
-             scatterlinecolor = 'xkcd:charcoal',
-             grouplabel = grouplabel,
-             barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-             barlabeloffset=barlabeloffset[3],
-             scattersize = scattersize,
-             ylim=[-2,22],
-             ax=ax[3])
-    
-    ax[3].set_ylabel('Choices (out of 20)')
-    ax[3].set_yticks([0, 10, 20])
+    if panel4 == 'choices':
+        x = [[df_behav.xs('NR', level=1)[choice_cas_key], df_behav.xs('NR', level=1)[choice_malt_key]],
+             [df_behav.xs('PR', level=1)[choice_cas_key], df_behav.xs('PR', level=1)[choice_malt_key]]]
+        jmfig.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = barfacecolor,
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel = grouplabel,
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 barlabeloffset=barlabeloffset[3],
+                 scattersize = scattersize,
+                 ylim=[-2,22],
+                 ax=ax[3])
+        
+        ax[3].set_ylabel('Choices (out of 20)')
+        ax[3].set_yticks([0, 10, 20])
+    else:
+        x = [df_behav.xs('NR', level=1)[pref_key], df_behav.xs('PR', level=1)[pref_key]]
+        jmfig.barscatter(x, paired=False, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [barfacecolor[0], barfacecolor[2]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel = grouplabel,
+                 grouplabeloffset = 0,
+                 barlabels=[],
+                 barlabeloffset=barlabeloffset[3],
+                 scattersize = 25,
+                 ylim=[-0.03, 1.1],
+                 ax=ax[3])
+        
+        ax[3].set_ylabel('Casein preference')
+        ax[3].set_yticks([0, 0.5, 1])
+        
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
                  peaktype='average', epoch=[100,119],
