@@ -27,7 +27,7 @@ except NameError:
         pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'rb')
     except FileNotFoundError:
         print('Cannot access pickled file')
-    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip = dill.load(pickle_in)
+    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip,_ = dill.load(pickle_in)
 
 usr = jmf.getuserhome()
 
@@ -72,14 +72,16 @@ def ppp_summaryANOVA_1way(df, cols, csvfile, dietgroup):
 def ppp_ttest_paired(df, subset, key1, key2):
     df = df.xs(subset, level=1)
     result = stats.ttest_rel(df[key1], df[key2])
-    print(subset, result, '\n')
+    print(subset, result)
+    print('With Sidak correction: ', jmf.sidakcorr(result[1]), '\n')
     return result
 
 def ppp_ttest_unpaired(df, index1, index2, key):
     df1 = df.xs(index1, level=1)
     df2 = df.xs(index2, level=1)
     result = stats.ttest_ind(df1[key], df2[key])
-    print(key, result, '\n')
+    print(key, result)
+    print('With Sidak correction: ', jmf.sidakcorr(result[1]), '\n')
     return result
 
 def ppp_ttest_onesample(df, index, key):
@@ -157,6 +159,8 @@ def stats_pref_behav(prefsession='1', verbose=True):
                    usr + '\\Documents\\GitHub\\PPP_analysis\\df_pref' + prefsession + '_choice.csv')
     
     ppp_full_ttests(df_behav, choicekeys)
+    
+    ppp_ttest_unpaired(df_behav, 'NR', 'PR', prefkey)
     ppp_ttest_onesample(df_behav, 'NR', prefkey)
     ppp_ttest_onesample(df_behav, 'PR', prefkey)
 
@@ -240,9 +244,9 @@ for session in [1, 2, 3]:
     df_photo = make_stats_df(df_photo, keys, prefsession=str(session), epoch=epoch)
 
 #
-stats_pref_behav()
+#stats_pref_behav()
 stats_pref_behav(prefsession='2')
-stats_pref_behav(prefsession='3')
+#stats_pref_behav(prefsession='3')
 
 #stats_pref_photo(df_photo)
 #stats_pref_photo(df_photo, prefsession='2')
