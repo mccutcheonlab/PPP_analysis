@@ -127,8 +127,11 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  barlabeloffset=barlabeloffset[3],
                  scattersize = 25,
                  ylim=[-0.03, 1.1],
+                 barwidth = .75,
+                 groupwidth = .5,
                  ax=ax[3])
         
+#        ax[3].set_xlim([0,3])
         ax[3].set_ylabel('Casein preference')
         ax[3].set_yticks([0, 0.5, 1])
         

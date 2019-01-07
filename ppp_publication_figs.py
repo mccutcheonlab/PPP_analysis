@@ -21,7 +21,7 @@ from ppp_pub_figs_supp import *
 make_fig1_behav=True
 make_fig1_photo=False
 
-make_fig2_behav=False
+make_fig2_behav=True
 make_fig2_photo=False
 
 make_fig3_summary=False
@@ -71,8 +71,13 @@ if make_fig1_photo:
     
 
 if make_fig2_behav:
-    pref2_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
+    panel4 = 'pref'
+    if panel4 == 'choices':
+        pref2_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
+    else:
+        pref2_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
     pref2_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
+    
     pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True,
                           barlabeloffset=[0.03, 0.06, 0.045, 0.07])
     pref2_behav_fig.savefig(savefolder + 'fig2_pref2_behav.pdf')
