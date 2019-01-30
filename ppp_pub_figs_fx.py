@@ -99,6 +99,8 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
 
     ax[2].set_ylabel('Licks')
     ax[2].set_yticks([0, 250, 500, 750])
+    
+    ax[3].axis('off')
 
     if panel4 == 'choices':
         x = [[df_behav.xs('NR', level=1)[choice_cas_key], df_behav.xs('NR', level=1)[choice_malt_key]],
@@ -114,7 +116,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  scattersize = scattersize,
                  ylim=[-2,22],
                  xfontsize=6,
-                 ax=ax[3])
+                 ax=ax[4])
         
         ax[3].set_ylabel('Choices (out of 20)')
         ax[3].set_yticks([0, 10, 20])
@@ -136,12 +138,12 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  xfontsize=6,
                  spaced=True,
                  xspace=0.06,
-                 ax=ax[3])
+                 ax=ax[4])
         
 #        ax[3].set_xlim([0,3])
-        ax[3].plot(ax[3].get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
-        ax[3].set_ylabel('Casein preference')
-        ax[3].set_yticks([0, 0.5, 1])
+        ax[4].plot(ax[4].get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
+        ax[4].set_ylabel('Casein preference')
+        ax[4].set_yticks([0, 0.5, 1])
         
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
