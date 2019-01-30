@@ -16,7 +16,7 @@ import JM_general_functions as jmf
 
 from ppp_pub_figs_settings import *
 
-def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barlabeloffset=[], panel4='pref'):
+def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barlabeloffset=[], gs=[], f=[]):
 
     forced_cas_key = 'pref' + str(prefsession) + '_cas_forced'
     forced_malt_key = 'pref' + str(prefsession) + '_malt_forced'
@@ -32,10 +32,6 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
 
     if len(barlabeloffset) < 4:
         barlabeloffset = [0.025, 0.025, 0.025, 0.025]
-        
-    if ax.ndim > 1:
-        print('Reshaping axis array')
-        ax = ax.flatten()
 
     if dietswitch == True:
         grouplabel=['NR \u2192 PR', 'PR \u2192 NR']
@@ -99,28 +95,10 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
 
     ax[2].set_ylabel('Licks')
     ax[2].set_yticks([0, 250, 500, 750])
-    
-    ax[3].axis('off')
 
-    if panel4 == 'choices':
-        x = [[df_behav.xs('NR', level=1)[choice_cas_key], df_behav.xs('NR', level=1)[choice_malt_key]],
-             [df_behav.xs('PR', level=1)[choice_cas_key], df_behav.xs('PR', level=1)[choice_malt_key]]]
-        jmfig.barscatter(x, paired=True, unequal=True,
-                 barfacecoloroption = 'individual',
-                 barfacecolor = barfacecolor,
-                 scatteredgecolor = ['xkcd:charcoal'],
-                 scatterlinecolor = 'xkcd:charcoal',
-                 grouplabel = grouplabel,
-                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-                 barlabeloffset=barlabeloffset[3],
-                 scattersize = scattersize,
-                 ylim=[-2,22],
-                 xfontsize=6,
-                 ax=ax[4])
-        
-        ax[3].set_ylabel('Choices (out of 20)')
-        ax[3].set_yticks([0, 10, 20])
-    else:
+    if prefsession == 1:
+        ax[3].axis('off')
+    
         x = [df_behav.xs('NR', level=1)[pref_key], df_behav.xs('PR', level=1)[pref_key]]
         jmfig.barscatter(x, paired=False, unequal=True,
                  barfacecoloroption = 'individual',
@@ -139,12 +117,34 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  spaced=True,
                  xspace=0.06,
                  ax=ax[4])
-        
-#        ax[3].set_xlim([0,3])
+            
         ax[4].plot(ax[4].get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
         ax[4].set_ylabel('Casein preference')
         ax[4].set_yticks([0, 0.5, 1])
-        
+    else:
+        inner = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=gs[1,1],
+                                             width_ratios=[0.3,1,0.2])
+        print(f)
+        print(type(f))
+        new_ax = f.add_subplot(inner[1])
+        x = [df_behav.xs('NR', level=1)[pref_key], df_behav.xs('PR', level=1)[pref_key]]
+        jmfig.barscatter(x, paired=False, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = [barfacecolor[0], barfacecolor[2]],
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabeloffset = 0,
+                 scattersize = 25,
+                 ylim=[-0.03, 1.1],
+                 barwidth = .75,
+                 groupwidth = .5,
+                 xfontsize=6,
+                 spaced=True,
+                 xspace=0.06,
+                 ax=new_ax)
+        new_ax.plot(new_ax.get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
+        new_ax.set_ylabel('Casein preference')
+        new_ax.set_yticks([0, 0.5, 1])
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
                  peaktype='average', epoch=[100,149],
