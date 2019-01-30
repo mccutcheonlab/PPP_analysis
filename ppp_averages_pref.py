@@ -82,6 +82,7 @@ def getfirstlick(side, event):
     return lats
 
 def average_without_noise(snips, key='blue_z'):
+    # Can change default key to switch been delatF (key='blue') and z-score (key='blue_z')
     no_noise_snips = [trial for trial, noise in zip(snips[key], snips['noise']) if not noise]
     try:
         result = np.mean(no_noise_snips, axis=0)
@@ -157,6 +158,7 @@ for j, forc_cas, forc_malt, free_cas, free_malt in zip(included_sessions,
     df_behav[free_malt] = [pref_sessions[x].malt['nlicks-free'] for x in pref_sessions if pref_sessions[x].session == j]
     
 # Assembles dataframe with photometry data
+
 df_photo = pd.DataFrame([x for x in rats], columns=['rat'])
 df_photo['diet'] = [rats.get(x) for x in rats]
 df_photo.set_index(['rat', 'diet'], inplace=True)
@@ -172,21 +174,6 @@ for j, c_sip_z, m_sip_z, c_licks_z, m_licks_z in zip(included_sessions,
     df_photo[c_licks_z] = [average_without_noise(pref_sessions[x].cas['snips_licks']) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_licks_z] = [average_without_noise(pref_sessions[x].malt['snips_licks']) for x in pref_sessions if pref_sessions[x].session == j]
 
-# adds licks and lanetcies - all values
-#for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip, m_lats_forc_fromsip in zip(included_sessions,
-#                           ['pref1_cas_licks_forced_all', 'pref2_cas_licks_forced_all', 'pref3_cas_licks_forced_all'],
-#                           ['pref1_malt_licks_forced_all', 'pref2_malt_licks_forced_all', 'pref3_malt_licks_forced_all'],
-#                           ['pref1_cas_lats_all', 'pref2_cas_lats_all', 'pref3_cas_lats_all'],
-#                           ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all'],
-#                           ['pref1_cas_lats_all_fromsip', 'pref2_cas_lats_all_fromsip', 'pref3_cas_lats_all_fromsip'],
-#                           ['pref1_malt_lats_all_fromsip', 'pref2_malt_lats_all_fromsip', 'pref3_malt_lats_all_fromsip']):
-#    df_photo[c_licks_forc] = [pref_sessions[x].cas['snips_licks_forced']['blue_z'] for x in pref_sessions if pref_sessions[x].session == j]
-#    df_photo[m_licks_forc] = [pref_sessions[x].malt['snips_licks_forced']['blue_z'] for x in pref_sessions if pref_sessions[x].session == j]
-#    df_photo[c_lats_forc] = [pref_sessions[x].cas['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
-#    df_photo[m_lats_forc] = [pref_sessions[x].malt['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
-#    df_photo[c_lats_forc_fromsip] = [pref_sessions[x].cas['lats'] for x in pref_sessions if pref_sessions[x].session == j]
-#    df_photo[m_lats_forc_fromsip] = [pref_sessions[x].malt['lats'] for x in pref_sessions if pref_sessions[x].session == j]
-
 # adds means of licks and latencies
 for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip, m_lats_forc_fromsip, in zip(included_sessions,
                            ['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced'],
@@ -201,6 +188,13 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
     df_photo[m_lats_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].malt['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
+
+for j, c_lats_all, m_lats_all in zip(included_sessions,
+                                     ['pref1_cas_lats_all', 'pref2_cas_lats_all', 'pref3_cas_lats_all'],
+                                     ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all']):
+    df_photo[c_lats_all] = [pref_sessions[x].cas['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_lats_all] = [pref_sessions[x].malt['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
+    
 
 # Assembles dataframe for reptraces
 

@@ -72,14 +72,15 @@ def cond_licks_fig(ax, df, diet):
              barfacecolor = cols,
              scatteredgecolor = ['xkcd:charcoal'],
              scatterlinecolor = 'xkcd:charcoal',
-             grouplabel=['Cas', 'Malt'],
+             grouplabel=[],
              barlabels=['1', '2', '1', '2'],
+             barlabeloffset=0.025,
              scattersize = scattersize,
-             
-#             ylim=[-5,50],
              ax=ax)
+
     ax.set_yticks([0,1000,2000,3000,4000])
-    ax.set_title(title)
+    ax.set_yticklabels([0,1000,2000,3000,4000], fontsize=8)
+    ax.set_title(title, fontsize=10)    
 
 def cond_photo_fig(ax, df, diet, keys, event='',
                  color=[almost_black, 'xkcd:bluish grey'],
@@ -263,7 +264,7 @@ def reptrace(f, gs, gsx, tracedata, yscale=False, xscale=False, event_text=False
     return ax1
 
 def figS2_rep(longtrace):
-    gs = gridspec.GridSpec(2, 3, wspace=0.5, hspace=0.3, bottom=0.1)
+    gs = gridspec.GridSpec(2, 3, wspace=0.5, hspace=0.3, bottom=0.1, left=0.1, right=0.9)
     f = plt.figure(figsize=(5,4))
     
     longtracefig(f, gs, longtrace)

@@ -260,8 +260,8 @@ def assemble_sessions(sessions,
                 
                 for side in [x.left, x.right]:   
                     if side['exist'] == True:
-                        side['snips_sipper'] = jmf.mastersnipper(x, side['sipper'], peak_between_time=[0, 2])
-                        side['snips_licks'] = jmf.mastersnipper(x, side['lickdata']['rStart'], peak_between_time=[0, 1])
+                        side['snips_sipper'] = jmf.mastersnipper(x, side['sipper'], peak_between_time=[0, 5])
+                        side['snips_licks'] = jmf.mastersnipper(x, side['lickdata']['rStart'], peak_between_time=[0, 2])
                         try:
                             timelock_events = [licks for licks in side['lickdata']['rStart'] if licks in side['licks-forced']]
                             latency_events = side['sipper']

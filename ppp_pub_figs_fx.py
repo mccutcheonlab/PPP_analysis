@@ -57,6 +57,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  barlabeloffset=barlabeloffset[0],
                  scattersize = scattersize,
                  ylim=[-50,1050],
+                 xfontsize=6,
                  ax=ax[0])
 
     ax[0].set_ylabel('Licks')
@@ -75,6 +76,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  barlabeloffset=barlabeloffset[1],
                  scattersize = scattersize,
                  ylim=[-0.5,10],
+                 xfontsize=6,
                  ax=ax[1])
     ax[1].set_ylabel('Latency (s)')
     ax[1].set_yticks([0, 2, 4, 6, 8, 10])
@@ -92,6 +94,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  barlabeloffset=barlabeloffset[2],
                  scattersize = scattersize,
                  ylim=[-50, 800],
+                 xfontsize=6,
                  ax=ax[2])
 
     ax[2].set_ylabel('Licks')
@@ -110,6 +113,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  barlabeloffset=barlabeloffset[3],
                  scattersize = scattersize,
                  ylim=[-2,22],
+                 xfontsize=6,
                  ax=ax[3])
         
         ax[3].set_ylabel('Choices (out of 20)')
@@ -129,15 +133,19 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
                  ylim=[-0.03, 1.1],
                  barwidth = .75,
                  groupwidth = .5,
+                 xfontsize=6,
+                 spaced=True,
+                 xspace=0.06,
                  ax=ax[3])
         
 #        ax[3].set_xlim([0,3])
+        ax[3].plot(ax[3].get_xlim(), [0.5, 0.5], linestyle='dashed',color='k', alpha=0.3)
         ax[3].set_ylabel('Casein preference')
         ax[3].set_yticks([0, 0.5, 1])
         
 
 def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
-                 peaktype='average', epoch=[100,119],
+                 peaktype='average', epoch=[100,149],
                  keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
                  keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
                  event='Licks'):
@@ -163,7 +171,7 @@ def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
         
     return f
 
-def fig2_photo(df_photo, peaktype='average', epoch=[100,119],
+def fig2_photo(df_photo, peaktype='average', epoch=[100,149],
                keys_traces = ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
                event='Licks'):
     
@@ -172,10 +180,12 @@ def fig2_photo(df_photo, peaktype='average', epoch=[100,119],
     
     ax1 = f.add_subplot(gs[0,0])
     averagetrace(ax1, df_photo, 'NR', keys_traces, event=event, colorgroup='exptl')
+    ax1.set_title('NR \u2192 PR')
     
     ax2 = f.add_subplot(gs[0,1], sharey=ax1)
     averagetrace(ax2, df_photo, 'PR', keys_traces, event=event, ylabel=False)
     ax2.set_ylim([-1.5, 2.5])
+    ax2.set_title('PR \u2192 NR')
     
     ax3 = f.add_subplot(gs[1,0]) 
     peakbargraph(ax3, df_photo, 'NR', keys_traces, peaktype=peaktype, epoch=epoch,
@@ -185,7 +195,7 @@ def fig2_photo(df_photo, peaktype='average', epoch=[100,119],
     ax4 = f.add_subplot(gs[1,1], sharey=ax3) 
     peakbargraph(ax4, df_photo, 'PR', keys_traces, peaktype=peaktype, epoch=epoch,
                  ylabel=False, grouplabeloffset=0.1)
-    ax4.set_ylim([-25, 100])
+    ax4.set_ylim([-3, 7.5])
 
     return f
 
@@ -299,8 +309,8 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
     df = df.xs(diet, level=1)
 
 # Plots casein and maltodextrin shaded erros
-    jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0])
-    jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1])
+    jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0], linewidth=2)
+    jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1], linewidth=2)
     
     #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
     if fullaxis == False:
@@ -328,7 +338,7 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
     if ylabel:
         ax.set_ylabel('Z-Score')
 
-def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
+def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 149],
                  sc_color='w', colorgroup='control', ylabel=True,
                  ylim=[-0.05, 0.1], grouplabeloffset=0):
     
@@ -347,8 +357,8 @@ def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
         ylab = 'Mean Z-Score'
         
     elif peaktype == 'auc':
-        a1 = [np.trapz(rat[epochrange]) for rat in df[keys[0]]]
-        a2 = [np.trapz(rat[epochrange]) for rat in df[keys[1]]]
+        a1 = [np.trapz(rat[epochrange])/10 for rat in df[keys[0]]]
+        a2 = [np.trapz(rat[epochrange])/10 for rat in df[keys[1]]]
         ylab = 'AUC'
         
     a = [a1, a2]
@@ -363,6 +373,7 @@ def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
                  grouplabel=['Cas', 'Malt'],
                  grouplabeloffset=grouplabeloffset,
                  scattersize = 50,
+                 xfontsize=6,
                  ax=ax)
 
 #    ax.set_yticks([-0.05,0,0.05, 0.1])
@@ -372,7 +383,7 @@ def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 109],
     if ylabel:
         ax.set_ylabel(ylab)
 
-def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average', epoch=[100,119], event=''):
+def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average', epoch=[100,149], event=''):
     
     inner = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0,1],
                                              height_ratios=[0.15,1],
@@ -401,7 +412,7 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average'
     ax2 = f.add_subplot(gs[1,1]) 
     peakbargraph(ax2, df_photo, diet, keys_traces, peaktype=peaktype, epoch=epoch,
                  colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.07)
-    ax2.set_ylim([-25, 105])
+    ax2.set_ylim([-3, 7])
 
 # To make summary figure
 
@@ -424,19 +435,19 @@ def summary_subfig_bars(ax, df, keys):
                  barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
                  scatteredgecolor = [almost_black],
                  scatterlinecolor = almost_black,
-                 scattersize = 60,
+                 scattersize = 50,
                  grouplabel = xlabels,
                  ax=ax)
 
-def find_delta(df, keys_in, epoch=[100,199]):
+def find_delta(df, keys_in, epoch=[100,149]):
     
     epochrange = range(epoch[0], epoch[1])
     
     keys_out = ['delta_1', 'delta_2', 'delta_3']
         
     for k_in, k_out in zip(keys_in, keys_out):
-        cas_auc = [np.trapz(x[epochrange]) for x in df[k_in[0]]]
-        malt_auc = [np.trapz(x[epochrange]) for x in df[k_in[1]]]
+        cas_auc = [np.trapz(x[epochrange])/10 for x in df[k_in[0]]]
+        malt_auc = [np.trapz(x[epochrange])/10 for x in df[k_in[1]]]
         df[k_out] = [c-m for c, m in zip(cas_auc, malt_auc)]
     
     return df
@@ -450,11 +461,14 @@ def summary_subfig_correl(ax, df_behav, df_photo, diet):
     xvals = [dfx['delta_1'], dfx['delta_2'], dfx['delta_3']]
     
     yvals_mean = np.mean(yvals, axis=1)
+    y_sem = np.std(yvals, axis=1)/np.sqrt(len(yvals))
+    
     xvals_mean = np.mean(xvals, axis=1)
+    x_sem = np.std(xvals, axis=1)/np.sqrt(len(xvals))
+
+#    ax.plot(xvals, yvals, color='k', alpha=0.2)
     
-    ax.plot(xvals, yvals, color='k', alpha=0.2)
-    
-    ax.plot(xvals_mean, yvals_mean, c=almost_black, linewidth=1, zorder=-1)
+    ax.errorbar(xvals_mean, yvals_mean, yerr=y_sem, xerr=x_sem, capsize=0, c=almost_black, linewidth=1, zorder=-1)
     ax.scatter(xvals_mean, yvals_mean, marker='o', c=['w', 'grey', 'k'], edgecolors='k')
     
     ax.set_ylabel('Protein preference')
@@ -462,16 +476,16 @@ def summary_subfig_correl(ax, df_behav, df_photo, diet):
     ax.set_yticks([0, 0.5, 1.0]) 
     ax.set_yticklabels(['0', '0.5', '1'])
     
-    ax.plot([-21, 21], [0.5, 0.5], linestyle='dashed',color='k', alpha=0.2)
+    ax.plot([-2.9, 2.9], [0.5, 0.5], linestyle='dashed',color='k', alpha=0.2)
     
     ax.set_xlabel('Diff. in z-score (Casein - Malt.)')
-    ax.set_xlim([-21, 21])
-    ax.set_xticks([-20, -10, 0, 10, 20])
+    ax.set_xlim([-2.9, 2.9])
+    ax.set_xticks([-2, -1, 0, 1, 2])
     
     ax.plot([0, 0], [-0.1, 1.1], linestyle='dashed',color='k', alpha=0.2)
 
-def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 119]):
-    gs = gridspec.GridSpec(2, 2, wspace=0.5, hspace=0.3, bottom=0.1)
+def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 149]):
+    gs = gridspec.GridSpec(2, 2, wspace=0.5, hspace=0.4, bottom=0.1)
     mpl.rcParams['figure.subplot.left'] = 0.10
     mpl.rcParams['figure.subplot.top'] = 0.85
     mpl.rcParams['axes.labelpad'] = 4
@@ -480,7 +494,7 @@ def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 119]):
     ax0 = f.add_subplot(gs[0, 0])
     summary_subfig_bars(ax0, df_behav, ['pref1', 'pref2', 'pref3'])
     ax0.set_ylabel('Protein preference')
-    ax0.set_ylim([-0.1, 1.1])
+    ax0.set_ylim([-0.1, 1.2])
     ax0.set_yticks([0, 0.5, 1.0]) 
     ax0.set_yticklabels(['0', '0.5', '1'])
     ax0.set_title('Behaviour')
@@ -499,13 +513,15 @@ def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 119]):
     ax1.set_ylabel('Diff. in z-score (Casein - Malt.)')
     
 #    ax1.set_ylim([-0.035, 0.11])
-    ax1.set_yticks([-20, 0, 20, 40])
+    #ax1.set_yticks([-20, 0, 20, 40])
     ax1.set_title('Photometry')
     
     ax2 = f.add_subplot(gs[1,0])
     summary_subfig_correl(ax2, df_behav, df_delta, 'NR')
+    ax2.set_title('NR \u2192 PR rats')
     
     ax3 = f.add_subplot(gs[1,1])
     summary_subfig_correl(ax3, df_behav, df_delta, 'PR')
-
+    ax3.set_title('PR \u2192 NR rats')
+    
     return f

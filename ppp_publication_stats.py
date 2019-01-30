@@ -24,14 +24,37 @@ try:
 except NameError:
     print('Loading in data from pickled file')
     try:
-        pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'rb')
+        pickle_folder = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\'
+        
+        pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
+        df_sacc_behav = dill.load(pickle_in)
+        
+        pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+        df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
+        
+        pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
+        df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
+    
     except FileNotFoundError:
-        print('Cannot access pickled file')
-    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip,_ = dill.load(pickle_in)
+        print('Cannot access pickled file(s)')
 
 usr = jmf.getuserhome()
 
 def extractandstack(df, cols_to_stack, new_cols=[]):
+    new_df = df.loc[:,cols_to_stack]
+    new_df = new_df.stack()
+    new_df = new_df.to_frame()
+    new_df.reset_index(inplace=True)
+
+    if len(new_cols) > 1:
+        try:
+            new_df.columns = new_cols
+        except ValueError:
+            print('Wrong number of labels for new columns given as argument.')
+            
+    return new_df
+
+def extractandstack_multi(df, cols1_to_stack, cols2_to_stack, new_cols=[]):
     new_df = df.loc[:,cols_to_stack]
     new_df = new_df.stack()
     new_df = new_df.to_frame()
@@ -52,6 +75,14 @@ def ppp_2wayANOVA(df, cols, csvfile):
     result = run([Rscriptpath, "--vanilla", "ppp_licksANOVA.R", csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
     print(result.returncode, result.stderr, result.stdout)
     return result
+
+def ppp_3wayANOVA(df, cols1, cols2, csvfile):
+    
+    df = extractandstack_multi(df, cols1, cols2, new_cols=['rat', 'diet', 'col1', 'col2', 'licks'])
+    df.to_csv(csvfile)
+#    result = run([Rscriptpath, "--vanilla", "ppp_licksANOVA.R", csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+#    print(result.returncode, result.stderr, result.stdout)
+#    return result
 
 def ppp_summaryANOVA_2way(df, cols, csvfile):
     df = extractandstack(df, cols, new_cols=['rat', 'diet', 'prefsession', 'value'])
@@ -117,6 +148,24 @@ def ppp_summary_ttests(df, keys, dietgroup, verbose=True):
     result = ppp_ttest_paired(df, dietgroup, keys[1], keys[2])
     print('Bonferroni corrected p-value = ', result[1]*3)
     
+def stats_conditioning(condsession='1', verbose=True):
+    if verbose: print('\nAnalysis of conditioning sessions ' + condsession)
+    df = df_cond1_behav
+    
+    keys1 = ['cond' + condsession + '-cas1-licks',
+            'cond' + condsession + '-cas2-licks']
+    keys2 = ['cond' + condsession + '-malt1-licks',
+            'cond' + condsession + '-malt2-licks']
+    
+    keys = ['cond' + condsession + '-cas-all',
+            'cond' + condsession + '-malt-all']
+
+    if verbose: print('\nANOVA on CONDITIONING trials\n')
+    ppp_3wayANOVA(df_cond1_behav,
+                   keys1, keys2,
+                   usr + '\\Documents\\GitHub\\PPP_analysis\\df_cond' + condsession + '_licks.csv')    
+
+
 def stats_pref_behav(prefsession='1', verbose=True):
     if verbose: print('\nAnalysis of preference session ' + prefsession)
         
@@ -200,6 +249,8 @@ def stats_summary_behav(verbose=True):
                choicekeys,
                usr + '\\Documents\\GitHub\\PPP_analysis\\df_summary_behav_PR.csv',
                'PR')
+    
+    ppp_summary_ttests(df_behav, choicekeys, 'PR')
 
 def stats_summary_photo(verbose=True):
     if verbose: print('\nAnalysis of summary data - PHOTOMETRY')
@@ -231,21 +282,29 @@ def make_stats_df(df, key_suffixes, prefsession='1', epoch=[100, 119]):
         keys_out.append('pref' + prefsession + '_auc_' + short_suffix)
 
     for key_in, key_out in zip(keys_in, keys_out):
-        df_photo[key_out] = [np.trapz(rat[epochrange]) for rat in df[key_in]]
+        df_photo[key_out] = [np.trapz(rat[epochrange])/10 for rat in df[key_in]]
 
     df['pref' + prefsession + '_delta'] = [cas-malt for cas, malt in zip(df[keys_out[0]], df[keys_out[1]])]
     
     return df
 
-epoch = [100,119]
+# for analysing licks
+epoch =[100,119]
 keys = ['_cas_licks_forced', '_malt_licks_forced']
+
+# for analysing sipper
+#epoch = [100,149]
+#keys = ['_cas_sip', '_malt_sip']
 
 for session in [1, 2, 3]:
     df_photo = make_stats_df(df_photo, keys, prefsession=str(session), epoch=epoch)
 
-#
+# Using SPSS for conditioning
+#stats_conditioning()
+#stats_conditioning(condsession='2')
+
 #stats_pref_behav()
-stats_pref_behav(prefsession='2')
+#stats_pref_behav(prefsession='2')
 #stats_pref_behav(prefsession='3')
 
 #stats_pref_photo(df_photo)
@@ -253,4 +312,13 @@ stats_pref_behav(prefsession='2')
 #stats_pref_photo(df_photo, prefsession='3')
 
 #stats_summary_behav()
-#stats_summary_photo()
+stats_summary_photo()
+
+#prefsession='1'
+#
+#latkeys = ['pref' + str(prefsession) + '_cas_lats_fromsip',
+#           'pref' + str(prefsession) + '_malt_lats_fromsip']
+#
+#df = extractandstack(df_photo, latkeys, new_cols=['rat', 'diet', 'substance', 'licks'])
+#
+#df.to_csv('C:\\Users\\James Rig\\Dropbox\\Publications in Progress\\PPP Paper\\Stats\\pref1_lats.csv')

@@ -84,7 +84,7 @@ if assemble_cond2:
 if assemble_pref:
     sessions = assemble_sessions(ppp_sessions,
                   rats_to_include = [],
-                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7'],
+                  rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-8'],
                   sessions_to_include = ['s10', 's11', 's16'],
                   outputfile='R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_pref.pickle',
                   savefile=savefile,
@@ -93,7 +93,7 @@ if assemble_pref:
 # Code to run for single rat
 if assemble_single:
     sessions_to_add = assemble_sessions(ppp_sessions,
-                  rats_to_include = ['PPP3-8'],
+                  rats_to_include = ['PPP1-7'],
                   rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
                   sessions_to_include = ['s10'],
                   outputfile=picklefolder + 'ppp_test.pickle',

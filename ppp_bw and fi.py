@@ -42,6 +42,7 @@ df.drop(['PPP1.8'], inplace=True)
 df.drop(['PPP3.1'], inplace=True)
 df.drop(['PPP3.6'], inplace=True)
 df.drop(['PPP3.7'], inplace=True)
+df.drop(['PPP3.8'], inplace=True)
 
 df_days = df.loc[:,'d0':'d14']
 
@@ -82,15 +83,16 @@ fig1.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, bottom=0.25, left=0.15, 
 
 # Makes bodyweight subplot
 ax1 = fig1.add_subplot(gs[0,0])
-nr_mean.plot(yerr=nr_sem, color='xkcd:charcoal', marker='o', markerfacecolor='white')
-pr_mean.plot(yerr=pr_sem, color=col['lp_cas'], marker='o', markerfacecolor='white')
+nr_mean.plot(yerr=nr_sem, linewidth=1, color='xkcd:charcoal', marker='o', markerfacecolor='white', capthick=1, elinewidth=1, capsize=2)
+pr_mean.plot(yerr=pr_sem, linewidth=1, color=col['lp_cas'], marker='o', markerfacecolor='white', capthick=1, elinewidth=1, capsize=2)
 ax1.set_ylim([450, 570])
 ax1.set_xlim([-1, 16])
 ax1.set_xticks([1,8,15])
-ax1.set_xticklabels(['0', '7', '14'])
+ax1.set_xticklabels(['0', '7', '14'], fontsize=8)
 ax1.set_yticks([450, 500, 550])
-ax1.set_ylabel('Body weight (g)')
-ax1.set_xlabel('Days since diet switch')
+ax1.set_yticklabels([450, 500, 550], fontsize=8)
+ax1.set_ylabel('Body weight (g)', fontsize=8)
+ax1.set_xlabel('Days since diet switch', fontsize=8)
 ax1.spines['right'].set_visible(False)
 ax1.spines['top'].set_visible(False)
 

@@ -18,10 +18,10 @@ from ppp_pub_figs_settings import *
 from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
-make_fig1_behav=True
+make_fig1_behav=False
 make_fig1_photo=False
 
-make_fig2_behav=True
+make_fig2_behav=False
 make_fig2_photo=False
 
 make_fig3_summary=False
@@ -34,7 +34,7 @@ make_cond_figs=False
 make_photo_sip_figs=False
 make_photo_licks_figs=False
 
-supp_rep_trace = False
+supp_rep_trace = True
 supp_heatmap = False
 
 peaktype='auc'
@@ -79,14 +79,14 @@ if make_fig2_behav:
     pref2_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
     
     pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True,
-                          barlabeloffset=[0.03, 0.06, 0.045, 0.07])
+                          barlabeloffset=[0.02, 0.02, 0.03, 0.07])
     pref2_behav_fig.savefig(savefolder + 'fig2_pref2_behav.pdf')
 
 
     pref3_behav_fig, ax = plt.subplots(figsize=(3.2, 3.2), ncols=2, nrows=2)
     pref3_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65)
     pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True,
-                          barlabeloffset=[0.02, 0.04, 0.045, 0.07])
+                          barlabeloffset=[0.02, 0.02, 0.03, 0.07])
     pref3_behav_fig.savefig(savefolder + 'fig2_pref3_behav.pdf')
     
     
@@ -109,12 +109,12 @@ if make_fig3_summary:
 
 if make_cond_figs:
     cond1_behav_fig, ax = plt.subplots(figsize=(4,3), ncols=2, sharey=True)
-    cond1_behav_fig.subplots_adjust(left=0.15, right=0.95, top=0.9, bottom=0.15, wspace=0.4)
+    cond1_behav_fig.subplots_adjust(left=0.15, right=0.95, top=0.9, bottom=0.15, wspace=0.2)
     
     cond_licks_fig(ax[0], df_cond1_behav, 'NR')
     cond_licks_fig(ax[1], df_cond1_behav, 'PR')
-    ax[0].set_ylabel('Licks')
-    
+    ax[0].set_ylabel('Licks', fontsize=8)
+        
     cond1_behav_fig.savefig(savefolder + 'cond1_behav.pdf')
 #
 #    keys=[['cond1_cas1_sip', 'cond1_cas2_sip'],
@@ -172,20 +172,20 @@ if supp_heatmap:
     figS2_photo_NR.savefig(savefolder + 'figS2_photo_NR.pdf')
     figS2_photo_PR.savefig(savefolder + 'figS2_photo_PR.pdf')
 
-if make_photo_sip_figs:
-    photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,
-                                                 keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
-                                                 keys_bars = ['pref1_cas_sip_peak', 'pref1_malt_sip_peak'],
-                                                 keys_lats = ['pref1_cas_lats_all_fromsip', 'pref1_malt_lats_all_fromsip'],
-                                                 event='Sipper')
-    
-    photo_pref1_sipper_fig.savefig(savefolder + 'pref1_sip_photo.pdf')
-
-if make_photo_licks_figs:
-    
-    photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
-                                          keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
-                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
-    
-    photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
+#if make_photo_sip_figs:
+#    photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,
+#                                                 keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
+#                                                 keys_bars = ['pref1_cas_sip_peak', 'pref1_malt_sip_peak'],
+#                                                 keys_lats = ['pref1_cas_lats_all_fromsip', 'pref1_malt_lats_all_fromsip'],
+#                                                 event='Sipper')
+#    
+#    photo_pref1_sipper_fig.savefig(savefolder + 'pref1_sip_photo.pdf')
+#
+#if make_photo_licks_figs:
+#    
+#    photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
+#                                          keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+#                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
+#                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
+#    
+#    photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')
