@@ -148,3 +148,4 @@ colors='control'
 
 heatmapCol(f, df_heatmap, gs, diet, session, rat, event=event, clims=clims, reverse=reverse, colorgroup=colors)
 f.savefig('EBBS_heatmap.jpg')
+f.savefig('SfN_heatmap.pdf')
