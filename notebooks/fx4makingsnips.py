@@ -152,12 +152,8 @@ def mastersnipper(x, events,
             latency = [x if (x<max_latency) else np.NaN for x in latency]
             if latency_direction == 'pre':
                 latency = [-x for x in latency]
-#            latency = np.asarray(latency)
-#            latency[latency>30] = np.nan
         else:
             print('No latency events found')
-            
-        print(latency)
 
     if output_as_dict == True:
         output = {}
