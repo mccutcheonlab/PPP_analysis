@@ -232,4 +232,3 @@ def metafilereader(filename):
     header = header.split('\t')
     # need to find a way to strip end of line \n from last column - work-around is to add extra dummy column at end of metafile
     return tablerows, header
-

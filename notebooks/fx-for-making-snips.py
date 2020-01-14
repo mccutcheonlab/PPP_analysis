@@ -5,6 +5,74 @@ Created on Fri Sep 13 14:51:54 2019
 @author: jmc010
 """
 
+import numpy as np
+
+
+"""
+this function makes 'snips' of a data file ('data' single scalar) aligned to an
+event of interest ('event', list of times in seconds).
+
+If a timelocked map is needed to align data precisely (e.g. with TDT equipment)
+then it is necessary to pass a t2sMap to the function.
+
+preTrial and trialLength are in seconds.
+
+Will put data into bins if requested.
+
+"""
+def snipper(data, timelock, fs = 1, t2sMap = [], preTrial=10, trialLength=30,
+                 adjustBaseline = True,
+                 bins = 0):
+
+    if len(timelock) == 0:
+        print('No events to analyse! Quitting function.')
+        raise Exception('no events')
+
+    pps = int(fs) # points per sample
+    pre = int(preTrial*pps) 
+#    preABS = preTrial
+    length = int(trialLength*pps)
+# converts events into sample numbers
+    event=[]
+    if len(t2sMap) > 1:
+        for x in timelock:
+            event.append(np.searchsorted(t2sMap, x, side="left"))
+    else:
+        event = [x*fs for x in timelock]
+
+    new_events = []
+    for x in event:
+        if int(x-pre) > 0:
+            new_events.append(x)
+    event = new_events
+
+    nSnips = len(event)
+    snips = np.empty([nSnips,length])
+    avgBaseline = []
+
+    for i, x in enumerate(event):
+        start = int(x) - pre
+        avgBaseline.append(np.mean(data[start : start + pre]))
+        try:
+            snips[i] = data[start : start+length]
+        except ValueError: # Deals with recording arrays that do not have a full final trial
+            snips = snips[:-1]
+            avgBaseline = avgBaseline[:-1]
+            nSnips = nSnips-1
+
+    if adjustBaseline == True:
+        snips = np.subtract(snips.transpose(), avgBaseline).transpose()
+        snips = np.divide(snips.transpose(), avgBaseline).transpose()
+
+    if bins > 0:
+        if length % bins != 0:
+            snips = snips[:,:-(length % bins)]
+        totaltime = snips.shape[1] / int(fs)
+        snips = np.mean(snips.reshape(nSnips,bins,-1), axis=2)
+        pps = bins/totaltime
+              
+    return snips, pps
+
 def mastersnipper(x, events,
                   bins=300,
                   preTrial=10,

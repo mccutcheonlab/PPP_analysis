@@ -470,6 +470,19 @@ def med_abs_dev(data, b=1.4826):
                    
     return mad
 
+def latencyCalc(licks, cueon, cueoff=10, nolat=np.nan, lag=3):
+    if type(cueoff) == int:
+        cueoff = [i+cueoff for i in cueon]
+    lats=[]
+    for on,off in zip(cueon, cueoff): 
+        try:
+            currentlat = [i-(on+lag) for i in licks if (i>on) and (i<off)][0]
+        except IndexError:
+            currentlat = nolat
+        lats.append(currentlat)
+
+    return(lats)
+
 """
 This function will calculate data for bursts from a train of licks. The threshold
 for bursts and clusters can be set. It returns all data as a dictionary.
