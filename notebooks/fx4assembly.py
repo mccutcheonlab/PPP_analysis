@@ -14,11 +14,12 @@ import os
 import tdt
 import numpy as np
 import matplotlib.pyplot as plt
+import dill
 
 import scipy.signal as sig
 
-import fx4behavior
-import fx4makingsnips
+from fx4behavior import *
+from fx4makingsnips import *
 
 class Session(object):
     
@@ -65,7 +66,11 @@ class Session(object):
             
     def setticks(self):
         try:
-            self.tick = self.ttls['Tick'].onset
+            if hasattr(self.ttls, 'Tick'):
+                self.tick = self.ttls['Tick'].onset
+            else:
+                tmp=tdt.read_block(self.tdtfile, evtype=['scalars'])
+                self.tick = getattr(tmp.scalars, 'Pars')['ts'][0::2]       
         except AttributeError:
             print('Problem setting ticks')        
         
@@ -236,6 +241,61 @@ def metafilereader(filename):
     # need to find a way to strip end of line \n from last column - work-around is to add extra dummy column at end of metafile
     return tablerows, header
 
+def assemble_sessions(sessions,
+                      rats_to_include=[],
+                      rats_to_exclude=[],
+                      sessions_to_include=[],
+                      outputfile=[],
+                      savefile=False,
+                      makefigs=False):
+    
+    # This section of code works out unique rats and makes a list of rats to
+    # exclude from analysis
+    rats = []
+    for session in sessions:
+        s = sessions[session]
+        if s.rat not in rats:
+            rats.append(s.rat)
+    
+    if len(rats_to_include) > 0:
+        print('Overriding values in rats_to_exclude because of entry in rats_to_include.')
+        rats_to_exclude = list(rats)
+        for rat in rats_to_include:
+            rats_to_exclude.remove(rat)
+        
+    # This section of code selects sessions for inclusion 
+    sessions_to_remove = []
+    
+    for session in sessions:         
+        s = sessions[session]
+        
+        if s.rat not in rats_to_exclude and s.session in sessions_to_include:
+            try:
+                process_rat(s)           
+            except:
+                print('Could not extract data from ' + s.sessionID)            
+            try:
+                pdf_pages.close()
+                plt.close('all')
+            except:
+                print('Nothing to close')
+        else:
+            sessions_to_remove.append(session)
+    
+    for session in sessions_to_remove:
+        sessions.pop(session)
+        
+    for rat in rats_to_exclude:
+        idx = rats.index(rat)
+        del rats[idx]
+    
+    if savefile == True:
+        pickle_out = open(outputfile, 'wb')
+        dill.dump([sessions, rats], pickle_out)
+        pickle_out.close()
+        
+    return sessions
+
 """
 process_rat is a function based on the notebook of the same name that was used
 to develop and test the functions. It relies on functions in this script
@@ -247,7 +307,7 @@ Ideally, any changes should be tested in the notebook first before being transfe
 def process_rat(session):
     
     s = session
-    
+    print('\nAnalysing rat ' + s.rat + ' in session ' + s.session)
     s.loaddata()
     s.data_filt = correctforbaseline(s.data, s.dataUV)
     s.setticks()

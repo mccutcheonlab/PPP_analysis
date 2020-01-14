@@ -109,19 +109,19 @@ def mastersnipper(x, events,
                                    bins=bins,
                                    preTrial=preTrial,
                                    trialLength=trialLength,
-                                   adjustBaseline=False)
+                                   adjustBaseline=True)
         
         filtTrials_z = zscore(filtTrials)
         filtTrials_z_adjBL = zscore(filtTrials, baseline_points=50)
         
         bgMAD = findnoise(x.data_filt, x.randomevents,
                               t2sMap=x.t2sMap, fs=x.fs, bins=bins,
-                              method='sum')        
+                              method='sum')
+
         sigSum = [np.sum(abs(i)) for i in filtTrials]
         sigSD = [np.std(i) for i in filtTrials]
         noiseindex = [i > bgMAD*threshold for i in sigSum]
-        
-                
+                        
         # do i need to remove noise trials first before averages
         filt_avg = np.mean(removenoise(filtTrials, noiseindex), axis=0)
         if verbose: print('{} noise trials removed'.format(sum(noiseindex)))
@@ -196,7 +196,7 @@ of noise, relative to other trials (or relative to the whole data file.
 def findnoise(data, background, t2sMap = [], fs = 1, bins=0, method='sd'):
     
     bgSnips, _ = snipper(data, background, t2sMap=t2sMap, fs=fs, bins=bins)
-    
+  
     if method == 'sum':
         bgSum = [np.sum(abs(i)) for i in bgSnips]
         bgMAD = med_abs_dev(bgSum)
@@ -204,7 +204,7 @@ def findnoise(data, background, t2sMap = [], fs = 1, bins=0, method='sd'):
         bgSD = [np.std(i) for i in bgSnips]
         bgMAD = med_abs_dev(bgSD)
    
-    return(bgMAD)
+    return bgMAD
 
 def removenoise(snipsIn, noiseindex):
     snipsOut = np.array([x for (x,v) in zip(snipsIn, noiseindex) if not v])   
