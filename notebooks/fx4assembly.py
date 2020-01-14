@@ -17,6 +17,9 @@ import matplotlib.pyplot as plt
 
 import scipy.signal as sig
 
+import fx4behavior
+import fx4makingsnips
+
 class Session(object):
     
     def __init__(self, sessionID, metafiledata, hrows, datafolder, outputfolder):
@@ -232,3 +235,67 @@ def metafilereader(filename):
     header = header.split('\t')
     # need to find a way to strip end of line \n from last column - work-around is to add extra dummy column at end of metafile
     return tablerows, header
+
+"""
+process_rat is a function based on the notebook of the same name that was used
+to develop and test the functions. It relies on functions in this script
+(fx4assembly) as well as fx4behavior and fx4makingsnips.
+
+Ideally, any changes should be tested in the notebook first before being transferred here.
+"""
+
+def process_rat(session):
+    
+    s = session
+    
+    s.loaddata()
+    s.data_filt = correctforbaseline(s.data, s.dataUV)
+    s.setticks()
+    s.time2samples()
+    s.check4events()
+    s.setbottlecolors()
+    
+    try:
+        s.left['lickdata'] = lickCalc(s.left['licks'],
+                          offset = s.left['licks_off'],
+                          burstThreshold = 0.50)
+    except IndexError:
+        s.left['lickdata'] = 'none'
+        print('No left licks')
+        
+    try:
+        s.right['lickdata'] = lickCalc(s.right['licks'],
+                  offset = s.right['licks_off'],
+                  burstThreshold = 0.50)
+    except IndexError:
+        s.right['lickdata'] = 'none'
+        print('No right licks')
+        
+    bins = 300
+
+    s.randomevents = makerandomevents(120, max(s.tick)-120)
+    s.bgTrials, s.pps = snipper(s.data, s.randomevents,
+                                    t2sMap = s.t2sMap, fs = s.fs, bins=bins)
+    
+    for side in [s.left, s.right]:   
+        if side['exist'] == True:
+            side['snips_sipper'] = mastersnipper(s, side['sipper'], peak_between_time=[0, 5],
+                                                 latency_events=side['lickdata']['rStart'],
+                                                 latency_direction='post')
+            side['snips_licks'] = mastersnipper(s, side['lickdata']['rStart'], peak_between_time=[0, 2],
+                                                latency_events=side['sipper'],
+                                                latency_direction='pre')
+                                               
+            try:
+                forced_licks = [licks for licks in side['lickdata']['rStart'] if licks in side['licks-forced']]
+                side['snips_licks_forced'] = mastersnipper(s, forced_licks, peak_between_time=[0, 2],
+                                                           latency_events=side['sipper'],
+                                                           latency_direction='pre')
+            except KeyError:
+                pass
+            try:
+                side['lats'] = latencyCalc(side['lickdata']['licks'], side['sipper'], cueoff=side['sipper_off'], lag=0)
+            except TypeError:
+                print('Cannot work out latencies as there are lick and/or sipper values missing.')
+                side['lats'] = []
+    s.side2subs()
