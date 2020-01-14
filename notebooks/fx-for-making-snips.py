@@ -82,6 +82,7 @@ def mastersnipper(x, events,
                   output_as_dict=True,
                   latency_events=[],
                   latency_direction='pre',
+                  max_latency=30,
                   verbose=True):
     
     if len(events) < 1:
@@ -133,19 +134,30 @@ def mastersnipper(x, events,
         peak = [np.mean(trial[peakbins[0]:peakbins[1]]) for trial in filtTrials_z]
         
         latency = []
-        try:
+
+        if len(latency_events) > 1: 
             for event in events:
                 if latency_direction == 'pre':
-                    latency.append(np.abs([lat-event for lat in latency_events if lat-event<0]).min())
+                    try:
+                        latency.append(np.abs([lat-event for lat in latency_events if lat-event<0]).min())
+                    except ValueError:
+                        latency.append([])
+                
                 elif latency_direction == 'post':
-                    latency.append(np.abs([lat-event for lat in latency_events if lat-event>0]).min())
-                else:
-                    latency.append(np.abs([lat-event for lat in latency_events]).min())
-#            latency = [x if (x<30) else None for x in latency]
-            latency = np.asarray(latency)
-            latency[latency>30] = np.nan
-        except ValueError:
+                    try:
+                        latency.append(np.abs([lat-event for lat in latency_events if lat-event>0]).min())
+                    except ValueError:
+                        latency.append([])
+
+            latency = [x if (x<max_latency) else np.NaN for x in latency]
+            if latency_direction == 'pre':
+                latency = [-x for x in latency]
+#            latency = np.asarray(latency)
+#            latency[latency>30] = np.nan
+        else:
             print('No latency events found')
+            
+        print(latency)
 
     if output_as_dict == True:
         output = {}
