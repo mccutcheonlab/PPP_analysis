@@ -6,7 +6,6 @@ Created on Thu Sep  6 10:53:31 2018
 """
 
 # ppp_publication_stats
-import JM_general_functions as jmf
 import dill
 import pandas as pd
 
@@ -16,6 +15,7 @@ import numpy as np
 from subprocess import PIPE, run
 
 Rscriptpath = 'C:\\Program Files\\R\\R-3.6.2\\bin\\Rscript'
+statsfolder = 'C:\\Github\\PPP_analysis\\stats\\'
 
 # Attempts to load pickled file
 
@@ -56,6 +56,15 @@ def extractandstack_multi(df, cols1_to_stack, cols2_to_stack, new_cols=[]):
             
     return new_df
 
+def sidakcorr(pval, ncomps=3):
+    corr_p = 1-((1-pval)**ncomps)   
+    return corr_p
+
+def sidakcorr_R(robj, ncomps=3):
+    pval = (list(robj.rx('p.value'))[0])[0]
+    corr_p = 1-((1-pval)**ncomps)   
+    return corr_p
+
 def ppp_2wayANOVA(df, cols, csvfile):
     
     df = extractandstack(df, cols, new_cols=['rat', 'diet', 'substance', 'licks'])
@@ -92,7 +101,7 @@ def ppp_ttest_paired(df, subset, key1, key2):
     df = df.xs(subset, level=1)
     result = stats.ttest_rel(df[key1], df[key2])
     print(subset, result)
-    print('With Sidak correction: ', jmf.sidakcorr(result[1]), '\n')
+    print('With Sidak correction: ', sidakcorr(result[1]), '\n')
     return result
 
 def ppp_ttest_unpaired(df, index1, index2, key):
@@ -100,7 +109,7 @@ def ppp_ttest_unpaired(df, index1, index2, key):
     df2 = df.xs(index2, level=1)
     result = stats.ttest_ind(df1[key], df2[key])
     print(key, result)
-    print('With Sidak correction: ', jmf.sidakcorr(result[1]), '\n')
+    print('With Sidak correction: ', sidakcorr(result[1]), '\n')
     return result
 
 def ppp_ttest_onesample(df, index, key):
@@ -151,7 +160,7 @@ def stats_conditioning(condsession='1', verbose=True):
     if verbose: print('\nANOVA on CONDITIONING trials\n')
     ppp_3wayANOVA(df_cond1_behav,
                    keys1, keys2,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_cond' + condsession + '_licks.csv')    
+                   statsfolder + 'df_cond' + condsession + '_licks.csv')    
 
 
 def stats_pref_behav(prefsession='1', verbose=True):
@@ -174,26 +183,26 @@ def stats_pref_behav(prefsession='1', verbose=True):
     if verbose: print('\nANOVA on FORCED LICK trials\n')
     ppp_2wayANOVA(df_behav,
                    forcedkeys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_pref' + prefsession + '_forc_licks.csv')
+                   statsfolder + 'df_pref' + prefsession + '_forc_licks.csv')
    
     if verbose: print('\ANOVA on LATENCIES on forced lick trials')
     ppp_2wayANOVA(df_photo,
                    latkeys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_pref' + prefsession + '_forc_licks.csv')
+                   statsfolder + 'df_pref' + prefsession + '_forc_licks.csv')
 
     ppp_full_ttests(df_photo, latkeys)
     
     if verbose: print('\nANOVA on FREE LICK trials\n')
     ppp_2wayANOVA(df_behav,
                    freekeys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_pref' + prefsession + '_free_licks.csv')
+                   statsfolder + 'df_pref' + prefsession + '_free_licks.csv')
     
     ppp_full_ttests(df_behav, freekeys)
 
     if verbose: print('\nANOVA of CHOICE data\n')
     ppp_2wayANOVA(df_behav,
                    choicekeys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_pref' + prefsession + '_choice.csv')
+                   statsfolder + 'df_pref' + prefsession + '_choice.csv')
     
     ppp_full_ttests(df_behav, choicekeys)
     
@@ -211,7 +220,7 @@ def stats_pref_photo(df, prefsession='1', verbose=True):
     if verbose: print('\nANOVA of photometry data, casein vs. maltodextrin\n')
     ppp_2wayANOVA(df_photo,
                    keys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_pref' + prefsession+ '_forc_licks.csv')
+                   statsfolder + 'df_pref' + prefsession+ '_forc_licks.csv')
     
     ppp_full_ttests(df_photo, keys)
 
@@ -222,12 +231,12 @@ def stats_summary_behav(verbose=True):
     
     ppp_summaryANOVA_2way(df_behav,
                    choicekeys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_summary_behav.csv')
+                   statsfolder + 'df_summary_behav.csv')
     
     if verbose: print('\nOne-way ANOVA on NR-PR rats')
     ppp_summaryANOVA_1way(df_behav,
                choicekeys,
-               'C:\\Github\\PPP_analysis\\data\stats\\df_summary_behav_NR.csv',
+               statsfolder + 'df_summary_behav_NR.csv',
                'NR')
     
     ppp_summary_ttests(df_behav, choicekeys, 'NR')
@@ -235,7 +244,7 @@ def stats_summary_behav(verbose=True):
     if verbose: print('\nOne-way ANOVA on PR-NR rats')
     ppp_summaryANOVA_1way(df_behav,
                choicekeys,
-               'C:\\Github\\PPP_analysis\\data\stats\\df_summary_behav_PR.csv',
+               statsfolder + 'df_summary_behav_PR.csv',
                'PR')
     
     ppp_summary_ttests(df_behav, choicekeys, 'PR')
@@ -247,18 +256,18 @@ def stats_summary_photo(verbose=True):
     
     ppp_summaryANOVA_2way(df_photo,
                    photokeys,
-                   'C:\\Github\\PPP_analysis\\data\stats\\df_summary_photo.csv')
+                   statsfolder + 'df_summary_photo.csv')
     
     if verbose: print('\nOne-way ANOVA on NR-PR rats')
     ppp_summaryANOVA_1way(df_photo,
                photokeys,
-               'C:\\Github\\PPP_analysis\\data\stats\\df_summary_photo_NR.csv',
+               statsfolder + 'df_summary_photo_NR.csv',
                'NR')
     
     if verbose: print('\nOne-way ANOVA on PR-NR rats')
     ppp_summaryANOVA_1way(df_photo,
                photokeys,
-               'C:\\Github\\PPP_analysis\\data\stats\\df_summary_photo_PR.csv',
+               statsfolder + 'df_summary_photo_PR.csv',
                'PR')
 
 def make_stats_df(df, key_suffixes, prefsession='1', epoch=[100, 119]):
