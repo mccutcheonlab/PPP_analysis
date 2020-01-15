@@ -17,3 +17,5 @@ output/choice-and-pref.csv
 *.RHistory
 
 data/*
+figs/*
+output/*
