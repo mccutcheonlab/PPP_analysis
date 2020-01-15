@@ -5,8 +5,8 @@ Created on Wed Nov  8 08:47:56 2017
 @author: Jaime
 """
 
-# Assembles data from PPP1 and PPP3 into pandas dataframes for plotting. Saves
-# dataframes, df_behav and df_photo, as pickle object (ppp_dfs_pref)
+# Assembles data from PPP1, PPP3, and PPP4 into pandas dataframes for plotting.
+# Saves dataframes, df_behav and df_photo, as pickle object (ppp_dfs_pref)
 
 # Choice data
 import scipy.io as sio
@@ -81,7 +81,7 @@ def getfirstlick(side, event):
     lats = [lat if (lat<20) else np.nan for lat in lats]
     return lats
 
-def average_without_noise(snips, key='blue_z'):
+def average_without_noise(snips, key='filt_z'):
     # Can change default key to switch been delatF (key='blue') and z-score (key='blue_z')
     no_noise_snips = [trial for trial, noise in zip(snips[key], snips['noise']) if not noise]
     try:
@@ -105,7 +105,7 @@ try:
 except NameError:
     print('Loading in data from pickled file')
     try:
-        pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_pref.pickle', 'rb')
+        pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_pref.pickle', 'rb')
     except FileNotFoundError:
         print('Cannot access pickled file')
     sessions, rats = dill.load(pickle_in)
@@ -380,7 +380,7 @@ for eventN, event in zip([n-1, n, n+1],
 
 
 
-pickle_out = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_dfs_pref.pickle', 'wb')
+pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_dfs_pref.pickle', 'wb')
 dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace], pickle_out)
 pickle_out.close()
 
