@@ -14,12 +14,15 @@ import os
 import tdt
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import dill
 
 import scipy.signal as sig
 
 from fx4behavior import *
 from fx4makingsnips import *
+import sessionfigs as sessionfigs
+
 
 class Session(object):
     
@@ -273,12 +276,21 @@ def assemble_sessions(sessions,
             try:
                 process_rat(s)           
             except:
-                print('Could not extract data from ' + s.sessionID)            
-            try:
-                pdf_pages.close()
-                plt.close('all')
-            except:
-                print('Nothing to close')
+                print('Could not extract data from ' + s.sessionID) 
+            
+            if makefigs == True:
+#                try:                   
+                pdf_pages = PdfPages(s.outputfolder + session + '.pdf')
+                sessionfigs.makeBehavFigs(s, pdf_pages)
+                sessionfigs.makePhotoFigs(s, pdf_pages)
+#                except:
+#                    print('Could not make figures from ' + s.sessionID)      
+                try:
+                    pdf_pages.close()
+                    plt.close('all')
+                except:
+                    print('Nothing to close')
+                    
         else:
             sessions_to_remove.append(session)
     
@@ -288,6 +300,8 @@ def assemble_sessions(sessions,
     for rat in rats_to_exclude:
         idx = rats.index(rat)
         del rats[idx]
+        
+
     
     if savefile == True:
         pickle_out = open(outputfile, 'wb')
