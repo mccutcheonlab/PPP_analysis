@@ -141,13 +141,13 @@ def mastersnipper(x, events,
                     try:
                         latency.append(np.abs([lat-event for lat in latency_events if lat-event<0]).min())
                     except ValueError:
-                        latency.append([])
+                        latency.append(np.NaN)
                 
                 elif latency_direction == 'post':
                     try:
                         latency.append(np.abs([lat-event for lat in latency_events if lat-event>0]).min())
                     except ValueError:
-                        latency.append([])
+                        latency.append(np.NaN)
 
             latency = [x if (x<max_latency) else np.NaN for x in latency]
             if latency_direction == 'pre':
