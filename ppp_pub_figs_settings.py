@@ -29,13 +29,13 @@ col['lp_malt'] = 'xkcd:light green'
 
 # Looks for existing data and if not there loads pickled file
 try:
-    pickle_folder = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\'
+    pickle_folder = 'C:\\Github\\PPP_analysis\\data\\'
     
-    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
-    df_sacc_behav = dill.load(pickle_in)
-    
-    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
-    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
+#    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
+#    df_sacc_behav = dill.load(pickle_in)
+#    
+#    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+#    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
@@ -43,10 +43,10 @@ try:
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
 
-usr = jmf.getuserhome()
+# usr = jmf.getuserhome()
 
 savefigs=True
-savefolder = usr + '\Dropbox\Publications in Progress\PPP Paper\Figs\\'
+savefolder = 'C:\\Github\\PPP_analysis\\figs\\'
 
 #Set general rcparams
 

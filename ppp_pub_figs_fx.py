@@ -398,7 +398,7 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average'
     
     ax1 = f.add_subplot(inner[1,0])
     averagetrace(ax1, df_photo, diet, keys_traces, event=event, fullaxis=True, colorgroup=colors)
-    ax1.set_ylim([-1.5, 3.5])
+    ax1.set_ylim([-1.5, 3.2])
     
     ax0 = f.add_subplot(inner[0,0], sharex=ax1)
     ax0.axis('off')
@@ -414,7 +414,7 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average'
     ax2 = f.add_subplot(gs[1,1]) 
     peakbargraph(ax2, df_photo, diet, keys_traces, peaktype=peaktype, epoch=epoch,
                  colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.07)
-    ax2.set_ylim([-3, 7])
+    ax2.set_ylim([-3, 7.5])
 
 # To make summary figure
 

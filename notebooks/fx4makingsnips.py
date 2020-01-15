@@ -109,7 +109,7 @@ def mastersnipper(x, events,
                                    bins=bins,
                                    preTrial=preTrial,
                                    trialLength=trialLength,
-                                   adjustBaseline=True)
+                                   adjustBaseline=False)
         
         filtTrials_z = zscore(filtTrials)
         filtTrials_z_adjBL = zscore(filtTrials, baseline_points=50)
@@ -195,7 +195,8 @@ of noise, relative to other trials (or relative to the whole data file.
 
 def findnoise(data, background, t2sMap = [], fs = 1, bins=0, method='sd'):
     
-    bgSnips, _ = snipper(data, background, t2sMap=t2sMap, fs=fs, bins=bins)
+    bgSnips, _ = snipper(data, background, t2sMap=t2sMap, fs=fs, bins=bins, 
+                        adjustBaseline=False)
   
     if method == 'sum':
         bgSum = [np.sum(abs(i)) for i in bgSnips]
