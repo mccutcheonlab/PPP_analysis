@@ -219,8 +219,11 @@ def barscatter(data, transpose = False, unequal=False,
     ax.tick_params(
         axis='x',          # changes apply to the x-axis
         which='both',      # both major and minor ticks are affected
-        bottom='off',      # ticks along the bottom edge are off
-        top='off') # labels along the bottom edge are off
+        bottom=False,      # ticks along the bottom edge are off
+        top=False,
+        labelbottom=False) # labels along the bottom edge are off
+    
+    ax.set_xticks([])
 
     if len(xlim) > 0:
         ax.set_xlim(xlim)

@@ -47,6 +47,7 @@ except FileNotFoundError:
 
 savefigs=True
 savefolder = 'C:\\Github\\PPP_analysis\\figs\\'
+savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_xxx\\Figs\\"
 
 #Set general rcparams
 
@@ -77,6 +78,7 @@ for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
 mpl.rc('legend', fontsize=8)
 mpl.rcParams['figure.subplot.left'] = 0.05
 mpl.rcParams['figure.subplot.top'] = 0.95
+
 
 def inch(mm):
     result = mm*0.0393701

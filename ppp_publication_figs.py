@@ -6,7 +6,7 @@ Loads in dataframes from pickled files created by ppp_averages
 
 @author: jaimeHP
 """
-
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.lines as mlines
@@ -18,10 +18,10 @@ from ppp_pub_figs_settings import *
 from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
-make_fig1_behav=False
-make_fig1_photo=False
+make_fig1_behav=True
+make_fig1_photo=True
 
-make_fig2_behav=True
+make_fig2_behav=False
 make_fig2_photo=False
 
 make_fig3_summary=False
@@ -69,8 +69,8 @@ if make_fig1_photo:
 if make_fig2_behav:
 
     pref2_behav_fig = plt.figure(figsize=(3.2, 3.2))
-
-    pref2_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65, hspace=0.5)  
+    pref2_behav_fig.subplots_adjust(left=0.20, right=0.95, bottom=0.15, wspace=0.65, hspace=0.5) 
+    gs =  gridspec.GridSpec(2, 2, figure=pref2_behav_fig)
     
     ax = []
     ax.append(pref2_behav_fig.add_subplot(gs[0, 0]))

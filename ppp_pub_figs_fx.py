@@ -218,6 +218,7 @@ def makeheatmap(ax, data, events=None, ylabel='Trials'):
     ax.set_yticks([1, ntrials])
     ax.set_xticks([])
     ax.invert_yaxis()
+    ax.spines['bottom'].set_visible(False)
     
     return ax, mesh
 
