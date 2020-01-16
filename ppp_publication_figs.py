@@ -21,10 +21,10 @@ from ppp_pub_figs_supp import *
 make_fig1_behav=True
 make_fig1_photo=True
 
-make_fig2_behav=False
-make_fig2_photo=False
+make_fig2_behav=True
+make_fig2_photo=True
 
-make_fig3_summary=False
+make_fig3_summary=True
 
 make_bwfood_figs=False
 
