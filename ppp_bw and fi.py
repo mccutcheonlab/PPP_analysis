@@ -26,11 +26,11 @@ col['np_malt'] = 'white'
 col['lp_cas'] = 'xkcd:kelly green'
 col['lp_malt'] = 'xkcd:light green'
 
-usr = jmf.getuserhome()
-
 # Loads in data
 
-xlfile = 'R:\\DA_and_Reward\\gc214\\PPP_combined\\PPP_body weight and food intake.xlsx'
+xlfile = "C:\\GitHub\\PPP_analysis\\data\\PPP_body weight and food intake.xlsx"
+statsfolder = "C:\\GitHub\\PPP_analysis\\stats\\"
+figsfolder = "C:\\GitHub\\PPP_analysis\\figs\\"
 
 # Body weight data
 df = pd.read_excel(xlfile, sheet_name='PPP_bodyweight')
@@ -43,6 +43,11 @@ df.drop(['PPP3.1'], inplace=True)
 df.drop(['PPP3.6'], inplace=True)
 df.drop(['PPP3.7'], inplace=True)
 df.drop(['PPP3.8'], inplace=True)
+df.drop(['PPP4.2'], inplace=True)
+df.drop(['PPP4.3'], inplace=True)
+df.drop(['PPP4.5'], inplace=True)
+df.drop(['PPP4.7'], inplace=True)
+df.drop(['PPP4.8'], inplace=True)
 
 df_days = df.loc[:,'d0':'d14']
 
@@ -52,6 +57,12 @@ nr_sem = df_days[df['diet'] == 'NR'].std() / np.sqrt(len(df['diet'] == 'NR'))
 pr_mean = df_days[df['diet'] == 'PR'].mean()
 pr_sem = df_days[df['diet'] == 'PR'].std() / np.sqrt(len(df['diet'] == 'PR'))
 
+nrd0 = df_days[df['diet'] == 'NR']['d0']
+prd0 = df_days[df['diet'] == 'PR']['d0']
+
+nrd14 = df_days[df['diet'] == 'NR']['d14']
+prd14 = df_days[df['diet'] == 'PR']['d14']
+
 # Prepare data for stats
 df.set_index(['diet'], inplace=True, append=True)
 df_days = df.loc[:,'d0':'d14']
@@ -60,7 +71,7 @@ data = data.to_frame()
 data.reset_index(inplace=True) 
 data.columns = ['rat', 'diet', 'day', 'bw']
 
-data.to_csv(usr + '\\Documents\\GitHub\\PPP_analysis\\df_days_stacked.csv')
+data.to_csv(statsfolder+"df_days_stacked.csv")
 
 # Food intake data
 df = pd.read_excel(xlfile, sheet_name='PPP_foodintake')
@@ -111,7 +122,7 @@ ax2.set_xlim([0.25,2.75])
 ax2.set_ylim([0, 35])
 
 # Saves figure
-fig1.savefig('R:\\DA_and_Reward\\gc214\\PPP_combined\\figs\\body weight and food intake.eps')
+fig1.savefig(figsfolder+"body weight and food intake.eps")
 
 
 
@@ -132,13 +143,18 @@ is then called by Rscript.exe via the subprocess module in Python.
 
 from subprocess import PIPE, run
 
-Rscriptpath = 'C:\\Program Files\\R\\R-3.5.1\\bin\\Rscript'
-Rprogpath = usr + '\\Documents\\GitHub\\PPP_analysis\\bw_fi_stats.R'
+Rscriptpath = 'C:\\Program Files\\R\\R-3.6.2\\bin\\Rscript'
+Rprogpath = statsfolder+"bw_fi_stats.R"
 
 result = run([Rscriptpath, "--vanilla", Rprogpath], stdout=PIPE, stderr=PIPE, universal_newlines=True)
 
 print(result.returncode, result.stderr, result.stdout)
 
+d0_stats = stats.ttest_ind(nrd0, prd0)
+d14_stats = stats.ttest_ind(nrd14, prd14)
+
+print(d0_stats)
+print(d14_stats)
 
 # Stats on food intake
 fi_stats = stats.ttest_ind(foodintake_NR, foodintake_PR)
