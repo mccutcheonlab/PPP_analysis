@@ -300,7 +300,7 @@ for session in [1, 2, 3]:
 #stats_conditioning()
 #stats_conditioning(condsession='2')
 
-stats_pref_behav()
+#stats_pref_behav()
 #stats_pref_behav(prefsession='2')
 #stats_pref_behav(prefsession='3')
 
@@ -309,7 +309,7 @@ stats_pref_behav()
 #stats_pref_photo(df_photo, prefsession='3')
 
 #stats_summary_behav()
-#stats_summary_photo()
+stats_summary_photo()
 
 #prefsession='1'
 #
