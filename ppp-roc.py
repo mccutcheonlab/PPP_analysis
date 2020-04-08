@@ -128,17 +128,27 @@ for prefsession in ['s10', 's11', 's16']:
     # Uncomment to run lick comparisons
     n4shuf=100
     ### Comparison of photo data aligned to SIPPER for PR rats on PREF DAY 1 
-    a, p = run_roc_comparison([pr_cas_sipper, pr_malt_sipper], n4shuf=n4shuf)
-    roc_results[prefsession]['pr_sipper'] = {'a':a, 'p':p}
+    data = [pr_cas_sipper, pr_malt_sipper]
+    a, p = run_roc_comparison(data, n4shuf=n4shuf)
+    roc_results[prefsession]['pr_sipper'] = {'a':a, 'p':p, 'data':data}
     
-    ### Comparison of photo data aligned to SIPPER for NR rats on PREF DAY 1 
-    a, p = run_roc_comparison([nr_cas_sipper, nr_malt_sipper], n4shuf=n4shuf)
-    roc_results[prefsession]['nr_sipper'] = {'a':a, 'p':p}
+    ### Comparison of photo data aligned to SIPPER for NR rats on PREF DAY 1
+    data = [nr_cas_sipper, nr_malt_sipper]
+    a, p = run_roc_comparison(data, n4shuf=n4shuf)
+    roc_results[prefsession]['nr_sipper'] = {'a':a, 'p':p, 'data':data}
     
-    ### Comparison of photo data aligned to LICK for PR rats on PREF DAY 1 
-    a, p = run_roc_comparison([pr_cas_licks, pr_malt_licks], n4shuf=n4shuf)
-    roc_results[prefsession]['pr_licks'] = {'a':a, 'p':p}
+    ### Comparison of photo data aligned to LICK for PR rats on PREF DAY 1
+    data = [pr_cas_licks, pr_malt_licks]
+    a, p = run_roc_comparison(data, n4shuf=n4shuf)
+    roc_results[prefsession]['pr_licks'] = {'a':a, 'p':p, 'data':data}
     
-    ### Comparison of photo data aligned to LICK for NR rats on PREF DAY 1 
-    a, p = run_roc_comparison([nr_cas_licks, nr_malt_licks], n4shuf=n4shuf)
-    roc_results[prefsession]['nr_licks'] = {'a':a, 'p':p}
+    ### Comparison of photo data aligned to LICK for NR rats on PREF DAY 1
+    data = [nr_cas_licks, nr_malt_licks]
+    a, p = run_roc_comparison(data, n4shuf=n4shuf)
+    roc_results[prefsession]['nr_licks'] = {'a':a, 'p':p, 'data':data}
+
+savefile=True
+if savefile:
+    pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_roc_results.pickle', 'wb')
+    dill.dump(roc_results, pickle_out)
+    pickle_out.close()
