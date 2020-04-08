@@ -20,3 +20,4 @@ output/choice-and-pref.csv
 data/*
 figs/*
 output/*
+*.ipynb
