@@ -18,14 +18,25 @@ import dill
 #Colors
 green = mpl.colors.to_rgb('xkcd:kelly green')
 light_green = mpl.colors.to_rgb('xkcd:light green')
+
+
 almost_black = mpl.colors.to_rgb('#262626')
 
 ## Colour scheme
 col={}
-col['np_cas'] = 'xkcd:silver'
-col['np_malt'] = 'white'
-col['lp_cas'] = 'xkcd:kelly green'
-col['lp_malt'] = 'xkcd:light green'
+col['nr_cas'] = 'xkcd:silver'
+col['nr_malt'] = 'white'
+
+col['pr_cas'] = 'xkcd:kelly green'
+col['pr_malt'] = 'xkcd:light green'
+
+col['pr_cas'] = 'xkcd:blue'
+col['pr_malt'] = 'xkcd:sky blue'
+
+heatmap_color_scheme = 'coolwarm'
+
+## Size of scatter dots
+scattersize=30
 
 # Looks for existing data and if not there loads pickled file
 try:
@@ -47,7 +58,7 @@ except FileNotFoundError:
 
 savefigs=True
 savefolder = 'C:\\Github\\PPP_analysis\\figs\\'
-savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_xxx\\Figs\\"
+savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
 
 #Set general rcparams
 
@@ -69,15 +80,18 @@ mpl.rcParams['axes.spines.top']=False
 mpl.rcParams['axes.spines.right']=False
 
 mpl.rc('lines', linewidth=0.5)
-mpl.rc('axes', linewidth=1, edgecolor=almost_black, labelsize=6, labelpad=4)
-mpl.rc('patch', linewidth=1, edgecolor=almost_black)
+mpl.rc('axes', linewidth=0.5, edgecolor=almost_black, labelsize=6, labelpad=4)
+mpl.rc('patch', linewidth=0.5, edgecolor=almost_black)
 mpl.rc('font', family='Arial', size=6)
 for tick,subtick in zip(['xtick', 'ytick'], ['xtick.major', 'ytick.major']):
     mpl.rc(tick, color=almost_black, labelsize=6)
-    mpl.rc(subtick, width=1)
+    mpl.rc(subtick, width=0.5)
 mpl.rc('legend', fontsize=8)
 mpl.rcParams['figure.subplot.left'] = 0.05
 mpl.rcParams['figure.subplot.top'] = 0.95
+
+mpl.rc('lines', markeredgewidth=0.5, markerfacecolor='white', markeredgecolor=almost_black)
+lw_barscatter=0.5
 
 
 def inch(mm):

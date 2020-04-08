@@ -105,12 +105,12 @@ def makePhotoFigs(x, pdf_pages):
     if x.left['exist'] == True:
         photoFigsCol(gs1, 0, x.pps,
                      x.left['snips_sipper'],
-                     x.left['snips_licks'])
+                     x.left['snips_licks_forced'])
 
     if x.right['exist'] == True:
         photoFigsCol(gs1, 2, x.pps,
                      x.right['snips_sipper'],
-                     x.right['snips_licks'])
+                     x.right['snips_licks_forced'])
         
     if x.left['exist'] == True and x.right['exist'] == True:
         ax = plt.subplot(gs1[6, 0])
@@ -130,7 +130,7 @@ def makePhotoFigs(x, pdf_pages):
     
 def photoFigsCol(gs1, col, pps, snips_sipper, snips_licks):
     ax = plt.subplot(gs1[2, col])
-    jmfig.trialsFig(ax, snips_sipper['filt'], pps, noiseindex = snips_sipper['noise'],
+    jmfig.trialsFig(ax, snips_sipper['filt_z'], pps, noiseindex = snips_sipper['noise'],
                     eventText = 'Sipper',
                     ylabel = 'Delta F / F0')
     
@@ -140,10 +140,11 @@ def photoFigsCol(gs1, col, pps, snips_sipper, snips_licks):
                               eventText = 'Sipper')
     
     ax = plt.subplot(gs1[2, col+1])
-    jmfig.shadedError(ax, snips_sipper['filt_z'])
+    data = [snip for snip, noise in zip(snips_sipper['filt_z'], snips_sipper['noise']) if not noise]
+    jmfig.shadedError(ax, data)
     
     ax = plt.subplot(gs1[4, col])
-    jmfig.trialsFig(ax, snips_licks['filt'], pps, noiseindex=snips_licks['noise'],
+    jmfig.trialsFig(ax, snips_licks['filt_z'], pps, noiseindex=snips_licks['noise'],
                     eventText = 'First Lick',
                     ylabel = 'Delta F / F0')
     
@@ -153,7 +154,8 @@ def photoFigsCol(gs1, col, pps, snips_sipper, snips_licks):
                               eventText = 'First Lick')
     
     ax = plt.subplot(gs1[4, col+1])
-    jmfig.shadedError(ax, snips_licks['filt_z'])
+    data = [snip for snip, noise in zip(snips_licks['filt_z'], snips_licks['noise']) if not noise]
+    jmfig.shadedError(ax, data)
     
 
     

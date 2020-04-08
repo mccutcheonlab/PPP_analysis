@@ -18,6 +18,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import dill
 
 import scipy.signal as sig
+from scipy import stats
 
 from fx4behavior import *
 from fx4makingsnips import *
@@ -45,8 +46,12 @@ class Session(object):
         self.left = {}
         self.right = {}
         self.both = {}
+        
         self.left['subs'] = metafiledata[hrows['bottleL']]
         self.right['subs'] = metafiledata[hrows['bottleR']]
+        
+        self.left['metafilelicks'] = metafiledata[hrows['licksL']]
+        self.right['metafilelicks'] = metafiledata[hrows['licksR']]
         
         self.tdtfile = datafolder + metafiledata[hrows['tdtfile']]
         self.SigBlue = metafiledata[hrows['sig-blue']]
@@ -162,6 +167,7 @@ class Session(object):
             self.right['color'] = malt_color
 
     def side2subs(self):
+
         if 'cas' in self.left['subs']:
             self.cas = self.left
         if 'cas' in self.right['subs']:
@@ -170,6 +176,17 @@ class Session(object):
             self.malt = self.left
         if 'malt' in self.right['subs']:
             self.malt = self.right
+
+    def getlicksfrommetafile(self):
+
+        if 'cas' in self.bottleL:
+            self.cas = self.left['metafilelicks']
+        if 'cas' in self.bottleR:
+            self.cas = self.right['metafilelicks']
+        if 'malt' in self.bottleL:
+            self.malt = self.left['metafilelicks']
+        if 'malt' in self.bottleR:
+            self.malt = self.right['metafilelicks']
 
 def findfreechoice(left, right):
     first = [idx for idx, x in enumerate(left) if x in right][0]
@@ -244,6 +261,11 @@ def metafilereader(filename):
     # need to find a way to strip end of line \n from last column - work-around is to add extra dummy column at end of metafile
     return tablerows, header
 
+def comparepeaks(cas, malt):
+    result = stats.ttest_ind([peak for peak, noise in zip(cas['peak'], cas['noise']) if not noise],
+                             [peak for peak, noise in zip(malt['peak'], malt['noise']) if not noise])
+    return result
+
 def assemble_sessions(sessions,
                       rats_to_include=[],
                       rats_to_exclude=[],
@@ -310,6 +332,36 @@ def assemble_sessions(sessions,
         
     return sessions
 
+def savejustmetafiledata(sessions,
+                         rats_to_exclude=[],
+                         sessions_to_include=[],
+                         outputfile=[]):
+    
+    rats = []
+    sessions_to_remove = []
+     
+    for session in sessions:
+        s = sessions[session]
+        if s.session in sessions_to_include:
+            if s.rat in rats_to_exclude:
+                sessions_to_remove.append(session)
+            else:
+                if s.rat not in rats:
+                    rats.append(s.rat)
+                print('Including rat {}, session {}'.format(s.rat, s.session))
+                s.getlicksfrommetafile()
+        else:
+            sessions_to_remove.append(session)
+            
+    for session in sessions_to_remove:
+        sessions.pop(session)
+        
+    pickle_out = open(outputfile, 'wb')
+    dill.dump([sessions, rats], pickle_out)
+    pickle_out.close()
+                
+    return sessions
+
 """
 process_rat is a function based on the notebook of the same name that was used
 to develop and test the functions. It relies on functions in this script
@@ -351,6 +403,10 @@ def process_rat(session):
     s.bgTrials, s.pps = snipper(s.data, s.randomevents,
                                     t2sMap = s.t2sMap, fs = s.fs, bins=bins)
     
+    s.bgMAD = findnoise(s.data_filt, s.randomevents,
+                              t2sMap=s.t2sMap, fs=s.fs, bins=bins,
+                              method='sum')
+    
     for side in [s.left, s.right]:   
         if side['exist'] == True:
             side['snips_sipper'] = mastersnipper(s, side['sipper'], peak_between_time=[0, 5],
@@ -373,3 +429,8 @@ def process_rat(session):
                 print('Cannot work out latencies as there are lick and/or sipper values missing.')
                 side['lats'] = []
     s.side2subs()
+    try:
+        s.peakdiff = comparepeaks(s.cas['snips_licks_forced'],
+                                  s.malt['snips_licks_forced'])
+    except:
+        print("Could not compare peaks")

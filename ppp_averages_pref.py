@@ -62,7 +62,15 @@ def makemeansnips(snips, noiseindex):
 
 def removenoise(snipdata):
     # returns blue snips with noisey ones removed
-    new_snips = [snip for (snip, noise) in zip(snipdata['blue'], snipdata['noise']) if not noise]
+    new_snips = [snip for (snip, noise) in zip(snipdata['filt_z'], snipdata['noise']) if not noise]
+    return new_snips
+
+def filt_as_delta(snipdata):
+    # converts filtered signal into delta change in fluorescence and removes noise   
+    new_snips=[]
+    for (snip, noise) in zip(snipdata['filt'], snipdata['noise']): 
+        if not noise:           
+            new_snips.append(snip/np.abs(np.mean(snip[:99])))
     return new_snips
 
 def getsipper(snipdata):
@@ -195,6 +203,9 @@ for j, c_lats_all, m_lats_all in zip(included_sessions,
     df_photo[c_lats_all] = [pref_sessions[x].cas['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_all] = [pref_sessions[x].malt['snips_licks_forced']['latency'] for x in pref_sessions if pref_sessions[x].session == j]
     
+for j, col in zip(included_sessions, ['peakdiff_1', 'peakdiff_2', 'peakdiff_3']):
+    df_photo[col] = [pref_sessions[x].peakdiff[0] for x in pref_sessions if pref_sessions[x].session == j]
+    
 
 # Assembles dataframe for reptraces
 
@@ -217,6 +228,7 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
 
     df_reptraces[pref + '_photo_blue'] = ""
     df_reptraces[pref + '_photo_uv'] = ""
+    df_reptraces[pref + '_filt'] = ""
     df_reptraces[pref + '_licks'] = ""
     df_reptraces[pref + '_sipper'] = ""
     
@@ -239,6 +251,7 @@ for s, pref, traces in zip(['s10', 's11', 's16'],
         df_reptraces.at[group, pref + '_sipper'] = [sip-run for sip in all_sips if (sip-run<0.01) and (sip-run>-10)]
         df_reptraces.at[group, pref + '_photo_blue'] = trial['blue'][trace]
         df_reptraces.at[group, pref + '_photo_uv'] = trial['uv'][trace]
+        df_reptraces.at[group, pref + '_filt'] = trial['filt'][trace]
 
 rats = np.unique(rats)
 df_heatmap = pd.DataFrame(rats, columns=['rat'])

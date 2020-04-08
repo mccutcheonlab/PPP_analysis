@@ -18,13 +18,13 @@ from ppp_pub_figs_settings import *
 from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
-make_fig1_behav=True
+make_fig1_behav=False
 make_fig1_photo=True
 
-make_fig2_behav=True
-make_fig2_photo=True
+make_fig2_behav=False
+make_fig2_photo=False
 
-make_fig3_summary=True
+make_fig3_summary=False
 
 make_bwfood_figs=False
 
@@ -46,21 +46,26 @@ if make_fig1_behav:
                                       gridspec_kw = {'width_ratios':[1, 1, 1, 0.2, 0.6]})
     fig1_behav.subplots_adjust(left=0.1, right=0.83, bottom=0.15, wspace=0.65)
     pref_behav_fig(ax, df_behav, df_photo, prefsession=1,
-                          barlabeloffset=[0.025, 0.035, 0.045, 0.07])
+                          barlabeloffset=[0.025, 0.035, 0.045, 0.07],
+                          scattersize=scattersize)
     fig1_behav.savefig(savefolder + 'fig1_behav.pdf')
 
-clims = [[-0.15,0.20], [-0.11,0.15]]
+clims = [[-0.15,0.20], [-0.11,0.15]] # when using 'blue' signal
+
+clims = [[-3,4], [-3,3]] # when using 'filt_z''
 
 if make_fig1_photo:
     fig1_photo_NR = fig1_photo(df_heatmap, df_photo, 'NR', 'pref1', clims=clims[0],
                                           peaktype=peaktype, epoch=epoch,
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
+                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
+                                          scattersize=scattersize)
     
     fig1_photo_PR = fig1_photo(df_heatmap, df_photo, 'PR', 'pref1', clims=clims[1],
                                           peaktype=peaktype, epoch=epoch,
                                           keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
+                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
+                                          scattersize=scattersize)
     
     fig1_photo_NR.savefig(savefolder + 'fig1_photo_NR.pdf')
     fig1_photo_PR.savefig(savefolder + 'fig1_photo_PR.pdf')
@@ -78,7 +83,8 @@ if make_fig2_behav:
     ax.append(pref2_behav_fig.add_subplot(gs[1, 0]))
     
     pref_behav_fig(ax, df_behav, df_photo, prefsession=2, dietswitch=True,
-                          barlabeloffset=[0.02, 0.02, 0.03, 0.07], gs=gs, f=pref2_behav_fig)
+                          barlabeloffset=[0.02, 0.02, 0.03, 0.07], gs=gs, f=pref2_behav_fig,
+                          scattersize=scattersize)
     pref2_behav_fig.savefig(savefolder + 'fig2_pref2_behav.pdf')
 
     pref3_behav_fig = plt.figure(figsize=(3.2, 3.2))
@@ -91,23 +97,27 @@ if make_fig2_behav:
     ax.append(pref3_behav_fig.add_subplot(gs[1, 0]))
     
     pref_behav_fig(ax, df_behav, df_photo, prefsession=3, dietswitch=True,
-                          barlabeloffset=[0.02, 0.02, 0.03, 0.07], gs=gs, f=pref3_behav_fig)
+                          barlabeloffset=[0.02, 0.02, 0.03, 0.07], gs=gs, f=pref3_behav_fig,
+                          scattersize=scattersize)
     pref3_behav_fig.savefig(savefolder + 'fig2_pref3_behav.pdf')
     
     
 if make_fig2_photo:
-    fig2_pref2_photo = fig2_photo(df_photo, peaktype=peaktype, epoch=epoch)
+    fig2_pref2_photo = fig2_photo(df_photo, peaktype=peaktype, epoch=epoch, peakkey='peakdiff_2',
+                                  scattersize=scattersize)
     fig2_pref2_photo.savefig(savefolder + 'fig2_pref2_photo.pdf')
     
     fig2_pref3_photo = fig2_photo(df_photo, peaktype=peaktype, epoch=epoch,
-                                          keys_traces = ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'])
+                                          keys_traces = ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'],
+                                          peakkey='peakdiff_3',
+                                          scattersize=scattersize)
     fig2_pref3_photo.savefig(savefolder + 'fig2_pref3_photo.pdf')
 
 if make_fig3_summary:
-    summaryFig = makesummaryFig(df_behav, df_photo, peaktype=peaktype, epoch=epoch)
+    summaryFig = makesummaryFig(df_behav, df_photo, peaktype=peaktype, epoch=epoch,
+                                use_zscore_diff=True,
+                                scattersize=scattersize)
     summaryFig.savefig(savefolder + 'summaryfig.pdf')
-
-
 
 # For making supplemental Figures
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)

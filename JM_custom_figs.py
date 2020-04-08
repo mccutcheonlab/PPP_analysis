@@ -32,14 +32,14 @@ for i in barlist1[1].get_children():
 """
 def barscatter(data, transpose = False, unequal=False,
                 groupwidth = .75,
-                barwidth = .9,
+                barwidth = .8,
                 paired = False,
                 spaced = False,
                 yspace = 20,
                 xspace = 0.1,
                 barfacecoloroption = 'same', # other options 'between' or 'individual'
                 barfacecolor = ['white'],
-                baredgecoloroption = 'same',
+                baredgecoloroption = 'same', # options are 'none' or 'solid'
                 baredgecolor = ['black'],
                 baralpha = 1,
                 scatterfacecoloroption = 'same',
@@ -50,7 +50,7 @@ def barscatter(data, transpose = False, unequal=False,
                 scattersize = 80,
                 scatteralpha = 1,
                 spreadscatters = False,
-                linewidth=1,
+                linewidth=0.5,
                 xlim=[],
                 ylim=[],
                 ylabel = 'none',
@@ -292,10 +292,14 @@ def setcolors(coloroption, colors, barspergroup, nGroups, data, paired_scatter =
             
     nColors = len(colors)
     
+    if coloroption not in ['within', 'between', 'individual', 'same']:
+        print('Color option {} is not valid. Reverting to one color')
+        coloroption='same'
+    
     if (paired_scatter == True) & (coloroption == 'within'):
         print('Not possible to make a Paired scatter plot with Within setting.')
         coloroption = 'same'
-        
+    
     if coloroption == 'within':
         if nColors < barspergroup:
             print('Not enough colors for this option! Reverting to one color.')

@@ -6,7 +6,7 @@ Created on Fri Sep 13 14:51:54 2019
 """
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 """
 this function makes 'snips' of a data file ('data' single scalar) aligned to an
@@ -77,7 +77,7 @@ def mastersnipper(x, events,
                   bins=300,
                   preTrial=10,
                   trialLength=30,
-                  threshold=10,
+                  threshold=8,
                   peak_between_time=[0, 1],
                   output_as_dict=True,
                   latency_events=[],
@@ -114,13 +114,16 @@ def mastersnipper(x, events,
         filtTrials_z = zscore(filtTrials)
         filtTrials_z_adjBL = zscore(filtTrials, baseline_points=50)
         
-        bgMAD = findnoise(x.data_filt, x.randomevents,
-                              t2sMap=x.t2sMap, fs=x.fs, bins=bins,
-                              method='sum')
+        # bgMAD = findnoise(x.data_filt, x.randomevents,
+        #                       t2sMap=x.t2sMap, fs=x.fs, bins=bins,
+        #                       method='sum')
+        
+        # print(bgMAD)
 
         sigSum = [np.sum(abs(i)) for i in filtTrials]
         sigSD = [np.std(i) for i in filtTrials]
-        noiseindex = [i > bgMAD*threshold for i in sigSum]
+
+        noiseindex = [i > x.bgMAD*threshold for i in sigSum]
                         
         # do i need to remove noise trials first before averages
         filt_avg = np.mean(removenoise(filtTrials, noiseindex), axis=0)

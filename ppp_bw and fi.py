@@ -42,7 +42,7 @@ df.drop(['PPP1.8'], inplace=True)
 df.drop(['PPP3.1'], inplace=True)
 df.drop(['PPP3.6'], inplace=True)
 df.drop(['PPP3.7'], inplace=True)
-df.drop(['PPP3.8'], inplace=True)
+# df.drop(['PPP3.8'], inplace=True)
 df.drop(['PPP4.2'], inplace=True)
 df.drop(['PPP4.3'], inplace=True)
 df.drop(['PPP4.5'], inplace=True)
@@ -78,6 +78,7 @@ df = pd.read_excel(xlfile, sheet_name='PPP_foodintake')
 df.set_index('cage', inplace=True)
 
 df.drop(['cage_3.5'], inplace=True)
+df.drop(['cage_4.4'], inplace=True)
 
 df_days = df.loc[:,'d0':'d14'].mul(1/df['ratspercage'],axis=0)
 

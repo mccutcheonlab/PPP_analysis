@@ -24,6 +24,10 @@ try:
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     
     df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
+
+    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+    
+    df_cond1_behav = dill.load(pickle_in)
        
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
@@ -135,16 +139,12 @@ def ppp_full_ttests(df, keys, verbose=True):
 def ppp_summary_ttests(df, keys, dietgroup, verbose=True):
     if verbose: print('t-test for session 1 vs session 2')
     result = ppp_ttest_paired(df, dietgroup, keys[0], keys[1])
-    print('Bonferroni corrected p-value = ', result[1]*3)
+    print('Dunnetts corrected p-value = ', result[1]*2)
     
     if verbose: print('t-test for session 1 vs session 3')
     result = ppp_ttest_paired(df, dietgroup, keys[0], keys[2])
-    print('Bonferroni corrected p-value = ', result[1]*3)
-    
-    if verbose: print('t-test for session 2 vs session 3')
-    result = ppp_ttest_paired(df, dietgroup, keys[1], keys[2])
-    print('Bonferroni corrected p-value = ', result[1]*3)
-    
+    print('Dunnetts corrected p-value = ', result[1]*2)
+
 def stats_conditioning(condsession='1', verbose=True):
     if verbose: print('\nAnalysis of conditioning sessions ' + condsession)
     df = df_cond1_behav
@@ -249,11 +249,14 @@ def stats_summary_behav(verbose=True):
     
     ppp_summary_ttests(df_behav, choicekeys, 'PR')
 
-def stats_summary_photo(verbose=True):
+def stats_summary_photo(verbose=True, use_tvals=False):
     if verbose: print('\nAnalysis of summary data - PHOTOMETRY')
     
-    photokeys = ['pref1_delta', 'pref2_delta', 'pref3_delta']
-    
+    if use_tvals:
+        photokeys = ['peakdiff_1', 'peakdiff_2', 'peakdiff_3']
+    else:
+        photokeys = ['pref1_delta', 'pref2_delta', 'pref3_delta']
+
     ppp_summaryANOVA_2way(df_photo,
                    photokeys,
                    statsfolder + 'df_summary_photo.csv')
@@ -296,20 +299,50 @@ keys = ['_cas_licks_forced', '_malt_licks_forced']
 for session in [1, 2, 3]:
     df_photo = make_stats_df(df_photo, keys, prefsession=str(session), epoch=epoch)
 
-# Using SPSS for conditioning
-#stats_conditioning()
+
+def stats_pref_ind(prefsession=1):
+    
+    if prefsession == 1:
+        day = 's10'
+    elif prefsession == 2:
+        day = 's11'
+    elif prefsession == 3:
+        day = 's16'
+    
+    try:
+        type(sessions)
+        print('Using existing data')
+    except NameError:
+        print('Loading in data from pickled file')
+        try:
+            pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_pref.pickle', 'rb')
+        except FileNotFoundError:
+            print('Cannot access pickled file')
+        sessions, rats = dill.load(pickle_in)
+        
+    for session in sessions:
+        s=sessions[session]
+        if s.session == day:
+            print(s.rat, s.session, '\n', s.peakdiff)
+
+# Using SPSS for statistical analysis of conditioning data because 3-way ANOVA
+# csvfile=statsfolder+'cond1_behav.csv'
+# df_cond1_behav.to_csv(csvfile)
+# stats_conditioning()
 #stats_conditioning(condsession='2')
 
-#stats_pref_behav()
-#stats_pref_behav(prefsession='2')
-#stats_pref_behav(prefsession='3')
+# stats_pref_behav()
+# stats_pref_behav(prefsession='2')
+# stats_pref_behav(prefsession='3')
 
-#stats_pref_photo(df_photo)
-#stats_pref_photo(df_photo, prefsession='2')
-#stats_pref_photo(df_photo, prefsession='3')
+# stats_pref_photo(df_photo)
+# stats_pref_photo(df_photo, prefsession='2')
+# stats_pref_photo(df_photo, prefsession='3')
 
-#stats_summary_behav()
-stats_summary_photo()
+# stats_pref_ind(prefsession=1)
+
+# stats_summary_behav()
+stats_summary_photo(use_tvals=False)
 
 #prefsession='1'
 #

@@ -21,56 +21,47 @@ import numpy as np
 import dill
 
 try:
-    type(sessions)
-    print('Using existing data')
-except NameError:
-    print('Loading in data from pickled file')
-    try:
-        pickle_in = open('R:\\DA_and_Reward\\gc214\\PPP_combined\\output\\ppp_rats_cond1.pickle', 'rb')
-    except FileNotFoundError:
-        print('Cannot access pickled file')
-    sessions, rats = dill.load(pickle_in)
-    
-cond_sessions = {}
-for session in sessions:
-    x = sessions[session]
-    try:
-        len(x.data)
-        cond_sessions[x.sessionID] = x
-        
-    except AttributeError:
-        pass
+    pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_cond.pickle', 'rb')
+except FileNotFoundError:
+    print('Cannot access pickled file')
 
+cond_sessions, rats = dill.load(pickle_in)
+    
 rats = {}
 
 for session in cond_sessions:
     x = cond_sessions[session]
     if x.rat not in rats.keys():
         rats[x.rat] = x.diet
-
+    
 cas_sessions = ['cond1-cas1', 'cond1-cas2']
 malt_sessions = ['cond1-malt1', 'cond1-malt2']  
 
-df_licks = pd.DataFrame([x for x in rats])
+df_licks = pd.DataFrame([x for x in rats], columns=['rat'])
 df_licks['diet'] = [rats.get(x) for x in rats]
 
-for cas, malt in zip(cas_sessions, malt_sessions):
-    df_licks[cas] = [cond_sessions[x].cas['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == cas]
-    df_licks[malt] = [cond_sessions[x].malt['lickdata']['total'] for x in cond_sessions if cond_sessions[x].sessiontype == malt]
-
-df_lickpeak = pd.DataFrame([x for x in rats])
-df_lickpeak['diet'] = [rats.get(x) for x in rats]
-
-for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
-    df_lickpeak[cas] = [np.mean(cond_sessions[x].cas['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
-    df_lickpeak[malt] = [np.mean(cond_sessions[x].malt['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
-
-df_sipperpeak = pd.DataFrame([x for x in rats])
-df_sipperpeak['diet'] = [rats.get(x) for x in rats]
+# s = cond_sessions['PPP4-1_s6']
 
 for cas, malt in zip(cas_sessions, malt_sessions):
-    df_sipperpeak[cas] = [np.mean(cond_sessions[x].cas['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
-    df_sipperpeak[malt] = [np.mean(cond_sessions[x].malt['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+    df_licks[cas] = [np.float(cond_sessions[x].cas) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df_licks[malt] = [np.float(cond_sessions[x].malt) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+df_licks['cond1-cas-all'] = df_licks['cond1-cas1'] + df_licks['cond1-cas2']
+df_licks['cond1-malt-all'] = df_licks['cond1-malt1'] + df_licks['cond1-malt2']
+
+# df_lickpeak = pd.DataFrame([x for x in rats])
+# df_lickpeak['diet'] = [rats.get(x) for x in rats]
+
+# for cas, malt, n in zip(cas_sessions, malt_sessions, [2,4]):
+#     df_lickpeak[cas] = [np.mean(cond_sessions[x].cas['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+#     df_lickpeak[malt] = [np.mean(cond_sessions[x].malt['snips_licks']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+# df_sipperpeak = pd.DataFrame([x for x in rats])
+# df_sipperpeak['diet'] = [rats.get(x) for x in rats]
+
+# for cas, malt in zip(cas_sessions, malt_sessions):
+#     df_sipperpeak[cas] = [np.mean(cond_sessions[x].cas['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+#     df_sipperpeak[malt] = [np.mean(cond_sessions[x].malt['snips_sipper']['peak']) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
 
 def condfigs(df, keys, dietmsk, cols, ax):
     
@@ -87,8 +78,6 @@ def condfigs(df, keys, dietmsk, cols, ax):
 
     return barx
 
-
-
 figcond, ax = plt.subplots(nrows=1, ncols=2, sharey=True)
 df = df_licks
 dietmsk = df['diet'] == 'NR'
@@ -104,7 +93,7 @@ ax[0].set_yticks([0, 1000, 2000, 3000, 4000])
 
 yrange = ax[0].get_ylim()[1] - ax[0].get_ylim()[0]
 grouplabel=['Casein', 'Maltodextrin']
-barlabels=['1','2','3','4']
+barlabels=['1','2','1','2']
 barlabeloffset=ax[0].get_ylim()[0] - yrange*0.04
 grouplabeloffset=ax[0].get_ylim()[0] - yrange*0.12
 for ax in ax:
@@ -112,22 +101,34 @@ for ax in ax:
         ax.text(x, barlabeloffset, label, va='top', ha='center')
     for x, label in zip([1,2], grouplabel):
         ax.text(x, grouplabeloffset, label, va='top', ha='center')
+        
+figcond.savefig(savefolder + 'figS1b_conditioning.pdf')
     
 
 
-for session in cond_sessions:
-    x = cond_sessions[session]
-    try:
-        print(np.shape(x.cas['snips_sipper']['peak']))
-    except:
-        print(np.shape(x.malt['snips_sipper']['peak']))
+# Preparing data for stats
+df_cond1_behav = df_licks
+df_cond1_behav.set_index(['rat', 'diet'], inplace=True)
+
+pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_dfs_cond1.pickle', 'wb')
+dill.dump(df_cond1_behav, pickle_out)
+pickle_out.close()
 
 
-binnedtrials = ['1-5','6-10','11-15','16-20','21-25','26-30','31-35','36-40']
-trialindex = []
 
-df_condtrials_cas = pd.DataFrame([x for x in rats])
-df_condtrials_cas['diet'] = [rats.get(x) for x in rats]
+# for session in cond_sessions:
+#     x = cond_sessions[session]
+#     try:
+#         print(np.shape(x.cas['snips_sipper']['peak']))
+#     except:
+#         print(np.shape(x.malt['snips_sipper']['peak']))
+
+
+# binnedtrials = ['1-5','6-10','11-15','16-20','21-25','26-30','31-35','36-40']
+# trialindex = []
+
+# df_condtrials_cas = pd.DataFrame([x for x in rats])
+# df_condtrials_cas['diet'] = [rats.get(x) for x in rats]
 
 # need to add trials to average to this code!!!!
 

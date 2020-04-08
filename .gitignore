@@ -8,6 +8,7 @@
 *.csv
 output/choice-and-pref.csv
 *.asv
+.spyproject*
 
 ~$tails for PPP analysis.docx
 
