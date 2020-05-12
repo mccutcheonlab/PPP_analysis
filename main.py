@@ -30,11 +30,11 @@ ppp4_sessions = metafile2sessions('D:\\DA_and_Reward\\gc214\\PPP4\\PPP4.xlsx',
 
 ppp_sessions = {**ppp1_sessions, **ppp3_sessions, **ppp4_sessions}
 
-savefile=True
+savefile=False
 makefigs=False
 
-assemble_pref = True
-assemble_single = False
+assemble_pref = False
+assemble_single = True
 assemble_exclusion = False
 assemble_cond1 = False # No photometry recordings for PPP4 during conditioning so cannot analyse this way using TDT timestamps
 assemble_cond1_metafiledata = False
