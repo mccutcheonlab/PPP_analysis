@@ -73,8 +73,8 @@ def plot_ROC_and_line(f, a, p, snips1, snips2,
     ax[1].spines['top'].set_visible(False)
     ax[1].spines['right'].set_visible(False)
     
-    ax[1].set_xticks([0, 5, 10, 15])
-    ax[1].set_xticklabels(['-5', '0', '5', '10'])
+    ax[1].set_xticks([0, 10, 20, 30])
+    ax[1].set_xticklabels(['-10', '0', '10', '20'])
     ax[1].set_xlabel('Time from distractor (s)')
     
     ax[1].text(20, np.mean(snips1, axis=0)[-1]-labeloffset, labels[0], color=colors[0], ha='left', va='center')

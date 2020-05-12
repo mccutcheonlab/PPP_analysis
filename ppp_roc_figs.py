@@ -16,20 +16,24 @@ except FileNotFoundError:
         
 roc_results = dill.load(pickle_in)
 
-data_to_plot = roc_results['s10']['nr_licks']
+def get_data_from_dict(roc_dict, prefsession, subset):
+    data_to_plot = roc_dict[prefsession][subset]
+    
+    a = data_to_plot['a']
+    p = data_to_plot['p']
+    data = data_to_plot['data']
+    
+    return [a, p, data]
 
-a = data_to_plot['a']
-p = data_to_plot['p']
-data = data_to_plot['data']
-
-
+### PR rats, s10 (pref1), licks
 colors_dis = ['grey', 'red']
 
+[a, p, data] = get_data_from_dict(roc_results, 's10', 'pr_licks')
 
 f = plt.figure(figsize=(3.4,2))
 f, ax = plot_ROC_and_line(f, a, p, data[0], data[1],
                   cdict=[colors_dis[0], 'white', colors_dis[1]],
                   colors = colors_dis,
-                  labels=['Not distracted', 'Distracted'],
+                  labels=['Casein', 'Maltodextrin'],
                   labeloffset=0,
-                  ylabel='Licks (Hz)')
+                  ylabel='Z-score')

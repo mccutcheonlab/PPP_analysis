@@ -7,8 +7,6 @@ Created on Tue Feb 18 15:50:43 2020
 
 import numpy as np
 
-#  import JM_custom_figs.py"
-
 def rocN(x,y,N=100):
     """ Function to calculate ROC based on MATLAB function"""
     if len(x) > 0 and len(y) >0:
