@@ -20,9 +20,11 @@ import dill
 import scipy.signal as sig
 from scipy import stats
 
-from fx4behavior import *
-from fx4makingsnips import *
+# from fx4behavior import *
+# from fx4makingsnips import *
 import sessionfigs as sessionfigs
+
+import trompy as tp
 
 
 class Session(object):
@@ -67,29 +69,25 @@ class Session(object):
 
             tmp = tdt.read_block(self.tdtfile, evtype=['streams'], store=[self.SigUV])
             self.dataUV = getattr(tmp.streams, self.SigUV)['data']
+            
+            self.data_filt = tp.processdata(self.data, self.dataUV)
 
             self.ttls = tdt.read_block(self.tdtfile, evtype=['epocs']).epocs
-        except:
-            print('Unable to load data properly.')
             
-    def setticks(self):
-        try:
-            if hasattr(self.ttls, 'Tick'):
-                self.tick = self.ttls['Tick'].onset
-            else:
-                tmp=tdt.read_block(self.tdtfile, evtype=['scalars'])
-                self.tick = getattr(tmp.scalars, 'Pars')['ts'][0::2]       
-        except AttributeError:
-            print('Problem setting ticks')        
-        
-    def time2samples(self):
-        maxsamples = len(self.tick)*int(self.fs)
-        if (len(self.data) - maxsamples) > 2*int(self.fs):
-            print('Something may be wrong with conversion from time to samples')
-            print(str(len(self.data) - maxsamples) + ' samples left over. This is more than double fs.')
-            self.t2sMap = np.linspace(min(self.tick), max(self.tick), maxsamples)
-        else:
-            self.t2sMap = np.linspace(min(self.tick), max(self.tick), maxsamples)
+            self.t2sMap = tp.time2samples(self.data, self.fs)
+             
+        except Exception as e:
+            print('Unable to load data properly.', e)
+            
+    # def setticks(self):
+    #     try:
+    #         if hasattr(self.ttls, 'Tick'):
+    #             self.tick = self.ttls['Tick'].onset
+    #         else:
+    #             tmp=tdt.read_block(self.tdtfile, evtype=['scalars'])
+    #             self.tick = getattr(tmp.scalars, 'Pars')['ts'][0::2]       
+    #     except AttributeError:
+    #         print('Problem setting ticks')        
 
     def event2sample(self, EOI):
         idx = (np.abs(self.t2sMap - EOI)).argmin()   
@@ -198,24 +196,9 @@ def dividelicks(licks, time):
     
     return before, after  
 
-def correctforbaseline(blue, uv):
-    pt = len(blue)
-    X = np.fft.rfft(uv, pt)
-    Y = np.fft.rfft(blue, pt)
-    Ynet = Y-X
-
-    datafilt = np.fft.irfft(Ynet)
-
-    datafilt = sig.detrend(datafilt)
-
-    b, a = sig.butter(9, 0.012, 'low', analog=True)
-    datafilt = sig.filtfilt(b, a, datafilt)
-    
-    return datafilt
-
 def metafile2sessions(xlfile, metafile, datafolder, outputfolder, sheetname='metafile'):
-    metafilemaker(xlfile, metafile, sheetname=sheetname, fileformat='txt')
-    rows, header = metafilereader(metafile + '.txt')
+    tp.metafilemaker(xlfile, metafile, sheetname=sheetname, fileformat='txt')
+    rows, header = tp.metafilereader(metafile + '.txt')
     
     hrows = {}
     for idx, field in enumerate(header):
@@ -228,38 +211,6 @@ def metafile2sessions(xlfile, metafile, datafolder, outputfolder, sheetname='met
         sessions[sessionID] = Session(sessionID, row, hrows, datafolder, outputfolder)
     
     return sessions
-
-def metafilemaker(xlfile, metafilename, sheetname='metafile', fileformat='csv'):
-    with xlrd.open_workbook(xlfile) as wb:
-        sh = wb.sheet_by_name(sheetname)  # or wb.sheet_by_name('name_of_the_sheet_here')
-        
-        if fileformat == 'csv':
-            with open(metafilename+'.csv', 'w', newline="") as f:
-                c = csv.writer(f)
-                for r in range(sh.nrows):
-                    c.writerow(sh.row_values(r))
-        if fileformat == 'txt':
-            with open(metafilename+'.txt', 'w', newline="") as f:
-                c = csv.writer(f, delimiter="\t")
-                for r in range(sh.nrows):
-                    c.writerow(sh.row_values(r))
-    
-def metafilereader(filename):
-    
-    f = open(filename, 'r')
-    f.seek(0)
-    header = f.readlines()[0]
-    f.seek(0)
-    filerows = f.readlines()[1:]
-    
-    tablerows = []
-    
-    for i in filerows:
-        tablerows.append(i.split('\t'))
-        
-    header = header.split('\t')
-    # need to find a way to strip end of line \n from last column - work-around is to add extra dummy column at end of metafile
-    return tablerows, header
 
 def comparepeaks(cas, malt):
     result = stats.ttest_ind([peak for peak, noise in zip(cas['peak'], cas['noise']) if not noise],
@@ -297,8 +248,8 @@ def assemble_sessions(sessions,
         if s.rat not in rats_to_exclude and s.session in sessions_to_include:
             try:
                 process_rat(s)           
-            except:
-                print('Could not extract data from ' + s.sessionID) 
+            except Exception as e:
+                print('Could not extract data from ' + s.sessionID, e) 
             
             if makefigs == True:
 #                try:                   
@@ -375,14 +326,11 @@ def process_rat(session):
     s = session
     print('\nAnalysing rat ' + s.rat + ' in session ' + s.session)
     s.loaddata()
-    s.data_filt = correctforbaseline(s.data, s.dataUV)
-    s.setticks()
-    s.time2samples()
     s.check4events()
     s.setbottlecolors()
     
     try:
-        s.left['lickdata'] = lickCalc(s.left['licks'],
+        s.left['lickdata'] = tp.lickCalc(s.left['licks'],
                           offset = s.left['licks_off'],
                           burstThreshold = 0.50)
     except IndexError:
@@ -390,7 +338,7 @@ def process_rat(session):
         print('No left licks')
         
     try:
-        s.right['lickdata'] = lickCalc(s.right['licks'],
+        s.right['lickdata'] = tp.lickCalc(s.right['licks'],
                   offset = s.right['licks_off'],
                   burstThreshold = 0.50)
     except IndexError:
@@ -399,26 +347,29 @@ def process_rat(session):
         
     bins = 300
 
-    s.randomevents = makerandomevents(120, max(s.tick)-120)
-    s.bgTrials, s.pps = snipper(s.data, s.randomevents,
-                                    t2sMap = s.t2sMap, fs = s.fs, bins=bins)
+    # s.randomevents = makerandomevents(120, max(s.tick)-120)
+    # s.bgTrials, s.pps = snipper(s.data, s.randomevents,
+    #                                 t2sMap = s.t2sMap, fs = s.fs, bins=bins)
     
-    s.bgMAD = findnoise(s.data_filt, s.randomevents,
-                              t2sMap=s.t2sMap, fs=s.fs, bins=bins,
-                              method='sum')
+    # s.bgMAD = findnoise(s.data_filt, s.randomevents,
+    #                           t2sMap=s.t2sMap, fs=s.fs, bins=bins,
+    #                           method='sum')
     
     for side in [s.left, s.right]:   
         if side['exist'] == True:
-            side['snips_sipper'] = mastersnipper(s, side['sipper'], peak_between_time=[0, 5],
+            side['snips_sipper'] = tp.mastersnipper(s.data, s.dataUV, s.data_filt, s.fs, side['sipper'],
+                                                 peak_between_time=[0, 5],
                                                  latency_events=side['lickdata']['rStart'],
                                                  latency_direction='post')
-            side['snips_licks'] = mastersnipper(s, side['lickdata']['rStart'], peak_between_time=[0, 2],
+            side['snips_licks'] = tp.mastersnipper(s.data, s.dataUV, s.data_filt, s.fs, side['lickdata']['rStart'],
+                                                peak_between_time=[0, 2],
                                                 latency_events=side['sipper'],
                                                 latency_direction='pre')
                                                
             try:
                 forced_licks = [licks for licks in side['lickdata']['rStart'] if licks in side['licks-forced']]
-                side['snips_licks_forced'] = mastersnipper(s, forced_licks, peak_between_time=[0, 2],
+                side['snips_licks_forced'] = tp.mastersnipper(s.data, s.dataUV, s.data_filt, s.fs, forced_licks,
+                                                           peak_between_time=[0, 2],
                                                            latency_events=side['sipper'],
                                                            latency_direction='pre')
             except KeyError:

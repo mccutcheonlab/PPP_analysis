@@ -4,6 +4,8 @@ Created on Tue Jan 14 12:14:26 2020
 
 @author: admin
 """
+# May need to run this first in ipython %matplotlib qt5
+
 import dill
 
 from fx4assembly import *
