@@ -20,12 +20,10 @@ import dill
 import scipy.signal as sig
 from scipy import stats
 
-# from fx4behavior import *
-# from fx4makingsnips import *
+from fx4behavior import *
 import sessionfigs as sessionfigs
 
 import trompy as tp
-
 
 class Session(object):
     
@@ -78,20 +76,6 @@ class Session(object):
              
         except Exception as e:
             print('Unable to load data properly.', e)
-            
-    # def setticks(self):
-    #     try:
-    #         if hasattr(self.ttls, 'Tick'):
-    #             self.tick = self.ttls['Tick'].onset
-    #         else:
-    #             tmp=tdt.read_block(self.tdtfile, evtype=['scalars'])
-    #             self.tick = getattr(tmp.scalars, 'Pars')['ts'][0::2]       
-    #     except AttributeError:
-    #         print('Problem setting ticks')        
-
-    def event2sample(self, EOI):
-        idx = (np.abs(self.t2sMap - EOI)).argmin()   
-        return idx
 
     def check4events(self):
         try:
@@ -346,14 +330,6 @@ def process_rat(session):
         print('No right licks')
         
     bins = 300
-
-    # s.randomevents = makerandomevents(120, max(s.tick)-120)
-    # s.bgTrials, s.pps = snipper(s.data, s.randomevents,
-    #                                 t2sMap = s.t2sMap, fs = s.fs, bins=bins)
-    
-    # s.bgMAD = findnoise(s.data_filt, s.randomevents,
-    #                           t2sMap=s.t2sMap, fs=s.fs, bins=bins,
-    #                           method='sum')
     
     for side in [s.left, s.right]:   
         if side['exist'] == True:
