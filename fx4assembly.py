@@ -361,3 +361,31 @@ def process_rat(session):
                                   s.malt['snips_licks_forced'])
     except:
         print("Could not compare peaks")
+
+"""
+This function and the line of code that follow it can be used to reduce the size of pickled files by removing
+stream data and just leaving snips and other relevant info.
+
+"""
+def removestreamdata(picklefilein, picklefileout):
+    try:
+        pickle_in = open(picklefilein, 'rb')
+    except FileNotFoundError:
+        print('Cannot access pickled file')
+        
+    sessions, rats = dill.load(pickle_in)
+    
+    for session in sessions:
+        s = sessions[session]
+        delattr(s, 'data')
+        delattr(s, 'dataUV')
+        delattr(s, 'data_filt')
+        
+    pickle_out = open(picklefileout, 'wb')
+    dill.dump([sessions, rats], pickle_out)
+    pickle_out.close()
+    
+# removestreamdata("C:\\Github\\PPP_analysis\\data\\ppp_pref.pickle", "C:\\Github\\PPP_analysis\\data\\ppp_pref_nostreams.pickle")
+        
+    
+        
