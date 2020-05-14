@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import JM_custom_figs as jmfig
-import JM_general_functions as jmf
+# import JM_general_functions as jmf
+
+import trompy as tp
 
 from ppp_pub_figs_settings import *
 
@@ -41,7 +43,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
 #panel 1 - forced choice licks    
     x = [[df_behav.xs('NR', level=1)[forced_cas_key], df_behav.xs('NR', level=1)[forced_malt_key]],
          [df_behav.xs('PR', level=1)[forced_cas_key], df_behav.xs('PR', level=1)[forced_malt_key]]]
-    jmfig.barscatter(x, paired=True, unequal=True,
+    tp.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = barfacecolor,
                  scatteredgecolor = ['xkcd:charcoal'],
@@ -60,7 +62,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
 #panel 2 - latency for forced choice
     x = [[df_photo.xs('NR', level=1)[lat_cas_key], df_photo.xs('NR', level=1)[lat_malt_key]],
          [df_photo.xs('PR', level=1)[lat_cas_key], df_photo.xs('PR', level=1)[lat_malt_key]]]
-    jmfig.barscatter(x, paired=True, unequal=True,
+    tp.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = barfacecolor,
                  scatteredgecolor = ['xkcd:charcoal'],
@@ -78,7 +80,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
 #panel 2 - free choice licks
     x = [[df_behav.xs('NR', level=1)[free_cas_key], df_behav.xs('NR', level=1)[free_malt_key]],
          [df_behav.xs('PR', level=1)[free_cas_key], df_behav.xs('PR', level=1)[free_malt_key]]]
-    jmfig.barscatter(x, paired=True, unequal=True,
+    tp.barscatter(x, paired=True, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = barfacecolor,
                  scatteredgecolor = ['xkcd:charcoal'],
@@ -98,7 +100,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
         ax[3].axis('off')
     
         x = [df_behav.xs('NR', level=1)[pref_key], df_behav.xs('PR', level=1)[pref_key]]
-        jmfig.barscatter(x, paired=False, unequal=True,
+        tp.barscatter(x, paired=False, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = [barfacecolor[0], barfacecolor[2]],
                  scatteredgecolor = ['xkcd:charcoal'],
@@ -126,7 +128,7 @@ def pref_behav_fig(ax, df_behav, df_photo, prefsession=1, dietswitch=False, barl
         print(type(f))
         new_ax = f.add_subplot(inner[1])
         x = [df_behav.xs('NR', level=1)[pref_key], df_behav.xs('PR', level=1)[pref_key]]
-        jmfig.barscatter(x, paired=False, unequal=True,
+        tp.barscatter(x, paired=False, unequal=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = [barfacecolor[0], barfacecolor[2]],
                  scatteredgecolor = ['xkcd:charcoal'],
@@ -328,8 +330,8 @@ def heatmapCol(f, df, gs, diet, session, rat, event='', reverse=False, clims=[0,
     
     ax3 = f.add_subplot(plots_gs[2,0])
  
-    jmfig.shadedError(ax3, data_cas, linecolor=color[0], errorcolor=errorcolors[0])
-    jmfig.shadedError(ax3, data_malt, linecolor=color[1], errorcolor=errorcolors[1])
+    tp.shadedError(ax3, data_cas, linecolor=color[0], errorcolor=errorcolors[0])
+    tp.shadedError(ax3, data_malt, linecolor=color[1], errorcolor=errorcolors[1])
     
     ax3.axis('off')
 
@@ -362,8 +364,8 @@ def averagetrace(ax, df, diet, keys, event='', fullaxis=True, colorgroup='contro
     df = df.xs(diet, level=1)
 
 # Plots casein and maltodextrin shaded erros
-    jmfig.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0], linewidth=2)
-    jmfig.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1], linewidth=2)
+    tp.shadedError(ax, df[keys[0]], linecolor=color[0], errorcolor=errorcolors[0], linewidth=2)
+    tp.shadedError(ax, df[keys[1]], linecolor=color[1], errorcolor=errorcolors[1], linewidth=2)
     
     #ax.legend(['Casein', 'Maltodextrin'], fancybox=True)    
     if fullaxis == False:
@@ -416,9 +418,8 @@ def peakbargraph(ax, df, diet, keys, peaktype='average', epoch=[100, 149],
         ylab = 'AUC'
         
     a = [a1, a2]
-    x = jmf.data2obj1D(a)
     
-    ax, x, _, _ = jmfig.barscatter(x, paired=True,
+    ax, x, _, _ = tp.barscatter(a, paired=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = bar_colors,
                  scatteredgecolor = [almost_black],
@@ -444,7 +445,7 @@ def tvaluegraph(ax, df, diet, key):
     df = df.xs(diet, level=1)
     data = df[key]
     
-    xvals, yvals = jmfig.xyspacer(ax, 1, list(data), bindist=10, space=0.4)
+    xvals, yvals = tp.xyspacer(ax, 1, list(data), bindist=10, space=0.4)
 
     for x, y in zip(xvals, yvals):
         if np.abs(y) > 2.02:
@@ -529,13 +530,13 @@ def summary_subfig_bars(ax, df, keys, scattersize=50):
     a = [[df_NR[keys[0]], df_NR[keys[1]], df_NR[keys[2]]],
           [df_PR[keys[0]], df_PR[keys[1]], df_PR[keys[2]]]]
     
-    x = jmf.data2obj2D(a)
+    x = tp.data2obj2D(a)
     
     cols = ['xkcd:silver', col['pr_cas']]
     
     xlabels = ['NR \u2192 PR', 'PR \u2192 NR']
     
-    jmfig.barscatter(x, paired=True,
+    tp.barscatter(x, paired=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = [cols[0], cols[1], cols[1], cols[1], cols[0], cols[0]],
                  scatteredgecolor = [almost_black],

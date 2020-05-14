@@ -11,7 +11,7 @@ cwd = os.getcwd()
 import sys
 sys.path.insert(0,cwd)
 
-import JM_general_functions as jmf
+# import JM_general_functions as jmf
 import matplotlib as mpl
 import dill
 
@@ -58,7 +58,7 @@ except FileNotFoundError:
 
 savefigs=True
 savefolder = 'C:\\Github\\PPP_analysis\\figs\\'
-savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
+# savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
 
 #Set general rcparams
 

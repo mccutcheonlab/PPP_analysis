@@ -10,9 +10,6 @@ Created on Wed Nov  8 08:47:56 2017
 
 # Choice data
 import scipy.io as sio
-import JM_general_functions as jmf
-import JM_custom_figs as jmfig
-
 import os
 import string
 import pandas as pd
