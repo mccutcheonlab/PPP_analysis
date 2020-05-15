@@ -10,7 +10,7 @@ PPP1 session figs, for individual rats when assembling data
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import JM_custom_figs as jmfig
+# import JM_custom_figs as jmfig
 import numpy as np
 
 mpl.rc('lines', linewidth=0.5)

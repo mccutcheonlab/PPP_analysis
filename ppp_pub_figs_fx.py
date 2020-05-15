@@ -11,9 +11,6 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-import JM_custom_figs as jmfig
-# import JM_general_functions as jmf
-
 import trompy as tp
 
 from ppp_pub_figs_settings import *
