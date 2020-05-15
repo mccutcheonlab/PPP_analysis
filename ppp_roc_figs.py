@@ -7,9 +7,12 @@ Created on Wed Apr  8 15:21:24 2020
 import dill
 import matplotlib.pyplot as plt
 
-# from figs4roc import *
-
+import numpy as np
 import trompy as tp
+
+import scipy.stats as stats
+
+from ppp_pub_figs_settings import *
 
 try:
     pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_roc_results.pickle', 'rb')
@@ -28,51 +31,92 @@ def get_data_from_dict(roc_dict, prefsession, subset):
     
     return [a, p, data, data_flat]
 
-### PR rats, s10 (pref1), licks
-colors_dis = ['grey', 'red']
-
-[a, p, data, data_flat] = get_data_from_dict(roc_results, 's16', 'pr_licks')
-
-f = plt.figure(figsize=(3.4, 2))
-
-f, ax = tp.plot_ROC_and_line(f, a, p, data_flat[0], data_flat[1],
-                  cdict=[colors_dis[0], 'white', colors_dis[1]],
-                  colors = colors_dis,
-                  labels=['Casein', 'Maltodextrin'],
-                  ylabel='Z-score',
-                  xlabel='Time from first lick')
-
-
-
-try:
-    pickle_folder = 'C:\\Github\\PPP_analysis\\data\\'   
-    pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
-    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
-
-except FileNotFoundError:
-    print('Cannot access pickled file(s)')
-
-
-from ppp_pub_figs_fx import peakbargraph
-
-diet = 'NR'
-
-if diet == 'NR':
-    colors = 'control'
-else:
-    colors = 'exptl'
+def ppp_plot_roc_and_peak(roc_results, session, key, colors, peakbetween=[10, 13]):
     
-scattersize=50
 
-keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced']
-peaktype='auc'
-epoch=[100,110]
-colorgroup=colors
-scattersize=scattersize
+    # get appropraite data from roc_results file
+    [a, p, data, data_flat] = get_data_from_dict(roc_results, session, key)
+    
+    #initialize figure
+    f = plt.figure(figsize=(6, 2))
+    
+    outer_gs = f.add_gridspec(1,2, wspace=0.7, width_ratios=[1, 0.5])
+    gsdict = {'gsx': 0, 'gsy': 0, 'gs_spec': outer_gs}
+    
+    # plot ROC figure
+    f, ax1 = tp.plot_ROC_and_line(f, a, p, data_flat[0], data_flat[1],
+                      cdict=[colors[0], 'white', colors[1]],
+                      colors = colors,
+                      labels=['Casein', 'Maltodextrin'],
+                      ylabel='Z-score',
+                      xlabel='Time from first lick',
+                      gridspec_dict=gsdict)
+    
+    # get data for peak plots
+    caspeak, maltpeak = [], []
+    
+    for cas, malt in zip(data[0], data[1]):
+        caspeak.append(np.mean(sum_of_epoch_from_snips(cas, peakbetween)))
+        maltpeak.append(np.mean(sum_of_epoch_from_snips(malt, peakbetween)))
+        
+    ax2 = f.add_subplot(outer_gs[0,1])
+    tp.barscatter([caspeak, maltpeak], paired=True,
+                  scattersize=50,
+                  barfacecoloroption = 'individual',
+                  barfacecolor = colors,
+                  scatteredgecolor = ['xkcd:charcoal'],
+                  scatterlinecolor = 'xkcd:charcoal',
+                  barlabels=['Cas', 'Malt'],
+                  ylabel='AUC',
+                  ax=ax2)
+    
+    print(stats.ttest_rel(caspeak, maltpeak))
+    
+    return {'f':f, 'a':a, 'p':p, 'caspeak':caspeak, 'maltpeak': maltpeak}
+    
+def sum_of_epoch_from_snips(snips, peakbetween):
+    start = peakbetween[0]
+    stop = peakbetween[1]
+    return [np.sum(trial[start:stop]) for trial in snips]
 
-f, ax = plt.subplots()
+colors_pr = [col['pr_cas'], col['pr_malt']]
+colors_nr = [col['nr_cas'], col['nr_malt']]
+figs_dict = {}
 
-peakbargraph(ax, df_photo, diet, keys_traces, peaktype=peaktype, epoch=epoch,
-             colorgroup=colors, ylim=[-0.04,0.12], grouplabeloffset=0.07,
-             scattersize=scattersize)
-ax.set_ylim([-3, 7.5])
+peakbetween=[10, 14]
+
+figs_dict['s10_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_licks', colors_pr, peakbetween=peakbetween)
+
+figs_dict['s11_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's11', 'pr_licks', colors_pr, peakbetween=peakbetween)
+
+figs_dict['s16_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's16', 'pr_licks', colors_pr, peakbetween=peakbetween)
+
+figs_dict['s10_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_licks', colors_nr, peakbetween=peakbetween)
+
+figs_dict['s11_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_licks', colors_nr, peakbetween=peakbetween)
+
+figs_dict['s16_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_licks', colors_nr, peakbetween=peakbetween)
+
+
+figs_dict['s10_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_sipper', colors_pr, peakbetween=peakbetween)
+
+figs_dict['s11_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'pr_sipper', colors_pr, peakbetween=peakbetween)
+
+figs_dict['s16_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'pr_sipper', colors_pr, peakbetween=peakbetween)
+
+figs_dict['s10_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_sipper', colors_nr, peakbetween=peakbetween)
+
+figs_dict['s11_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_sipper', colors_nr, peakbetween=peakbetween)
+
+figs_dict['s16_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_sipper', colors_nr, peakbetween=peakbetween)
+
+
+for key in figs_dict.keys():
+    fig = figs_dict[key]['f']
+
+
+
+[a, p, data, data_flat] = get_data_from_dict(roc_results, 's10', 'pr_sipper')
+
+
+    
