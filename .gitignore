@@ -1,4 +1,3 @@
-
 .spyproject/workspace.ini
 
 *.ini
@@ -20,4 +19,10 @@ output/choice-and-pref.csv
 data/*
 figs/*
 output/*
+stats/*
+
+data\*
+
+
 *.ipynb
+*.pdf
