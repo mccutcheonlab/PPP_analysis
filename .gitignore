@@ -1,8 +1,23 @@
 
 .spyproject/workspace.ini
+
 *.ini
-*.ini
+
 *.pyc
-*.ini
-*.ini
-*.ini
+.output/
+*.csv
+output/choice-and-pref.csv
+*.asv
+.spyproject*
+
+~$tails for PPP analysis.docx
+
+
+*.tmp
+
+*.RHistory
+
+data/*
+figs/*
+output/*
+*.ipynb
