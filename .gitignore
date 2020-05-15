@@ -21,8 +21,6 @@ figs/*
 output/*
 stats/*
 
-data\*
-
 
 *.ipynb
 *.pdf
