@@ -18,7 +18,7 @@ from ppp_pub_figs_settings import *
 from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
-make_fig1_behav=False
+make_fig1_behav=True
 make_fig1_photo=False
 
 make_fig2_behav=False
@@ -31,7 +31,7 @@ make_bwfood_figs=False
 make_sacc_figs=False
 make_cond_figs=False
 
-make_photo_sip_figs=True
+make_photo_sip_figs=False
 make_photo_licks_figs=False
 
 supp_rep_trace = False
