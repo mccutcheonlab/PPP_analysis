@@ -30,7 +30,9 @@ def get_snips(sessions, diet, prefsession, sol, event, datatype):
     for key in sessions.keys():
         s = sessions[key]
         if s.session == prefsession and s.diet == diet:
-            snips = getattr(s, sol)[eventkey][datatype]
+            snip_dict = getattr(s, sol)[eventkey]
+            noise = snip_dict['noise']
+            snips = [snip for snip, noise in zip(snip_dict[datatype], noise) if not noise]
             snips = tp.resample_snips(snips)
             list_of_snips.append(snips)
     
