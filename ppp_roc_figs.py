@@ -6,6 +6,7 @@ Created on Wed Apr  8 15:21:24 2020
 """
 import dill
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 
 import numpy as np
 import trompy as tp
@@ -110,10 +111,12 @@ figs_dict['s11_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_sippe
 
 figs_dict['s16_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_sipper', colors_nr, peakbetween=peakbetween)
 
-
+pdf_pages = PdfPages('C:/Github/PPP_analysis/figs/roc_figs.pdf')
 for key in figs_dict.keys():
     fig = figs_dict[key]['f']
+    pdf_pages.savefig(fig)
 
+pdf_pages.close()
 
 
 [a, p, data, data_flat] = get_data_from_dict(roc_results, 's10', 'pr_sipper')

@@ -14,7 +14,7 @@ import numpy as np
 
 from subprocess import PIPE, run
 
-Rscriptpath = 'C:\\Program Files\\R\\R-3.6.2\\bin\\Rscript'
+Rscriptpath = 'C:\\Program Files\\R\\R-4.0.1\\bin\\Rscript'
 statsfolder = 'C:\\Github\\PPP_analysis\\stats\\'
 
 # Attempts to load pickled file
@@ -25,9 +25,9 @@ try:
     
     df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
 
-    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
+    # pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
     
-    df_cond1_behav = dill.load(pickle_in)
+    # df_cond1_behav = dill.load(pickle_in)
        
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
@@ -341,8 +341,8 @@ def stats_pref_ind(prefsession=1):
 
 # stats_pref_ind(prefsession=1)
 
-# stats_summary_behav()
-stats_summary_photo(use_tvals=False)
+stats_summary_behav()
+# stats_summary_photo(use_tvals=False)
 
 #prefsession='1'
 #
