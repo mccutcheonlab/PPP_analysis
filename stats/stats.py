@@ -14,7 +14,7 @@ import numpy as np
 
 from subprocess import PIPE, run
 
-Rscriptpath = 'C:\\Program Files\\R\\R-3.6.2\\bin\\Rscript'
+Rscriptpath = 'C:\\Program Files\\R\\R-4.0.1\\bin\\Rscript'
 statsfolder = 'C:\\Github\\PPP_analysis\\stats\\'
 
 # Attempts to load pickled file
@@ -27,7 +27,7 @@ try:
 
     pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
     
-    df_cond1_behav = dill.load(pickle_in)
+    # df_cond1_behav = dill.load(pickle_in)
        
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
@@ -325,6 +325,45 @@ def stats_pref_ind(prefsession=1):
         if s.session == day:
             print(s.rat, s.session, '\n', s.peakdiff)
 
+def stats_pref_postpref1(df_behav, df_photo, diet, prefsession='2', verbose=True):
+    if verbose: print(f'\nAnalysis of preference session {prefsession} for {diet} rats.')
+        
+    forcedkeys = ['pref' + prefsession + '_cas_forced',
+                  'pref' + prefsession + '_malt_forced']
+    
+    latkeys = ['pref' + str(prefsession) + '_cas_lats_fromsip',
+               'pref' + str(prefsession) + '_malt_lats_fromsip']
+    
+    freekeys = ['pref' + prefsession + '_cas_free',
+                'pref' + prefsession + '_malt_free']
+    
+    choicekeys = ['pref' + str(prefsession) + '_ncas',
+                  'pref' + str(prefsession) + '_nmalt']
+    
+    prefkey = ['pref' + str(prefsession)]
+    
+    photokeys = ['pref' + prefsession + '_auc_cas',
+            'pref' + prefsession + '_auc_malt']
+    
+    if verbose: print('\nt-test on FORCED LICK trials\n')
+    ppp_ttest_paired(df_behav, diet, forcedkeys[0], forcedkeys[1])
+    
+    if verbose: print('\nt-test on LATENCIES on forced lick trials\n')
+    ppp_ttest_paired(df_photo, diet, latkeys[0], latkeys[1])
+    
+    if verbose: print('\nt-test on FREE LICK trials\n')
+    ppp_ttest_paired(df_behav, diet, freekeys[0], freekeys[1])
+    
+    if verbose: print('\nt-test on CHOICE data\n')
+    ppp_ttest_paired(df_behav, diet, choicekeys[0], choicekeys[1])
+    
+    if verbose: print('\nt-test on PREF RATIO data\n')
+    ppp_ttest_onesample(df_behav, diet, prefkey)
+    
+    if verbose: print('\nt-test on PHOTOMETRY data\n')
+    ppp_ttest_paired(df_photo, diet, photokeys[0], photokeys[1])
+
+
 # Using SPSS for statistical analysis of conditioning data because 3-way ANOVA
 # csvfile=statsfolder+'cond1_behav.csv'
 # df_cond1_behav.to_csv(csvfile)
@@ -342,7 +381,16 @@ def stats_pref_ind(prefsession=1):
 # stats_pref_ind(prefsession=1)
 
 # stats_summary_behav()
-stats_summary_photo(use_tvals=False)
+# stats_summary_photo(use_tvals=False)
+
+### New stats with rejigged figures
+# stats_pref_postpref1(df_behav, df_photo, diet='NR', prefsession='2')
+
+# stats_pref_postpref1(df_behav, df_photo, diet='NR', prefsession='3')
+
+# stats_pref_postpref1(df_behav, df_photo, diet='PR', prefsession='2')
+
+stats_pref_postpref1(df_behav, df_photo, diet='PR', prefsession='3')
 
 #prefsession='1'
 #
