@@ -18,11 +18,14 @@ from ppp_pub_figs_settings import *
 from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
-make_fig1_behav=True
+make_fig1_behav=False
 make_fig1_photo=False
 
 make_fig2_behav=False
 make_fig2_photo=False
+
+make_fig2_new=True
+make_fig3_new=True
 
 make_fig3_summary=False
 
@@ -112,6 +115,18 @@ if make_fig2_photo:
                                           peakkey='peakdiff_3',
                                           scattersize=scattersize)
     fig2_pref3_photo.savefig(savefolder + 'fig2_pref3_photo.pdf')
+
+if make_fig2_new:
+    fig2 = make_fig2_and_3(df_behav, df_photo, 'NR',
+                      peaktype=peaktype, epoch=epoch,
+                      scattersize=scattersize)
+    fig2.savefig(savefolder + 'fig2.pdf')
+    
+if make_fig3_new:
+    fig3 = make_fig2_and_3(df_behav, df_photo, 'PR',
+                      peaktype=peaktype, epoch=epoch,
+                      scattersize=scattersize)
+    fig3.savefig(savefolder + 'fig3.pdf')
 
 if make_fig3_summary:
     summaryFig = makesummaryFig(df_behav, df_photo, peaktype=peaktype, epoch=epoch,

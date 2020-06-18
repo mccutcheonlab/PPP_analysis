@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-import JM_custom_figs as jmfig
-import JM_general_functions as jmf
+# import JM_custom_figs as jmfig
+# import JM_general_functions as jmf
+
+from trompy import *
 
 from ppp_pub_figs_settings import *
 

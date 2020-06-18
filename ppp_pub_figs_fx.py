@@ -647,3 +647,117 @@ def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 149], use_zsc
     ax3.set_title('PR \u2192 NR rats')
     
     return f
+
+def make_fig2_and_3(df_behav, df_photo, diet, dietswitch=False,
+                      peaktype='auc', epoch=[], peakkey='peakdiff_2',
+                      scattersize=50):
+    
+    if diet == 'NR':
+        colorgroup='control'
+    else:
+        colorgroup='exptl'
+    
+    
+    f = plt.figure(figsize=(7.2, 3.5), constrained_layout=False)
+    gs=f.add_gridspec(nrows=2, ncols=6, left=0.13, right=0.9, top=0.95, bottom=0.1, wspace=0.7, hspace=0.4,
+                      width_ratios=[1, 1, 1, 1, 1.5, 1])
+    
+    ax1 = f.add_subplot(gs[0,0])
+    behavbargraph(ax1, df_behav, diet,
+                  ['pref2_cas_forced', 'pref2_malt_forced'],
+                  colorgroup=colorgroup,
+                  ylabel="Licks")
+    
+    ax2 = f.add_subplot(gs[0,1])
+    behavbargraph(ax2, df_photo, diet, ['pref2_cas_lats_fromsip', 'pref2_malt_lats_fromsip'],
+                  colorgroup=colorgroup,
+                  ylabel="Latency (s)")
+    
+    ax3 = f.add_subplot(gs[0,2])
+    behavbargraph(ax3, df_behav, diet,
+              ['pref2_cas_free', 'pref2_malt_free'],
+              colorgroup=colorgroup,
+              ylabel="Licks")
+    
+    ax4 = f.add_subplot(gs[0,3])
+    behavbargraph(ax4, df_behav, diet,
+              ['pref2_ncas', 'pref2_nmalt'],
+              colorgroup=colorgroup,
+              ylabel="Choices out of 20")
+
+    ax5 = f.add_subplot(gs[0,4])
+    averagetrace(ax5, df_photo, diet, ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
+                 event='Licks', fullaxis=True, colorgroup=colorgroup, ylabel=True)
+       
+    ax6 = f.add_subplot(gs[0,5])
+    peakbargraph(ax6, df_photo, diet, ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
+                 peaktype=peaktype, epoch=[100, 149],
+                 sc_color='w', colorgroup=colorgroup,
+                 scattersize=scattersize)
+
+    ax7 = f.add_subplot(gs[1,0], sharey=ax1)
+    behavbargraph(ax7, df_behav, diet,
+                  ['pref3_cas_forced', 'pref3_malt_forced'],
+                  colorgroup=colorgroup,
+                  ylabel="Licks")
+                     
+    ax8 = f.add_subplot(gs[1,1], sharey=ax2)
+    behavbargraph(ax8, df_photo, diet, ['pref3_cas_lats_fromsip', 'pref3_malt_lats_fromsip'],
+                  colorgroup=colorgroup,
+                  ylabel="Latency (s)")
+    
+    ax9 = f.add_subplot(gs[1,2], sharey=ax3)
+    behavbargraph(ax9, df_behav, diet,
+              ['pref3_cas_free', 'pref3_malt_free'],
+              colorgroup=colorgroup,
+              ylabel="Licks")
+    
+    ax10 = f.add_subplot(gs[1,3], sharey=ax4)
+    behavbargraph(ax10, df_behav, diet,
+              ['pref3_ncas', 'pref3_nmalt'],
+              colorgroup=colorgroup,
+              ylabel="Choices out of 20")
+
+
+    ax11 = f.add_subplot(gs[1,4], sharey=ax5)
+    averagetrace(ax11, df_photo, diet, ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'],
+                 event='Licks', fullaxis=True, colorgroup=colorgroup, ylabel=True)
+                     
+    
+    ax12 = f.add_subplot(gs[1,5], sharey=ax6)
+    peakbargraph(ax12, df_photo, diet, ['pref3_cas_licks_forced', 'pref3_malt_licks_forced'],
+                 peaktype=peaktype, epoch=[100, 149],
+                 sc_color='w', colorgroup=colorgroup,
+                 scattersize=scattersize)
+    
+    return f
+
+def behavbargraph(ax, df, diet, keys,
+                 sc_color='w', colorgroup='control', ylabel="",
+                 ylim=[-0.05, 0.1], grouplabeloffset=0,
+                 scattersize=30):
+    
+    if colorgroup == 'control':
+        bar_colors=['xkcd:silver', 'w']
+    else:
+        bar_colors=[col['pr_cas'], col['pr_malt']]
+    
+    df = df.xs(diet, level=1)
+    
+    a = [df[keys[0]], df[keys[1]]]
+
+    ax, x, _, _ = tp.barscatter(a, paired=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = bar_colors,
+                 scatteredgecolor = [almost_black],
+                 scatterlinecolor = almost_black,
+                 scatterfacecolor = [sc_color],
+                 grouplabel=['Cas', 'Malt'],
+                 grouplabeloffset=grouplabeloffset,
+                 scattersize = scattersize,
+                 xfontsize=6,
+                 barwidth=0.75,
+                 ax=ax)
+    
+    ax.set_ylabel(ylabel)
+    # ax.set_xlim([0, 6])
