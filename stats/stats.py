@@ -12,6 +12,8 @@ import pandas as pd
 from scipy import stats
 import numpy as np
 
+import trompy as tp
+
 from subprocess import PIPE, run
 
 Rscriptpath = 'C:\\Program Files\\R\\R-4.0.1\\bin\\Rscript'
@@ -101,19 +103,19 @@ def ppp_summaryANOVA_1way(df, cols, csvfile, dietgroup):
     print(result.returncode, result.stderr, result.stdout)
     return result
 
-def ppp_ttest_paired(df, subset, key1, key2):
+def ppp_ttest_paired(df, subset, key1, key2, ncomps=3):
     df = df.xs(subset, level=1)
     result = stats.ttest_rel(df[key1], df[key2])
     print(subset, result)
-    print('With Sidak correction: ', sidakcorr(result[1]), '\n')
+    print('With Sidak correction: ', tp.sidakcorr(result[1], ncomps=ncomps), '\n')
     return result
 
-def ppp_ttest_unpaired(df, index1, index2, key):
+def ppp_ttest_unpaired(df, index1, index2, key, ncomps=3):
     df1 = df.xs(index1, level=1)
     df2 = df.xs(index2, level=1)
     result = stats.ttest_ind(df1[key], df2[key])
     print(key, result)
-    print('With Sidak correction: ', sidakcorr(result[1]), '\n')
+    print('With Sidak correction: ', tp.sidakcorr(result[1], ncomps=ncomps), '\n')
     return result
 
 def ppp_ttest_onesample(df, index, key):
@@ -138,12 +140,10 @@ def ppp_full_ttests(df, keys, verbose=True):
 
 def ppp_summary_ttests(df, keys, dietgroup, verbose=True):
     if verbose: print('t-test for session 1 vs session 2')
-    result = ppp_ttest_paired(df, dietgroup, keys[0], keys[1])
-    print('Dunnetts corrected p-value = ', result[1]*2)
+    result = ppp_ttest_paired(df, dietgroup, keys[0], keys[1], ncomps=2)
     
     if verbose: print('t-test for session 1 vs session 3')
-    result = ppp_ttest_paired(df, dietgroup, keys[0], keys[2])
-    print('Dunnetts corrected p-value = ', result[1]*2)
+    result = ppp_ttest_paired(df, dietgroup, keys[0], keys[2], ncomps=2)
 
 def stats_conditioning(condsession='1', verbose=True):
     if verbose: print('\nAnalysis of conditioning sessions ' + condsession)
@@ -273,7 +273,7 @@ def stats_summary_photo(verbose=True, use_tvals=False):
                statsfolder + 'df_summary_photo_PR.csv',
                'PR')
 
-def make_stats_df(df, key_suffixes, prefsession='1', epoch=[100, 119]):
+def make_stats_df(df, key_suffixes, prefsession='1', epoch=[100, 149]):
     epochrange = range(epoch[0], epoch[1])
     
     keys_in, keys_out = [], []
@@ -289,16 +289,18 @@ def make_stats_df(df, key_suffixes, prefsession='1', epoch=[100, 119]):
     return df
 
 # for analysing licks
-epoch =[100,119]
+epoch =[100,149]
 keys = ['_cas_licks_forced', '_malt_licks_forced']
 
 # for analysing sipper
-#epoch = [100,149]
-#keys = ['_cas_sip', '_malt_sip']
+# epoch = [100,149]
+# keys = ['_cas_sip', '_malt_sip']
 
 for session in [1, 2, 3]:
     df_photo = make_stats_df(df_photo, keys, prefsession=str(session), epoch=epoch)
 
+def stats_summary_photo_casvmalt():
+    print('Boo yeah')
 
 def stats_pref_ind(prefsession=1):
     
@@ -324,6 +326,8 @@ def stats_pref_ind(prefsession=1):
         s=sessions[session]
         if s.session == day:
             print(s.rat, s.session, '\n', s.peakdiff)
+            
+            
 
 def stats_pref_postpref1(df_behav, df_photo, diet, prefsession='2', verbose=True):
     if verbose: print(f'\nAnalysis of preference session {prefsession} for {diet} rats.')
@@ -382,6 +386,33 @@ def stats_pref_postpref1(df_behav, df_photo, diet, prefsession='2', verbose=True
 
 # stats_summary_behav()
 # stats_summary_photo(use_tvals=False)
+stats_summary_photo_casvmalt()
+
+
+csvfile = statsfolder + "df_summary_photo2wayNR.csv"
+diet = 'NR'
+cols_to_stack= ['pref1_auc_cas', 'pref2_auc_cas', 'pref3_auc_cas', 'pref1_auc_malt', 'pref2_auc_malt', 'pref3_auc_malt']
+
+
+df = df_photo.xs(diet, level=1)
+
+df = extractandstack(df, cols_to_stack, new_cols=['rat', 'datalabel', 'value'])
+
+df['prefsession'] = [label[:5] for label in df['datalabel']]
+
+sol =[]
+for label in df['datalabel']:
+    if 'cas' in label:
+        sol.append('cas')
+    else:
+        sol.append('malt')
+
+df['sol'] = sol
+
+df.to_csv(csvfile)
+result = run([Rscriptpath, "--vanilla", "ppp_summaryANOVA_2way_within_within.R", csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+print(result.returncode, result.stderr, result.stdout)
+
 
 ### New stats with rejigged figures
 # stats_pref_postpref1(df_behav, df_photo, diet='NR', prefsession='2')
@@ -390,7 +421,7 @@ def stats_pref_postpref1(df_behav, df_photo, diet, prefsession='2', verbose=True
 
 # stats_pref_postpref1(df_behav, df_photo, diet='PR', prefsession='2')
 
-stats_pref_postpref1(df_behav, df_photo, diet='PR', prefsession='3')
+# stats_pref_postpref1(df_behav, df_photo, diet='PR', prefsession='3')
 
 #prefsession='1'
 #

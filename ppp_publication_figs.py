@@ -19,13 +19,15 @@ from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
 make_fig1_behav=False
-make_fig1_photo=False
+make_fig1_photo=True
 
 make_fig2_behav=False
 make_fig2_photo=False
 
-make_fig2_new=True
-make_fig3_new=True
+make_fig2_new=False
+make_fig3_new=False
+
+make_fig4_summary=False
 
 make_fig3_summary=False
 
@@ -34,14 +36,13 @@ make_bwfood_figs=False
 make_sacc_figs=False
 make_cond_figs=False
 
-make_photo_sip_figs=False
-make_photo_licks_figs=False
-
 supp_rep_trace = False
 supp_heatmap = False
 
 peaktype='auc'
-epoch=[100,119]
+epoch=[100,149]
+
+savefigs=True
 
 if make_fig1_behav:
 
@@ -70,8 +71,9 @@ if make_fig1_photo:
                                           keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
                                           scattersize=scattersize)
     
-    fig1_photo_NR.savefig(savefolder + 'fig1_photo_NR.pdf')
-    fig1_photo_PR.savefig(savefolder + 'fig1_photo_PR.pdf')
+    if savefigs:
+        fig1_photo_NR.savefig(savefolder + 'fig1_photo_NR.pdf')
+        fig1_photo_PR.savefig(savefolder + 'fig1_photo_PR.pdf')
     
 
 if make_fig2_behav:
@@ -120,19 +122,25 @@ if make_fig2_new:
     fig2 = make_fig2_and_3(df_behav, df_photo, 'NR',
                       peaktype=peaktype, epoch=epoch,
                       scattersize=scattersize)
-    fig2.savefig(savefolder + 'fig2.pdf')
+    if savefigs: fig2.savefig(savefolder + 'fig2.pdf')
     
 if make_fig3_new:
     fig3 = make_fig2_and_3(df_behav, df_photo, 'PR',
                       peaktype=peaktype, epoch=epoch,
                       scattersize=scattersize)
-    fig3.savefig(savefolder + 'fig3.pdf')
+    if savefigs: fig3.savefig(savefolder + 'fig3.pdf')
 
 if make_fig3_summary:
     summaryFig = makesummaryFig(df_behav, df_photo, peaktype=peaktype, epoch=epoch,
                                 use_zscore_diff=True,
                                 scattersize=scattersize)
     summaryFig.savefig(savefolder + 'summaryfig.pdf')
+    
+if make_fig4_summary:
+    summaryFig = makesummaryFig_new(df_behav, df_photo, peaktype=peaktype, epoch=epoch,
+                                use_zscore_diff=True,
+                                scattersize=scattersize)
+    summaryFig.savefig(savefolder + 'summaryfig_new.pdf')
 
 # For making supplemental Figures
 #sacc_behav_fig = pppfig.sacc_behav_fig(df_sacc_behav)
@@ -202,20 +210,3 @@ if supp_heatmap:
     figS2_photo_NR.savefig(savefolder + 'figS2_photo_NR.pdf')
     figS2_photo_PR.savefig(savefolder + 'figS2_photo_PR.pdf')
 
-#if make_photo_sip_figs:
-#    photo_pref1_sipper_fig = pppfig.mainphotoFig(df_reptraces_sip, df_heatmap_sip, df_photo, clims=clims,
-#                                                 keys_traces = ['pref1_cas_sip', 'pref1_malt_sip'],
-#                                                 keys_bars = ['pref1_cas_sip_peak', 'pref1_malt_sip_peak'],
-#                                                 keys_lats = ['pref1_cas_lats_all_fromsip', 'pref1_malt_lats_all_fromsip'],
-#                                                 event='Sipper')
-#    
-#    photo_pref1_sipper_fig.savefig(savefolder + 'pref1_sip_photo.pdf')
-#
-#if make_photo_licks_figs:
-#    
-#    photo_pref1_fig = pppfig.mainphotoFig(df_reptraces, df_heatmap, df_photo, clims=clims,
-#                                          keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
-#                                          keys_bars = ['pref1_cas_licks_peak', 'pref1_malt_licks_peak'],
-#                                          keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'])
-#    
-#    photo_pref1_fig.savefig(savefolder + 'pref1_licks_photo.pdf')

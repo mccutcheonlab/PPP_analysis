@@ -87,14 +87,20 @@ def getfirstlick(side, event):
     return lats
 
 def average_without_noise(snips, key='filt_z'):
-    # Can change default key to switch been delatF (key='blue') and z-score (key='blue_z')
-    no_noise_snips = [trial for trial, noise in zip(snips[key], snips['noise']) if not noise]
+    # Can change default key to switch been delatF (key='blue') and z-score (key='blue_z') 
     try:
+        no_noise_snips = [trial for trial, noise in zip(snips[key], snips['noise']) if not noise]
         result = np.mean(no_noise_snips, axis=0)
         return result
     except:
         print('Problem averaging snips')
-        return
+        return []
+
+def get_first_trial(snips, key='filt_z'):
+    try:
+        return snips[key][0]
+    except:
+        return []
     
 def convert_events(events, t2sMap):
     events_convert=[]
@@ -194,6 +200,18 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
     df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].malt['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
+for j, c_licks_free, m_licks_free, c_licks_free1st, m_licks_free1st in zip(included_sessions,
+                           ['pref1_cas_licks_free', 'pref2_cas_licks_free', 'pref3_cas_licks_free'],
+                           ['pref1_malt_licks_free', 'pref2_malt_licks_free', 'pref3_malt_licks_free'],
+                           ['pref1_cas_licks_free1st', 'pref2_cas_licks_free1st', 'pref3_cas_licks_free1st'],
+                           ['pref1_malt_licks_free1st', 'pref2_malt_licks_free1st', 'pref3_malt_licks_free1st']):
+    df_photo[c_licks_free] = [average_without_noise(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_free] = [average_without_noise(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_licks_free1st] = [get_first_trial(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_free1st] = [get_first_trial(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+    
+
+
 for j, c_lats_all, m_lats_all in zip(included_sessions,
                                      ['pref1_cas_lats_all', 'pref2_cas_lats_all', 'pref3_cas_lats_all'],
                                      ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all']):
@@ -202,7 +220,12 @@ for j, c_lats_all, m_lats_all in zip(included_sessions,
     
 for j, col in zip(included_sessions, ['peakdiff_1', 'peakdiff_2', 'peakdiff_3']):
     df_photo[col] = [pref_sessions[x].peakdiff[0] for x in pref_sessions if pref_sessions[x].session == j]
-    
+
+for col_in, col_out in zip(['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced',
+                            'pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced'],
+                            ['pref1_auc_cas', 'pref2_auc_cas', 'pref3_auc_cas',
+                            'pref1_auc_malt', 'pref2_auc_malt', 'pref3_auc_malt']):
+    df_photo[col_out] = [np.trapz(data[100:149])/10 for data in df_photo[col_in]]
 
 # Assembles dataframe for reptraces
 

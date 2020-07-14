@@ -72,47 +72,58 @@ def ppp_plot_roc_and_peak(roc_results, session, key, colors, peakbetween=[10, 13
     
     print(stats.ttest_rel(caspeak, maltpeak))
     
+    f.suptitle(f"{session}, {key}, epoch={peakbetween}")
+    
     return {'f':f, 'a':a, 'p':p, 'caspeak':caspeak, 'maltpeak': maltpeak}
     
 def sum_of_epoch_from_snips(snips, peakbetween):
     start = peakbetween[0]
     stop = peakbetween[1]
-    return [np.sum(trial[start:stop]) for trial in snips]
+    return [np.trapz(trial[start:stop]) for trial in snips]
 
 colors_pr = [col['pr_cas'], col['pr_malt']]
 colors_nr = [col['nr_cas'], col['nr_malt']]
+colors_nr = ['red', 'grey']
 figs_dict = {}
 
-peakbetween=[10, 14]
+peakbetween_forlicks = [10, 16]
+peakbetween_forsip = [11, 14]
 
-figs_dict['s10_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_licks', colors_pr, peakbetween=peakbetween)
+# figs_dict['s10_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_licks', colors_pr, peakbetween=peakbetween_forlicks)
 
-figs_dict['s11_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's11', 'pr_licks', colors_pr, peakbetween=peakbetween)
+figs_dict['s11_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's11', 'pr_licks', colors_pr, peakbetween=peakbetween_forlicks)
 
-figs_dict['s16_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's16', 'pr_licks', colors_pr, peakbetween=peakbetween)
+figs_dict['s16_pr_licks'] = ppp_plot_roc_and_peak(roc_results, 's16', 'pr_licks', colors_pr, peakbetween=peakbetween_forlicks)
 
-figs_dict['s10_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_licks', colors_nr, peakbetween=peakbetween)
+# figs_dict['s10_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_licks', colors_nr, peakbetween=peakbetween_forlicks)
 
-figs_dict['s11_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_licks', colors_nr, peakbetween=peakbetween)
+# figs_dict['s11_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_licks', colors_nr, peakbetween=peakbetween_forlicks)
 
-figs_dict['s16_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_licks', colors_nr, peakbetween=peakbetween)
+# figs_dict['s16_nr_licks'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_licks', colors_nr, peakbetween=peakbetween_forlicks)
 
 
-figs_dict['s10_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_sipper', colors_pr, peakbetween=peakbetween)
+# figs_dict['s10_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_sipper', colors_pr, peakbetween=peakbetween_forsip)
 
-figs_dict['s11_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'pr_sipper', colors_pr, peakbetween=peakbetween)
+# figs_dict['s11_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'pr_sipper', colors_pr, peakbetween=peakbetween_forsip)
 
-figs_dict['s16_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'pr_sipper', colors_pr, peakbetween=peakbetween)
+# figs_dict['s16_pr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'pr_sipper', colors_pr, peakbetween=peakbetween_forsip)
 
-figs_dict['s10_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_sipper', colors_nr, peakbetween=peakbetween)
+# figs_dict['s10_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_sipper', colors_nr, peakbetween=peakbetween_forsip)
 
-figs_dict['s11_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_sipper', colors_nr, peakbetween=peakbetween)
+# figs_dict['s11_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's11', 'nr_sipper', colors_nr, peakbetween=peakbetween_forsip)
 
-figs_dict['s16_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_sipper', colors_nr, peakbetween=peakbetween)
+# figs_dict['s16_nr_sipper'] = ppp_plot_roc_and_peak(roc_results, 's16', 'nr_sipper', colors_nr, peakbetween=peakbetween_forsip)
+
+
+
+figs_dict['s10_pr_licks_free'] = ppp_plot_roc_and_peak(roc_results, 's10', 'pr_licks_free', colors_pr, peakbetween=peakbetween_forlicks)
+
+figs_dict['s10_nr_licks_free'] = ppp_plot_roc_and_peak(roc_results, 's10', 'nr_licks_free', colors_nr, peakbetween=peakbetween_forlicks)
 
 
 for key in figs_dict.keys():
     fig = figs_dict[key]['f']
+    fig.savefig(f"C:\\Github\\PPP_analysis\\figs\\rocfigs\\{key}.png")
 
 
 
