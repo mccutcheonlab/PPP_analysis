@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.lines as mlines
 
+import pandas as pd
+
 # import JM_general_functions as jmf
 # import JM_custom_figs as jmfig
 
@@ -19,7 +21,9 @@ from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
 make_fig1_behav=False
-make_fig1_photo=True
+make_fig1_photo=False
+
+make_fig1_new=True
 
 make_fig2_behav=False
 make_fig2_photo=False
@@ -75,6 +79,15 @@ if make_fig1_photo:
         fig1_photo_NR.savefig(savefolder + 'fig1_photo_NR.pdf')
         fig1_photo_PR.savefig(savefolder + 'fig1_photo_PR.pdf')
     
+    
+if make_fig1_new:
+    fig1_upper, fig1_middle_left, fig1_middle_center, fig1_lower = fig1_new(df_behav, df_heatmap, df_photo)
+    
+    if savefigs:
+    #     fig1_upper.savefig(savefolder + "fig1_upper.pdf")
+    #     fig1_middle_left.savefig(savefolder + "fig1_middle_left.pdf")
+    #     fig1_middle_center.savefig(savefolder + "fig1_middle_center.pdf")
+        fig1_lower.savefig(savefolder + "fig1_lower.pdf")
 
 if make_fig2_behav:
 

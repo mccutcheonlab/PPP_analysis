@@ -10,6 +10,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import numpy as np
+import pandas as pd
 
 import trompy as tp
 
@@ -540,7 +541,279 @@ def averageCol(f, df_photo, gs, diet, keys_traces, keys_lats, peaktype='average'
         # ax2.set_ylim([-3, 7.5]) # for epoch=[100:119]
         ax2.set_ylim([-15, 30]) # for epoch=[100:149]
 
+
+def fig1_forced_behavior(df_behav, df_photo):
+    
+    grouplabel=['NR', 'PR']
+    barfacecolor = [col['nr_cas'], col['nr_malt'], col['pr_cas'], col['pr_malt']]
+    
+    gs = gridspec.GridSpec(nrows=1, ncols=2, wspace=0.45, left=0.15, bottom=0.2)
+    f = plt.figure(figsize=(3.5, 1.75))
+    
+    # panel 1 - forced choice licks
+    keys = ["pref1_cas_forced", "pref1_malt_forced"]
+    ax1 = f.add_subplot(gs[0,0])
+    
+    barlabeloffset=[]
+    if len(barlabeloffset) < 4:
+        barlabeloffset = [0.025, 0.025, 0.025, 0.025]
+
+#panel 1 - forced choice licks    
+    x = [[df_behav.xs('NR', level=1)[keys[0]], df_behav.xs('NR', level=1)[keys[1]]],
+         [df_behav.xs('PR', level=1)[keys[0]], df_behav.xs('PR', level=1)[keys[1]]]]
+    tp.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = barfacecolor,
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=grouplabel,
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 barlabeloffset=barlabeloffset[0],
+                 scattersize = scattersize,
+                 ylim=[-50,1050],
+                 xfontsize=6,
+                 ax=ax1)
+
+    ax1.set_ylabel('Licks')
+    ax1.set_yticks([0, 500, 1000])
+    
+    # panel 2
+    keys = ["pref1_cas_lats_fromsip", "pref1_malt_lats_fromsip"]
+    ax2 = f.add_subplot(gs[0,1])
+    
+    barlabeloffset=[]
+    if len(barlabeloffset) < 4:
+        barlabeloffset = [0.025, 0.025, 0.025, 0.025]
+
+#panel 1 - forced choice licks    
+    x = [[df_photo.xs('NR', level=1)[keys[0]], df_photo.xs('NR', level=1)[keys[1]]],
+         [df_photo.xs('PR', level=1)[keys[0]], df_photo.xs('PR', level=1)[keys[1]]]]
+    tp.barscatter(x, paired=True, unequal=True,
+                 barfacecoloroption = 'individual',
+                 barfacecolor = barfacecolor,
+                 scatteredgecolor = ['xkcd:charcoal'],
+                 scatterlinecolor = 'xkcd:charcoal',
+                 grouplabel=grouplabel,
+                 barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                 barlabeloffset=barlabeloffset[1],
+                 scattersize = scattersize,
+                 ylim=[-0.5,10],
+                 xfontsize=6,
+                 ax=ax2)
+    
+    ax2.set_ylabel('Latency (s)')
+    ax2.set_yticks([0, 2, 4, 6, 8, 10])
+    
+    return f
+
+def fig1_heatmap_panel(df, diet):
+    
+    if diet == 'NR':
+        color = [almost_black, 'xkcd:bluish grey']
+        errorcolors = ['xkcd:silver', 'xkcd:silver']
+        rat = 'PPP1-7'
+        clims = [-3,4]
+    else:
+        color = [col['pr_cas'], col['pr_malt']]
+        errorcolors = ['xkcd:silver', 'xkcd:silver']
+        rat = 'PPP1-4'
+        clims =  [-3,3]
+
+    data_cas = df['pref1_cas'][rat]
+    data_malt = df['pref1_malt'][rat]
+    event_cas = df['pref1_cas_event'][rat]
+    event_malt = df['pref1_malt_event'][rat]    
+
+    gs = gridspec.GridSpec(nrows=2, ncols=1, wspace=0.45, left=0.15, bottom=0.2,
+                                             height_ratios=[0.05,1],
+                                             hspace=0.0)
+    f = plt.figure(figsize=(2, 3.5))
+    
+    plots_gs = gridspec.GridSpecFromSubplotSpec(3,2,subplot_spec=gs[1,0],
+                                             width_ratios=[12,1],
+                                             wspace=0.05)
+    
+    marker_gs = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[0,0],
+                                             width_ratios=[12,1],
+                                             wspace=0.05)
+
+    ax1 = f.add_subplot(plots_gs[0,0])
+    ax, mesh = makeheatmap(ax1, data_cas, events=event_cas, ylabel='Casein trials \u2192')
+    mesh.set_clim(clims)
+    
+    ax2 = f.add_subplot(plots_gs[1,0], sharex=ax1)
+    ax, mesh = makeheatmap(ax2, data_malt, events=event_malt, ylabel='Malt. trials \u2192', xscalebar=True)
+    mesh.set_clim(clims)
+    
+    ax0 = f.add_subplot(marker_gs[0,0], sharex=ax1)
+    ax0.axis('off')
+
+    ax0.plot([0,5], [0,0], color='xkcd:silver', linewidth=3)
+    ax0.annotate("Licks", xy=(2.5, 0), xytext=(0,5), textcoords='offset points',
+        ha='center', va='bottom')
         
+    ax1.set_xlim([-10,20])
+    
+    cbar_ax = f.add_subplot(plots_gs[0,1])   
+    cbar = f.colorbar(mesh, cax=cbar_ax, ticks=[clims[0], 0, clims[1]])
+    
+    ## for labels with raw blue signal 
+    # cbar_labels = ['{0:.0f}%'.format(clims[0]*100),
+    #                '0% \u0394F',
+    #                '{0:.0f}%'.format(clims[1]*100)]
+    
+    cbar_labels = ['{0:.0f}'.format(clims[0]),
+                   '0 Z',
+                   '{0:.0f}'.format(clims[1])]
+    cbar.ax.set_yticklabels(cbar_labels)
+    
+    ax3 = f.add_subplot(plots_gs[2,0])
+ 
+    tp.shadedError(ax3, data_cas, linecolor=color[0], errorcolor=errorcolors[0])
+    tp.shadedError(ax3, data_malt, linecolor=color[1], errorcolor=errorcolors[1])
+    
+    ax3.axis('off')
+
+    y = [y for y in ax3.get_yticks() if y>0][:2]
+    l = y[1] - y[0]
+    ## for use with raw blue signal
+    # scale_label = '{0:.0f}% \u0394F'.format(l*100)
+    
+    scale_label = '{0:.0f} Z-score'.format(l)
+    
+    ax3.plot([50,50], [y[0], y[1]], c=almost_black)
+    ax3.text(40, y[0]+(l/2), scale_label, va='center', ha='right')
+
+# Adds x scale bar   
+    y = ax3.get_ylim()[0]
+    ax3.plot([251,300], [y, y], c=almost_black, linewidth=2)
+    ax3.annotate('5 s', xy=(276,y), xycoords='data',
+                xytext=(0,-5), textcoords='offset points',
+                ha='center',va='top')
+    return f
+
+def fig1_photogroup_panel(df_photo):
+    print("oh yeah")
+    
+    # def fig1_photo(df_heatmap, df_photo, diet, session, clims=[[0,1], [0,1]],
+    #              peaktype='average', epoch=[100,149],
+    #              keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+    #              keys_lats = ['pref1_cas_lats_all', 'pref1_malt_lats_all'],
+    #              event='Licks',
+    #              scattersize=50):
+    epoch=[100,149]
+    keys_traces = ['pref1_cas_licks_forced', 'pref1_malt_licks_forced']
+    event='Licks'
+    
+    f = plt.figure(figsize=(4, 3.5))
+    
+    gs = gridspec.GridSpec(nrows=2, ncols=2, wspace=0.45, left=0.15, bottom=0.2,
+                                         height_ratios=[1,1],
+                                         hspace=0.3)
+    
+    traceNR_gs = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0,0],
+                                         height_ratios=[0.15,1],
+                                         hspace=0.0)
+    
+    tracePR_gs = gridspec.GridSpecFromSubplotSpec(2,1,subplot_spec=gs[0,1],
+                                     height_ratios=[0.15,1],
+                                     hspace=0.0)
+    
+    ax1 = f.add_subplot(traceNR_gs[1,0])
+    averagetrace(ax1, df_photo, "NR", keys_traces, event=event, fullaxis=True, colorgroup="control")
+    ax1.set_ylim([-1.5, 3.2])
+    for xval in epoch:
+        ax1.axvline(xval, linestyle='--', color='k', alpha=0.3)
+        
+    ax3 = f.add_subplot(tracePR_gs[1,0])
+    averagetrace(ax3, df_photo, "PR", keys_traces, event=event, fullaxis=True, colorgroup="expt")
+    ax3.set_ylim([-1.5, 3.2])
+    for xval in epoch:
+        ax3.axvline(xval, linestyle='--', color='k', alpha=0.3)
+        
+    ax2 = f.add_subplot(traceNR_gs[0,0], sharex=ax1)
+    ax4 = f.add_subplot(tracePR_gs[0,0], sharex=ax3)
+    
+    for axis in [ax2, ax4]:
+
+        axis.axis('off')
+        if event == 'Sipper':
+            axis.plot(100,0, 'v', color='xkcd:silver')
+            axis.annotate(event, xy=(100, 0), xytext=(0,5), textcoords='offset points',
+                ha='center', va='bottom')
+        elif event == 'Licks':
+            axis.plot([100,150], [0,0], color='xkcd:silver', linewidth=3)
+            axis.annotate(event, xy=(125, 0), xytext=(0,5), textcoords='offset points',
+                ha='center', va='bottom')
+            
+    bar_gs = gridspec.GridSpecFromSubplotSpec(1,2,subplot_spec=gs[1,:],
+                                         width_ratios=[1, 0.4],
+                                         )
+    
+    ax5 = f.add_subplot(bar_gs[0,0])
+    
+    epochrange = range(epoch[0], epoch[1])
+    
+
+    dfNR = df_photo.xs('NR', level=1)
+    auc_NRcas = [np.trapz(rat[epochrange])/10 for rat in dfNR[keys_traces[0]]]
+    auc_NRmalt = [np.trapz(rat[epochrange])/10 for rat in dfNR[keys_traces[1]]]
+    
+    dfPR = df_photo.xs('PR', level=1)
+    auc_PRcas = [np.trapz(rat[epochrange])/10 for rat in dfPR[keys_traces[0]]]
+    auc_PRmalt = [np.trapz(rat[epochrange])/10 for rat in dfPR[keys_traces[1]]]
+      
+    x = [[auc_NRcas, auc_NRmalt],
+          [auc_PRcas, auc_PRmalt]]
+    tp.barscatter(x, paired=True, unequal=True,
+                  barfacecoloroption = 'individual',
+                  barfacecolor = [col['nr_cas'], col['nr_malt'], col['pr_cas'], col['pr_malt']],
+                  scatteredgecolor = ['xkcd:charcoal'],
+                  scatterlinecolor = 'xkcd:charcoal',
+                  grouplabel = ['Non-Restricted', 'Protein-Restricted'],
+                  barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
+                  # barlabeloffset=barlabeloffset[2],
+                  scattersize = scattersize,
+                  # ylim=[-3, 7.5],
+                  xfontsize=6,
+                  ax=ax5)
+    
+    ax5.set_ylabel("AUC")
+
+    # id_col = pd.Series(range(1, len(auc_NRcas)+1))
+    # dfx=pd.DataFrame({"NRcas": auc_NRcas, "NRmalt": auc_NRmalt, "ID": id_col})
+    
+    # print(dfx)
+    
+    # import dabest
+    # NR = dabest.load(dfx, idx=("NRcas", "NRmalt"), paired=True, id_col="ID")
+    # print(NR.mean_diff)
+    # NR.mean_diff.plot(ax=ax5)
+    
+    # print(dir(NR.mean_diff))
+    # ax[2].set_ylabel('Licks')
+    # ax[2].set_yticks([0, 250, 500, 750])
+    
+    
+    return f
+
+
+
+def fig1_new(df_behav, df_heatmaps, df_photo):
+    
+    print("Woo yeah")
+    
+    # f1 = fig1_forced_behavior(df_behav, df_photo)
+    
+    # f2 = fig1_heatmap_panel(df_heatmap, "NR")
+    
+    # f3 = fig1_heatmap_panel(df_heatmap, "PR")
+    
+    f1, f2, f3 = [], [], []
+    
+    f4 = fig1_photogroup_panel(df_photo)
+    
+    return f1, f2, f3, f4
 
 # To make summary figure
 
