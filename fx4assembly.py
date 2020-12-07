@@ -110,13 +110,13 @@ class Session(object):
             
         if self.left['exist'] == True and self.right['exist'] == True:
             try:
-                first = findfreechoice(self.left['sipper'], self.right['sipper'])
-                self.both['sipper'] = self.left['sipper'][first:]
-                self.both['sipper_off'] = self.left['sipper_off'][first:]
-                self.left['sipper'] = self.left['sipper'][:first-1]
-                self.left['sipper_off'] = self.left['sipper_off'][:first-1]
-                self.right['sipper'] = self.right['sipper'][:first-1]
-                self.right['sipper_off'] = self.right['sipper_off'][:first-1]
+                firstL, firstR = findfreechoice(self.left['sipper'], self.right['sipper'])
+                self.both['sipper'] = self.left['sipper'][firstL:]
+                self.both['sipper_off'] = self.left['sipper_off'][firstL:]
+                self.left['sipper'] = self.left['sipper'][:firstL]
+                self.left['sipper_off'] = self.left['sipper_off'][:firstL]
+                self.right['sipper'] = self.right['sipper'][:firstR]
+                self.right['sipper_off'] = self.right['sipper_off'][:firstR]
                 self.left['licks-forced'], self.left['licks-free'] = dividelicks(self.left['licks'], self.both['sipper'][0])
                 self.right['licks-forced'], self.right['licks-free'] = dividelicks(self.right['licks'], self.both['sipper'][0])
                 self.left['nlicks-forced'] = len(self.left['licks-forced'])
@@ -171,8 +171,9 @@ class Session(object):
             self.malt = self.right['metafilelicks']
 
 def findfreechoice(left, right):
-    first = [idx for idx, x in enumerate(left) if x in right][0]
-    return first
+    firstL = [idx for idx, x in enumerate(left) if x in right][0]
+    firstR = [idx for idx, x in enumerate(right) if x in left][0]
+    return firstL, firstR
         
 def dividelicks(licks, time):
     before = [x for x in licks if x < time]
@@ -200,6 +201,83 @@ def comparepeaks(cas, malt):
     result = stats.ttest_ind([peak for peak, noise in zip(cas['peak'], cas['noise']) if not noise],
                              [peak for peak, noise in zip(malt['peak'], malt['noise']) if not noise])
     return result
+
+def variablesnipper(data_filt, fs, events, all_events_baseline,
+                                      trialLength=30,
+                                      snipfs=10,
+                                      preTrial=10,
+                                      threshold=8,
+                                      peak_between_time=[0, 1],
+                                      latency_events=[],
+                                      latency_direction='pre',
+                                      max_latency=30,
+                                      verbose=True,
+                                      removenoisefromaverage=True,
+                                      **kwargs):
+    
+   # Parse arguments relating to trial length, bins etc
+
+    if preTrial > trialLength:
+        baseline = trialLength / 2
+        print("preTrial is too long relative to total trialLength. Changing to half of trialLength.")
+    else:
+        baseline = preTrial
+    
+    if 'bins' in kwargs.keys():
+        bins = kwargs['bins']
+        print(f"bins given as kwarg. Fs for snip will be {trialLength/bins} Hz.")
+    else:
+        if snipfs > fs-1:
+            print('Snip fs is too high, reducing to data fs')
+            bins = 0
+        else:
+            bins = int(trialLength * snipfs)
+    
+    print('Number of bins is:', bins)
+    
+    if 'baselinebins' in kwargs.keys():
+        baselinebins = kwargs['baselinebins']
+        if baselinebins > bins:
+            print('Too many baseline bins for length of trial. Changing to length of baseline.')
+            baselinebins = int(baseline*snipfs)
+        baselinebins = baselinebins
+    else:
+        baselinebins = int(baseline*snipfs)
+    
+    if len(events) < 1:
+        print('Cannot find any events. All outputs will be empty.')
+        return {}
+    else:
+        if verbose: print('{} events to analyze.'.format(len(events)))
+
+    # find closest baseline event for each timelocked event
+    events_baseline = []
+    for event in events:
+        events_baseline.append([e for e in all_events_baseline if e < event][-1])
+        
+    # calculate mean and SD of baseline by taking 10s window butting in 100 bins and working out
+    baseline_snips,_ = tp.snipper(data_filt, events_baseline,
+                           fs=fs,
+                           bins=100,
+                           preTrial=10,
+                           trialLength=10,
+                           adjustBaseline=False)
+    
+    baseline_mean = np.mean(baseline_snips, axis=1)
+    baseline_sd = np.std(baseline_snips, axis=1)
+    
+    filt_snips,_ = tp.snipper(data_filt, events,
+                                   fs=fs,
+                                   bins=bins,
+                                   preTrial=baseline,
+                                   trialLength=trialLength,
+                                   adjustBaseline=False)
+    
+    filt_snips_z = []
+    for snip, mean, sd in zip(filt_snips, baseline_mean, baseline_sd):
+        filt_snips_z.append([(x-mean)/sd for x in snip])
+      
+    return filt_snips_z
 
 def assemble_sessions(sessions,
                       rats_to_include=[],
@@ -348,6 +426,8 @@ def process_rat(session):
                                                            peak_between_time=[0, 2],
                                                            latency_events=side['sipper'],
                                                            latency_direction='pre')
+                # side['snips_licks_forced']["filt_z_varBL"] = variablesnipper(s.data_filt, s.fs, forced_licks, side['sipper'])
+                                                           
             except KeyError:
                 pass
             try:

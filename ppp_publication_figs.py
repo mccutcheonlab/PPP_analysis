@@ -20,7 +20,7 @@ from ppp_pub_figs_settings import *
 from ppp_pub_figs_fx import *
 from ppp_pub_figs_supp import *
 
-make_fig1_behav=False
+make_fig1_behav=True
 make_fig1_photo=False
 
 make_fig1_new=True

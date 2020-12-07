@@ -16,7 +16,7 @@ import trompy as tp
 
 from subprocess import PIPE, run
 
-Rscriptpath = 'C:\\Program Files\\R\\R-4.0.1\\bin\\Rscript'
+Rscriptpath = 'C:\\Program Files\\R\\R-4.0.3\\bin\\Rscript'
 statsfolder = 'C:\\Github\\PPP_analysis\\stats\\'
 
 # Attempts to load pickled file
@@ -220,7 +220,7 @@ def stats_pref_photo(df, prefsession='1', verbose=True):
     if verbose: print('\nANOVA of photometry data, casein vs. maltodextrin\n')
     ppp_2wayANOVA(df_photo,
                    keys,
-                   statsfolder + 'df_pref' + prefsession+ '_forc_licks.csv')
+                   statsfolder + 'df_pref' + prefsession+ '_forc_licks_auc.csv')
     
     ppp_full_ttests(df_photo, keys)
 
@@ -374,19 +374,19 @@ def stats_pref_postpref1(df_behav, df_photo, diet, prefsession='2', verbose=True
 # stats_conditioning()
 #stats_conditioning(condsession='2')
 
-# stats_pref_behav()
-# stats_pref_behav(prefsession='2')
-# stats_pref_behav(prefsession='3')
+stats_pref_behav()
+stats_pref_behav(prefsession='2')
+stats_pref_behav(prefsession='3')
 
-# stats_pref_photo(df_photo)
-# stats_pref_photo(df_photo, prefsession='2')
-# stats_pref_photo(df_photo, prefsession='3')
+stats_pref_photo(df_photo)
+stats_pref_photo(df_photo, prefsession='2')
+stats_pref_photo(df_photo, prefsession='3')
 
 # stats_pref_ind(prefsession=1)
 
 # stats_summary_behav()
 # stats_summary_photo(use_tvals=False)
-stats_summary_photo_casvmalt()
+# stats_summary_photo_casvmalt()
 
 
 csvfile = statsfolder + "df_summary_photo2wayNR.csv"

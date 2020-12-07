@@ -32,11 +32,11 @@ ppp4_sessions = metafile2sessions('D:\\DA_and_Reward\\gc214\\PPP4\\PPP4.xlsx',
 
 ppp_sessions = {**ppp1_sessions, **ppp3_sessions, **ppp4_sessions}
 
-savefile=False
+savefile=True
 makefigs=False
 
-assemble_pref = False
-assemble_single = True
+assemble_pref = True
+assemble_single = False
 assemble_exclusion = False
 assemble_cond1 = False # No photometry recordings for PPP4 during conditioning so cannot analyse this way using TDT timestamps
 assemble_cond1_metafiledata = False
@@ -79,9 +79,9 @@ if assemble_cond1_metafiledata:
 # Code to run for single rat
 if assemble_single:
     sessions_to_add = assemble_sessions(ppp_sessions,
-                  rats_to_include = ['PPP1-4'],
+                  rats_to_include = ['PPP4-6'],
                   rats_to_exclude = ['PPP1-8', 'PPP3-1', 'PPP3-6', 'PPP3-7', 'PPP3-2', 'PPP3-8'],
-                  sessions_to_include = ['s10'],
+                  sessions_to_include = ['s16'],
                   outputfile=picklefolder + 'ppp_test.pickle',
                   savefile=savefile,
                   makefigs=makefigs)

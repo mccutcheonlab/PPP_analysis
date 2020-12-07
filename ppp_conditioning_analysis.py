@@ -8,8 +8,6 @@ For analysis of conditioning sessions
 """
 
 import scipy.io as sio
-import JM_general_functions as jmf
-import JM_custom_figs as jmfig
 
 import os
 import string
@@ -20,12 +18,18 @@ import numpy as np
 
 import dill
 
+import trompy as tp
+
+from ppp_pub_figs_settings import *
+
 try:
     pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_cond.pickle', 'rb')
 except FileNotFoundError:
     print('Cannot access pickled file')
 
 cond_sessions, rats = dill.load(pickle_in)
+
+figsfolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
     
 rats = {}
 
@@ -68,41 +72,42 @@ def condfigs(df, keys, dietmsk, cols, ax):
     a = [[df[keys[0]][dietmsk], df[keys[1]][dietmsk]],
           [df[keys[2]][dietmsk], df[keys[3]][dietmsk]]]
 
-    ax, barx, _, _ = jmfig.barscatter(a, paired=True,
+    ax, barx, _, _ = tp.barscatter(a, paired=True,
                  barfacecoloroption = 'individual',
                  barfacecolor = cols,
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
-                 scattersize = 100,
+                 scattersize = 50,
                  ax=ax)
 
     return barx
 
-figcond, ax = plt.subplots(nrows=1, ncols=2, sharey=True)
+figcond, ax = plt.subplots(nrows=1, ncols=2, sharey=True, gridspec_kw={
+    "left": 0.2, "bottom": 0.2})
 df = df_licks
 dietmsk = df['diet'] == 'NR'
-cols = ['xkcd:silver']*2 + ['white']*2
-barx = condfigs(df, cas_sessions+malt_sessions, dietmsk, cols, ax[0])
+cols = [col["nr_malt"]]*2 + [col["nr_cas"]]*2
+barx = condfigs(df, malt_sessions+cas_sessions, dietmsk, cols, ax[0])
 
 dietmsk = df['diet'] == 'PR'
-cols = ['xkcd:kelly green']*2 + ['xkcd:light green']*2
-barx = condfigs(df, cas_sessions+malt_sessions, dietmsk, cols, ax[1])
+cols = [col["pr_malt"]]*2 + [col["pr_cas"]]*2
+barx = condfigs(df, malt_sessions+cas_sessions, dietmsk, cols, ax[1])
 
-ax[0].set_ylabel('Licks')
+ax[0].set_ylabel('Licks', fontsize=8)
 ax[0].set_yticks([0, 1000, 2000, 3000, 4000])
 
 yrange = ax[0].get_ylim()[1] - ax[0].get_ylim()[0]
-grouplabel=['Casein', 'Maltodextrin']
+grouplabel=['Maltodextrin', 'Casein', ]
 barlabels=['1','2','1','2']
-barlabeloffset=ax[0].get_ylim()[0] - yrange*0.04
-grouplabeloffset=ax[0].get_ylim()[0] - yrange*0.12
+barlabeloffset=ax[0].get_ylim()[0] - yrange*0.02
+grouplabeloffset=ax[0].get_ylim()[0] - yrange*0.08
 for ax in ax:
     for x, label in zip(barx, barlabels):
-        ax.text(x, barlabeloffset, label, va='top', ha='center')
+        ax.text(x, barlabeloffset, label, va='top', ha='center', fontsize=8)
     for x, label in zip([1,2], grouplabel):
-        ax.text(x, grouplabeloffset, label, va='top', ha='center')
+        ax.text(x, grouplabeloffset, label, va='top', ha='center', fontsize=8)
         
-figcond.savefig(savefolder + 'figS1b_conditioning.pdf')
+figcond.savefig(figsfolder + 'figS1b_conditioning.pdf')
     
 
 

@@ -57,9 +57,9 @@ def makemeansnips(snips, noiseindex):
         
     return meansnip
 
-def removenoise(snipdata):
+def removenoise(snipdata, key="filt_z"):
     # returns blue snips with noisey ones removed
-    new_snips = [snip for (snip, noise) in zip(snipdata['filt_z'], snipdata['noise']) if not noise]
+    new_snips = [snip for (snip, noise) in zip(snipdata[key], snipdata['noise']) if not noise]
     return new_snips
 
 def filt_as_delta(snipdata):
@@ -174,16 +174,18 @@ df_photo = pd.DataFrame([x for x in rats], columns=['rat'])
 df_photo['diet'] = [rats.get(x) for x in rats]
 df_photo.set_index(['rat', 'diet'], inplace=True)
 
+signal="filt_z"
+
 for j, c_sip_z, m_sip_z, c_licks_z, m_licks_z in zip(included_sessions,
                              ['pref1_cas_sip', 'pref2_cas_sip', 'pref3_cas_sip'],
                              ['pref1_malt_sip', 'pref2_malt_sip', 'pref3_malt_sip'],
                              ['pref1_cas_licks', 'pref2_cas_licks', 'pref3_cas_licks'],
                              ['pref1_malt_licks', 'pref2_malt_licks', 'pref3_malt_licks']):
 
-    df_photo[c_sip_z] = [average_without_noise(pref_sessions[x].cas['snips_sipper']) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_sip_z] = [average_without_noise(pref_sessions[x].malt['snips_sipper']) for x in pref_sessions if pref_sessions[x].session == j] 
-    df_photo[c_licks_z] = [average_without_noise(pref_sessions[x].cas['snips_licks']) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_z] = [average_without_noise(pref_sessions[x].malt['snips_licks']) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_sip_z] = [average_without_noise(pref_sessions[x].cas['snips_sipper'], key=signal) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_sip_z] = [average_without_noise(pref_sessions[x].malt['snips_sipper'], key=signal) for x in pref_sessions if pref_sessions[x].session == j] 
+    df_photo[c_licks_z] = [average_without_noise(pref_sessions[x].cas['snips_licks'], key=signal) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_z] = [average_without_noise(pref_sessions[x].malt['snips_licks'], key=signal) for x in pref_sessions if pref_sessions[x].session == j]
 
 # adds means of licks and latencies
 for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip, m_lats_forc_fromsip, in zip(included_sessions,
@@ -193,22 +195,22 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
                            ['pref1_malt_lats', 'pref2_malt_lats', 'pref3_malt_lats'],
                            ['pref1_cas_lats_fromsip', 'pref2_cas_lats_fromsip', 'pref3_cas_lats_fromsip'],
                            ['pref1_malt_lats_fromsip', 'pref2_malt_lats_fromsip', 'pref3_malt_lats_fromsip']):
-    df_photo[c_licks_forc] = [average_without_noise(pref_sessions[x].cas['snips_licks_forced']) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_forc] = [average_without_noise(pref_sessions[x].malt['snips_licks_forced']) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[c_licks_forc] = [average_without_noise(pref_sessions[x].cas['snips_licks_forced'], key=signal) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_licks_forc] = [average_without_noise(pref_sessions[x].malt['snips_licks_forced'], key=signal) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc] = [np.nanmean(pref_sessions[x].cas['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc] = [np.nanmean(pref_sessions[x].malt['snips_licks_forced']['latency'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].malt['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
-for j, c_licks_free, m_licks_free, c_licks_free1st, m_licks_free1st in zip(included_sessions,
-                           ['pref1_cas_licks_free', 'pref2_cas_licks_free', 'pref3_cas_licks_free'],
-                           ['pref1_malt_licks_free', 'pref2_malt_licks_free', 'pref3_malt_licks_free'],
-                           ['pref1_cas_licks_free1st', 'pref2_cas_licks_free1st', 'pref3_cas_licks_free1st'],
-                           ['pref1_malt_licks_free1st', 'pref2_malt_licks_free1st', 'pref3_malt_licks_free1st']):
-    df_photo[c_licks_free] = [average_without_noise(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_free] = [average_without_noise(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[c_licks_free1st] = [get_first_trial(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-    df_photo[m_licks_free1st] = [get_first_trial(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+# for j, c_licks_free, m_licks_free, c_licks_free1st, m_licks_free1st in zip(included_sessions,
+#                            ['pref1_cas_licks_free', 'pref2_cas_licks_free', 'pref3_cas_licks_free'],
+#                            ['pref1_malt_licks_free', 'pref2_malt_licks_free', 'pref3_malt_licks_free'],
+#                            ['pref1_cas_licks_free1st', 'pref2_cas_licks_free1st', 'pref3_cas_licks_free1st'],
+#                            ['pref1_malt_licks_free1st', 'pref2_malt_licks_free1st', 'pref3_malt_licks_free1st']):
+#     df_photo[c_licks_free] = [average_without_noise(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+#     df_photo[m_licks_free] = [average_without_noise(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+#     df_photo[c_licks_free1st] = [get_first_trial(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
+#     df_photo[m_licks_free1st] = [get_first_trial(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
     
 
 
@@ -226,6 +228,95 @@ for col_in, col_out in zip(['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 
                             ['pref1_auc_cas', 'pref2_auc_cas', 'pref3_auc_cas',
                             'pref1_auc_malt', 'pref2_auc_malt', 'pref3_auc_malt']):
     df_photo[col_out] = [np.trapz(data[100:149])/10 for data in df_photo[col_in]]
+
+## new function to calculate different snip baseline
+def variablesnipper(data_filt, fs, events, all_events_baseline,
+                                      trialLength=30,
+                                      snipfs=10,
+                                      preTrial=10,
+                                      threshold=8,
+                                      peak_between_time=[0, 1],
+                                      latency_events=[],
+                                      latency_direction='pre',
+                                      max_latency=30,
+                                      verbose=True,
+                                      removenoisefromaverage=True,
+                                      **kwargs):
+    
+   # Parse arguments relating to trial length, bins etc
+
+    if preTrial > trialLength:
+        baseline = trialLength / 2
+        print("preTrial is too long relative to total trialLength. Changing to half of trialLength.")
+    else:
+        baseline = preTrial
+    
+    if 'bins' in kwargs.keys():
+        bins = kwargs['bins']
+        print(f"bins given as kwarg. Fs for snip will be {trialLength/bins} Hz.")
+    else:
+        if snipfs > fs-1:
+            print('Snip fs is too high, reducing to data fs')
+            bins = 0
+        else:
+            bins = int(trialLength * snipfs)
+    
+    print('Number of bins is:', bins)
+    
+    if 'baselinebins' in kwargs.keys():
+        baselinebins = kwargs['baselinebins']
+        if baselinebins > bins:
+            print('Too many baseline bins for length of trial. Changing to length of baseline.')
+            baselinebins = int(baseline*snipfs)
+        baselinebins = baselinebins
+    else:
+        baselinebins = int(baseline*snipfs)
+    
+    if len(events) < 1:
+        print('Cannot find any events. All outputs will be empty.')
+        return {}
+    else:
+        if verbose: print('{} events to analyze.'.format(len(events)))
+
+    # find closest baseline event for each timelocked event
+    events_baseline = []
+    for event in events:
+        events_baseline.append([e for e in all_events_baseline if e < event][-1])
+        
+    # calculate mean and SD of baseline by taking 10s window butting in 100 bins and working out
+    baseline_snips,_ = tp.snipper(data_filt, events_baseline,
+                           fs=fs,
+                           bins=100,
+                           preTrial=10,
+                           trialLength=10,
+                           adjustBaseline=False)
+    
+    baseline_mean = np.mean(baseline_snips, axis=1)
+    baseline_sd = np.std(baseline_snips, axis=1)
+    
+    filt_snips,_ = tp.snipper(data_filt, events,
+                                   fs=fs,
+                                   bins=bins,
+                                   preTrial=baseline,
+                                   trialLength=trialLength,
+                                   adjustBaseline=False)
+    
+    filt_snips_z = []
+    for snip, mean, sd in zip(filt_snips, baseline_mean, baseline_sd):
+        filt_snips_z.append([(x-mean)/sd for x in snip])
+      
+    return filt_snips_z
+
+s = sessions["PPP1-7_s10"]
+
+forced_licks = [licks for licks in x.cas['lickdata']['rStart'] if licks in s.cas['licks-forced']]
+
+s.cas["snips_licks_forced"]["snips_filt_z"] = variablesnipper(s.data_filt, s.fs, forced_licks, s.cas["sipper"])
+
+forced_licks = [licks for licks in x.cas['lickdata']['rStart'] if licks in s.malt['licks-forced']]
+
+s.malt["snips_licks_forced"]["snips_filt_z"] = variablesnipper(s.data_filt, s.fs, forced_licks, s.malt["sipper"])
+
 
 # Assembles dataframe for reptraces
 
@@ -277,6 +368,8 @@ rats = np.unique(rats)
 df_heatmap = pd.DataFrame(rats, columns=['rat'])
 df_heatmap.set_index(['rat'], inplace=True)
 
+signal = "filt_z"
+
 for s, pref in zip(['s10', 's11', 's16'],
                            pref_list):
 
@@ -288,9 +381,9 @@ for s, pref in zip(['s10', 's11', 's16'],
     for rat in rats:
         x = pref_sessions[rat + '_' + s]
         
-        df_heatmap.at[rat, pref + '_cas'] = removenoise(x.cas[event])
+        df_heatmap.at[rat, pref + '_cas'] = removenoise(x.cas[event], key=signal)
         df_heatmap.at[rat, pref + '_cas_event'] = getsipper(x.cas[event])        
-        df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event])
+        df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event], key=signal)
         df_heatmap.at[rat, pref + '_malt_event'] = getsipper(x.malt[event])
 
 # Assembles dataframe for reptraces     for SIPPER TRIALS    
