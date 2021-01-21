@@ -12,22 +12,22 @@ from fx4assembly import *
 
 picklefolder = 'C:\\Github\\PPP_analysis\\data\\'
 
-ppp1_sessions = metafile2sessions('D:\\DA_and_Reward\\es334\PPP1\\PPP1.xlsx',
-                                  'D:\\DA_and_Reward\\es334\PPP1\\PPP1_metafile',
-                                  'D:\\DA_and_Reward\\es334\\PPP1\\tdtfiles\\',
-                                  'D:\\DA_and_Reward\\es334\\PPP1\\output\\',
+ppp1_sessions = metafile2sessions('E:\\DA_and_Reward\\es334\PPP1\\PPP1.xlsx',
+                                  'E:\\DA_and_Reward\\es334\PPP1\\PPP1_metafile',
+                                  'E:\\DA_and_Reward\\es334\\PPP1\\tdtfiles\\',
+                                  'E:\\DA_and_Reward\\es334\\PPP1\\output\\',
                                   sheetname='metafile')
 
-ppp3_sessions = metafile2sessions('D:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx',
-                                  'D:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile',
-                                  'D:\\DA_and_Reward\\gc214\\PPP3\\tdtfiles\\',
-                                  'D:\\DA_and_Reward\\gc214\\PPP3\\output\\',
+ppp3_sessions = metafile2sessions('E:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx',
+                                  'E:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile',
+                                  'E:\\DA_and_Reward\\gc214\\PPP3\\tdtfiles\\',
+                                  'E:\\DA_and_Reward\\gc214\\PPP3\\output\\',
                                   sheetname='PPP3_metafile')
 
-ppp4_sessions = metafile2sessions('D:\\DA_and_Reward\\gc214\\PPP4\\PPP4.xlsx',
-                                  'D:\\DA_and_Reward\\gc214\\PPP4\\PPP4_metafile',
-                                  'D:\\DA_and_Reward\\gc214\\PPP4\\tdtfiles\\',
-                                  'D:\\DA_and_Reward\\gc214\\PPP4\\output\\',
+ppp4_sessions = metafile2sessions('E:\\DA_and_Reward\\gc214\\PPP4\\PPP4.xlsx',
+                                  'E:\\DA_and_Reward\\gc214\\PPP4\\PPP4_metafile',
+                                  'E:\\DA_and_Reward\\gc214\\PPP4\\tdtfiles\\',
+                                  'E:\\DA_and_Reward\\gc214\\PPP4\\output\\',
                                   sheetname='PPP4_metafile')
 
 ppp_sessions = {**ppp1_sessions, **ppp3_sessions, **ppp4_sessions}
