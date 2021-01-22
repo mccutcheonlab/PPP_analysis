@@ -779,12 +779,41 @@ stats_args["file"] = "" # Comment this line out to write a new stats file
 # fig2_p2 = barscatter_plus_estimation(data, df, ylabel="Latency (s)", stats_args=stats_args)
 # fig2_p2.savefig(savefolder + 'fig2_p2.pdf')
 
-keys =  ['pref1_auc_malt', 'pref1_auc_cas']
-stats_args["sheet"] = "pref1_auc"
-data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
-fig2_p3 = barscatter_plus_estimation(data, df, ylabel="AUC", stats_args=stats_args)
-fig2_p3.savefig(savefolder + 'fig3_p3.pdf')
+# keys =  ['pref1_auc_malt', 'pref1_auc_cas']
+# stats_args["sheet"] = "pref1_auc"
+# data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+# fig2_p3 = barscatter_plus_estimation(data, df, ylabel="AUC", stats_args=stats_args)
+# fig2_p3.savefig(savefolder + 'fig3_p3.pdf')
 
+## Figure for late AUC (5-10 s) for revision
+# keys =  ['pref1_lateauc_malt', 'pref1_lateauc_cas']
+# stats_args["sheet"] = "pref1_lateauc"
+# data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+# fig2_p4 = barscatter_plus_estimation(data, df, ylabel="AUC", stats_args=stats_args)
+# # fig2_p4.savefig(savefolder + 'fig3_supp.pdf')
+# fig2_p4.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\lateauc.jpg")
+
+## Figures for peak Z score instead of AUC, for revision
+keys =  ['pref1_malt_peak', 'pref1_cas_peak']
+stats_args["sheet"] = "pref1_peaks"
+data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
+# fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
+f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref1.jpg")
+
+keys =  ['pref2_malt_peak', 'pref2_cas_peak']
+stats_args["sheet"] = "pref2_peaks"
+data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
+# fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
+f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref2.jpg")
+
+keys =  ['pref3_malt_peak', 'pref3_cas_peak']
+stats_args["sheet"] = "pref3_peaks"
+data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
+# fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
+f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref3.jpg")
 
 # # # For Figure 3 - behaviour on free choice trials
 # keys = ["pref1_malt_free", "pref1_cas_free"]
