@@ -95,6 +95,15 @@ def average_without_noise(snips, key='filt_z'):
     except:
         print('Problem averaging snips')
         return []
+    
+def average_peak_without_noise(snips):
+    try:
+        no_noise_peak = [peak for peak, noise in zip(snips["peak"], snips['noise']) if not noise]
+        result = np.nanmean(no_noise_peak)
+        return result
+    except:
+        print('Problem getting peaks')
+        return []
 
 def get_first_trial(snips, key='filt_z'):
     try:
@@ -223,11 +232,25 @@ for j, c_lats_all, m_lats_all in zip(included_sessions,
 for j, col in zip(included_sessions, ['peakdiff_1', 'peakdiff_2', 'peakdiff_3']):
     df_photo[col] = [pref_sessions[x].peakdiff[0] for x in pref_sessions if pref_sessions[x].session == j]
 
+# For calculating AUCs - immediately following first lick (5s)
 for col_in, col_out in zip(['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced',
                             'pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced'],
                             ['pref1_auc_cas', 'pref2_auc_cas', 'pref3_auc_cas',
                             'pref1_auc_malt', 'pref2_auc_malt', 'pref3_auc_malt']):
     df_photo[col_out] = [np.trapz(data[100:149])/10 for data in df_photo[col_in]]
+
+# For calculating AUCs - immediately following first lick (5s)
+for col_in, col_out in zip(['pref1_cas_licks_forced', 'pref2_cas_licks_forced', 'pref3_cas_licks_forced',
+                            'pref1_malt_licks_forced', 'pref2_malt_licks_forced', 'pref3_malt_licks_forced'],
+                            ['pref1_lateauc_cas', 'pref2_lateauc_cas', 'pref3_lateauc_cas',
+                            'pref1_lateauc_malt', 'pref2_lateauc_malt', 'pref3_lateauc_malt']):
+    df_photo[col_out] = [np.trapz(data[150:199])/10 for data in df_photo[col_in]]
+
+for j, c_peak, m_peak in zip(included_sessions,
+                                     ['pref1_cas_peak', 'pref2_cas_peak', 'pref3_cas_peak'],
+                                     ['pref1_malt_peak', 'pref2_malt_peak', 'pref3_malt_peak']):
+    df_photo[c_peak] = [average_peak_without_noise(pref_sessions[x].cas["snips_licks_forced"]) for x in pref_sessions if pref_sessions[x].session == j]
+    df_photo[m_peak] = [average_peak_without_noise(pref_sessions[x].malt["snips_licks_forced"]) for x in pref_sessions if pref_sessions[x].session == j]
 
 ## new function to calculate different snip baseline
 def variablesnipper(data_filt, fs, events, all_events_baseline,
