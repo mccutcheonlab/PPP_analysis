@@ -416,14 +416,14 @@ def process_rat(session):
                                                  latency_events=side['lickdata']['rStart'],
                                                  latency_direction='post')
             side['snips_licks'] = tp.mastersnipper(s.data, s.dataUV, s.data_filt, s.fs, side['lickdata']['rStart'],
-                                                peak_between_time=[0, 2],
+                                                peak_between_time=[0, 5],
                                                 latency_events=side['sipper'],
                                                 latency_direction='pre')
                                                
             try:
                 forced_licks = [licks for licks in side['lickdata']['rStart'] if licks in side['licks-forced']]
                 side['snips_licks_forced'] = tp.mastersnipper(s.data, s.dataUV, s.data_filt, s.fs, forced_licks,
-                                                           peak_between_time=[0, 2],
+                                                           peak_between_time=[0, 5],
                                                            latency_events=side['sipper'],
                                                            latency_direction='pre')
                 # side['snips_licks_forced']["filt_z_varBL"] = variablesnipper(s.data_filt, s.fs, forced_licks, side['sipper'])
