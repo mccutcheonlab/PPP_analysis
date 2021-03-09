@@ -30,6 +30,8 @@ import numpy as np
 import dill
 import tdt
 
+from scipy.stats import ttest_ind
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(sessions)
@@ -50,9 +52,102 @@ for session in sessions:
         pref_sessions[x.sessionID] = x
     except AttributeError:
         pass
+         
+
+start_times = {"PPP1-1_s10": 62052,
+               "PPP1-2_s10": 175600,
+               "PPP1-3_s10": 99691,
+               "PPP1-4_s10": 269571,
+               "PPP1-5_s10": 105794,
+               "PPP1-6_s10": 258890,
+               "PPP1-7_s10": 110880,
+               "PPP3-2_s10": 263458,
+               "PPP3-3_s10": 78328,
+               "PPP3-4_s10": 180053,
+               "PPP3-5_s10": 119018,
+               "PPP3-8_s10": 109863,
+               "PPP4-1_s10": 1017,
+               "PPP4-4_s10": 1017,
+               "PPP4-6_s10": 92570}
+
+def get_auc(key, makefig=False, figfile=""):
+
+    print("Analysing", key)
+    s = pref_sessions[key]
+    
+    sip0 = min(s.cas["sipper"][0], s.malt["sipper"][0])
+    
+    start_t = start_times[key] / s.fs
+    
+    print("Total time analysed is",  sip0-start_t)
+    
+    data = s.data_filt[int(start_t*s.fs):int(sip0*s.fs)]
+    
+    if makefig:
+        data2plot = data+np.abs(np.min(data)*2)
+        if s.diet == "NR":
+            color=col["nr_cas"]
+        elif s.diet == "PR":
+            color = col["pr_cas"]
+        f, ax = plt.subplots(figsize=(1.5,0.5))
+        ax.plot(data2plot, color=color)
+        # ax.text(0,0,key)
+        tp.invisible_axes(ax)
+        ax.plot([0, 0], [0, 0.1], color="k")
+        ax.plot([0, s.fs*5], [0, 0], color="k")
+        try:
+            f.savefig(figfile)
+        except:
+            pass
+
+    min_value = np.min(data)
+    data = data + np.abs(min_value)
+    
+    return np.mean(data)
+
+savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\"
+
+NR_aucs = []
+PR_aucs = []
+
+for key in start_times.keys():
+    auc = get_auc(key)
+    diet = pref_sessions[key].diet
+    if diet == "NR":
+        NR_aucs.append(auc)
+    elif diet == "PR":
+        PR_aucs.append(auc)
+    else:
+        print("problem assigning AUC to group")
+        
+f, ax = plt.subplots(figsize=(1.5,2))
+f.subplots_adjust(left=0.25, bottom=0.15)
+tp.barscatter([NR_aucs, PR_aucs],
+              barfacecolor=[col["nr_cas"], col["pr_cas"]],
+              barfacecoloroption="individual",
+              barlabels = ["NR", "PR"],
+              scattersize=20,
+              ax=ax)
+
+ax.set_ylabel("Baseline (AUC)")
+
+stats = ttest_ind(NR_aucs, PR_aucs)
+
+f.savefig(savefolder + "baseline.pdf")
 
 
-### This code was used to determine start times for each rat
+### For saving representative figs for revision
+# get_auc("PPP1-1_s10", makefig=True,
+#         figfile=savefolder + "PPP1-1_trans.pdf")
+
+# get_auc("PPP1-5_s10", makefig=True,
+#         figfile=savefolder + "PPP1-5_trans.pdf")
+
+
+
+### This code was used to determine start times for each rat by looking for
+# first sipper entry and time at which power to LED was stable
+
 # s = pref_sessions["PPP4-6_s10"]
 
 # # Sets indices for power parameters
@@ -74,72 +169,6 @@ for session in sessions:
 # ax[0].plot(s.data_filt[:int(sip0*s.fs)])
 # ax[1].plot(pars.ts[:sip0_pars_index], pars.data[power_index[0]][:sip0_pars_index])
 # ax[2].plot(pars.ts[:sip0_pars_index], pars.data[power_index[1]][:sip0_pars_index])
-           
-
-start_times = {"PPP1-1_s10": 62052,
-               "PPP1-2_s10": 175600,
-               "PPP1-3_s10": 99691,
-               "PPP1-4_s10": 269571,
-               "PPP1-5_s10": 105794,
-               "PPP1-6_s10": 258890,
-               "PPP1-7_s10": 110880,
-               "PPP3-2_s10": 263458,
-               "PPP3-3_s10": 78328,
-               "PPP3-4_s10": 180053,
-               "PPP3-5_s10": 119018,
-               "PPP3-8_s10": 109863,
-               "PPP4-1_s10": 1017,
-               "PPP4-4_s10": 1017,
-               "PPP4-6_s10": 92570}
-
-def get_auc(key, makefig=False):
-
-    print("Analysing", key)
-    s = pref_sessions[key]
-    
-    sip0 = min(s.cas["sipper"][0], s.malt["sipper"][0])
-    
-    start_t = start_times[key] / s.fs
-    
-    print("Total time analysed is",  sip0-start_t)
-    
-    data = s.data_filt[int(start_t*s.fs):int(sip0*s.fs)]
-    
-    if makefig:
-        f, ax = plt.subplots()
-        ax.plot(data)
-
-    min_value = np.min(data)
-    data = data + np.abs(min_value)
-    
-    return np.mean(data)
-
-NR_aucs = []
-PR_aucs = []
-
-for key in start_times.keys():
-    auc = get_auc(key)
-    diet = pref_sessions[key].diet
-    if diet == "NR":
-        NR_aucs.append(auc)
-    elif diet == "PR":
-        PR_aucs.append(auc)
-    else:
-        print("problem assigning AUC to group")
-        
-f, ax = plt.subplots(figsize=(2,2))
-f.subplots_adjust(left=0.25, bottom=0.15)
-tp.barscatter([NR_aucs, PR_aucs],
-              barfacecolor=[col["nr_cas"], col["pr_cas"]],
-              barfacecoloroption="individual",
-              barlabels = ["NR", "PR"],
-              scattersize=20,
-              ax=ax)
-
-ax.set_ylabel("Baseline (Delta F)")
-
-f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\baseline.jpg")
-
 
 
 # start_inds=[]

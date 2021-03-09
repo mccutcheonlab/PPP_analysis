@@ -7,9 +7,9 @@ Created on Thu Jan 21 18:15:46 2021
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-# import matplotlib.gridspec as gridspec
-# import matplotlib.lines as mlines
-# import matplotlib.transforms as transforms
+import matplotlib.gridspec as gridspec
+import matplotlib.lines as mlines
+import matplotlib.transforms as transforms
 
 # import pandas as pd
 
@@ -156,7 +156,7 @@ def remove_long_lats(x, y, threshold=20):
     return x, y
 
 
-def scatter_plus_density(x1, y1, x2, y2, colors=["black", "red"]):
+def scatter_plus_density(x1, y1, x2, y2, colors=["red", "black"]):
 
     # Tidies up data by removing long latencies
     x1, y1 = remove_long_lats(x1, y1)
@@ -164,11 +164,11 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["black", "red"]):
     
     # Set up figure grid
     gs = gridspec.GridSpec(2, 2, wspace=0.1, hspace=0.1,
-                           bottom=0.1, left=0.15,
+                           bottom=0.15, left=0.15, right=0.85, top=0.85,
                            width_ratios=[1,0.2], height_ratios=[0.2,1])
     
     #Initialize figure
-    f = plt.figure(figsize=(4,4))
+    f = plt.figure(figsize=(3,3))
     
     # Create main axis
     main_ax = f.add_subplot(gs[1, 0])
@@ -176,14 +176,16 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["black", "red"]):
     scatter(x1, y1, main_ax, color=colors[0])
     scatter(x2, y2, main_ax, color=colors[1])
     
-    main_ax.set_ylabel("Time to peak (s)")
-    main_ax.set_xlabel("Latency (s)")
+    main_ax.set_ylabel("Time to peak (s)", fontsize=8)
+    main_ax.set_xlabel("Latency (s)", fontsize=8)
+    
+    # main_ax.tick
     
     # Create axis for latency density plot
     lat_ax = f.add_subplot(gs[0, 0], sharex=main_ax)
     lat_ax.tick_params(labelbottom=False)
     lat_ax.set_yticks([])
-    lat_ax.set_ylabel("Density")
+    lat_ax.set_ylabel("Density", fontsize=8)
     
     density1 = gaussian_kde(x1)
     density2 = gaussian_kde(x2)
@@ -200,7 +202,7 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["black", "red"]):
     peak_ax = f.add_subplot(gs[1, 1], sharey=main_ax)
     peak_ax.tick_params(labelleft=False)
     peak_ax.set_xticks([])
-    peak_ax.set_xlabel("Density")
+    peak_ax.set_xlabel("Density", fontsize=8)
     
     density1 = gaussian_kde(y1)
     density2 = gaussian_kde(y2)
@@ -216,8 +218,8 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["black", "red"]):
     label_ax = f.add_subplot(gs[0,1])
     tp.invisible_axes(label_ax)
 
-    label_ax.text(0,0.5,"Maltodextrin", color=colors[1], fontsize=10)
-    label_ax.text(0,0.2,"Casein", color=colors[0], fontsize=10)
+    label_ax.text(0,0.5,"Maltodextrin", color=colors[1], fontsize=8)
+    label_ax.text(0,0.2,"Casein", color=colors[0], fontsize=8)
     
     label_ax.set_ylim([0,1])
     
@@ -226,14 +228,19 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["black", "red"]):
 f_NR = scatter_plus_density(x1data, y1data, x2data, y2data)
 f_PR = scatter_plus_density(x3data, y3data, x4data, y4data, colors=["blue", "green"])
 
-f_NR.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peak-vs-latency_NR.jpg")
+f_NR.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peak-vs-latency_NR.pdf")
 
-f_PR.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peak-vs-latency_PR.jpg")
+f_PR.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peak-vs-latency_PR.pdf")
 
 u, p = mannwhitneyu(x1data, x2data, alternative="two-sided")
+print(u,p)
 u, p = mannwhitneyu(y1data, y2data, alternative="two-sided")
+print(u,p)
 
 u, p = mannwhitneyu(x3data, x4data, alternative="two-sided")
+print(u,p)
+
 u, p = mannwhitneyu(y3data, y4data, alternative="two-sided")
+print(u,p)
 
 

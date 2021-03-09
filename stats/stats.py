@@ -25,7 +25,8 @@ try:
     pickle_folder = 'C:\\Github\\PPP_analysis\\data\\'
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     
-    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
+    pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
+    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = pd.read_pickle(pickle_in)
 
     pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
     
@@ -223,6 +224,18 @@ def stats_pref_photo(df, prefsession='1', verbose=True):
                    statsfolder + 'df_pref' + prefsession+ '_forc_licks_auc.csv')
     
     ppp_full_ttests(df_photo, keys)
+    
+    keys = ['pref' + prefsession + '_lateauc_cas',
+            'pref' + prefsession + '_lateauc_malt']
+
+    if verbose: print('\nAnalysis of preference session ' + prefsession)
+
+    if verbose: print('\nANOVA of photometry data (late AUC), casein vs. maltodextrin\n')
+    ppp_2wayANOVA(df_photo,
+                   keys,
+                   statsfolder + 'df_pref' + prefsession+ '_forc_licks_lateauc.csv')
+    
+    ppp_full_ttests(df_photo, keys)
 
 def stats_summary_behav(verbose=True):
     if verbose: print('\nAnalysis of summary data - BEHAVIOUR')
@@ -374,13 +387,13 @@ def stats_pref_postpref1(df_behav, df_photo, diet, prefsession='2', verbose=True
 # stats_conditioning()
 #stats_conditioning(condsession='2')
 
-stats_pref_behav()
-stats_pref_behav(prefsession='2')
-stats_pref_behav(prefsession='3')
+# stats_pref_behav()
+# stats_pref_behav(prefsession='2')
+# stats_pref_behav(prefsession='3')
 
 stats_pref_photo(df_photo)
-stats_pref_photo(df_photo, prefsession='2')
-stats_pref_photo(df_photo, prefsession='3')
+# stats_pref_photo(df_photo, prefsession='2')
+# stats_pref_photo(df_photo, prefsession='3')
 
 # stats_pref_ind(prefsession=1)
 

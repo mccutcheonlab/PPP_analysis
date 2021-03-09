@@ -14,6 +14,7 @@ sys.path.insert(0,cwd)
 # import JM_general_functions as jmf
 import matplotlib as mpl
 import dill
+import pandas as pd
 
 #Colors
 green = mpl.colors.to_rgb('xkcd:kelly green')
@@ -49,7 +50,7 @@ try:
 #    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
-    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = dill.load(pickle_in)
+    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = pd.read_pickle(pickle_in)
 
 except FileNotFoundError:
     print('Cannot access pickled file(s)')

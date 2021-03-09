@@ -1034,7 +1034,6 @@ def makesummaryFig(df_behav, df_photo, peaktype='auc', epoch=[100, 149], use_zsc
 
 def makesummaryFig_new(df_behav, df_photo, peaktype='auc', epoch=[100, 149], use_zscore_diff=True,
                                 scattersize=50):
-    print('Bløah')
     
     summary_photo_keys = [['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
                       ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],

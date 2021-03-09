@@ -121,7 +121,7 @@ def barscatter_plus_estimation(data, df, ylabel="", stats_args={}):
     barlabels = ['Malt', 'Cas', 'Malt', 'Cas']
     
     for xtick, label in zip(barx, barlabels):
-        ax1.text(xtick, -0.03, label, ha="center", va="top", transform=trans, fontsize=6)
+        ax1.text(xtick, -0.03, label, ha="center", va="top", transform=trans, fontsize=5)
         
     f.align_ylabels()
     
@@ -785,37 +785,37 @@ stats_args["file"] = "" # Comment this line out to write a new stats file
 # fig2_p3 = barscatter_plus_estimation(data, df, ylabel="AUC", stats_args=stats_args)
 # fig2_p3.savefig(savefolder + 'fig3_p3.pdf')
 
-## Figure for late AUC (5-10 s) for revision
+# Figure for late AUC (5-10 s) for revision
 # keys =  ['pref1_lateauc_malt', 'pref1_lateauc_cas']
 # stats_args["sheet"] = "pref1_lateauc"
 # data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
-# fig2_p4 = barscatter_plus_estimation(data, df, ylabel="AUC", stats_args=stats_args)
+# fig2_p4 = barscatter_plus_estimation(data, df, ylabel="Late AUC (5-10 s)", stats_args=stats_args)
 # # fig2_p4.savefig(savefolder + 'fig3_supp.pdf')
-# fig2_p4.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\lateauc.jpg")
+# fig2_p4.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\lateauc.pdf")
 
-## Figures for peak Z score instead of AUC, for revision
-keys =  ['pref1_malt_peak', 'pref1_cas_peak']
-stats_args["sheet"] = "pref1_peaks"
-data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
-f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
-# fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
-f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref1.jpg")
+# ## Figures for peak Z score instead of AUC, for revision
+# keys =  ['pref1_malt_peak', 'pref1_cas_peak']
+# stats_args["sheet"] = "pref1_peaks"
+# data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+# f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
+# # fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
+# f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref1.jpg")
 
-keys =  ['pref2_malt_peak', 'pref2_cas_peak']
-stats_args["sheet"] = "pref2_peaks"
-data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
-f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
-# fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
-f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref2.jpg")
+# keys =  ['pref2_malt_peak', 'pref2_cas_peak']
+# stats_args["sheet"] = "pref2_peaks"
+# data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+# f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
+# # fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
+# f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref2.jpg")
 
-keys =  ['pref3_malt_peak', 'pref3_cas_peak']
-stats_args["sheet"] = "pref3_peaks"
-data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
-f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
-# fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
-f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref3.jpg")
+# keys =  ['pref3_malt_peak', 'pref3_cas_peak']
+# stats_args["sheet"] = "pref3_peaks"
+# data, df = prep4estimationstats(df_photo, ["NR", "PR"], keys)
+# f = barscatter_plus_estimation(data, df, ylabel="Peak (Delta F)", stats_args=stats_args)
+# # fig2_p5.savefig(savefolder + 'fig3_supp.pdf')
+# f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\02_revision 1\\revision figs\\peaks_pref3.jpg")
 
-# # # For Figure 3 - behaviour on free choice trials
+# # # # For Figure 3 - behaviour on free choice trials
 # keys = ["pref1_malt_free", "pref1_cas_free"]
 # stats_args["sheet"] = "pref1_free_licks"
 # data, df = prep4estimationstats(df_behav, ["NR", "PR"], keys)
@@ -841,56 +841,56 @@ f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_J
 # stats_args["sheet"] = "pref2_forced_licks_nr"
 # data, df = prep4estimationstats_1group(df_behav, ["NR"], keys)
 # fig4_p1 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="Licks (forced)", stats_args=stats_args)
-# fig4_p1.savefig(savefolder + "fig4_p1.pdf")
+# # fig4_p1.savefig(savefolder + "fig4_p1.pdf")
 
 # keys = ["pref2_malt_lats_fromsip", "pref2_cas_lats_fromsip"]
 # stats_args["sheet"] = "pref2_latency_nr"
 # data, df = prep4estimationstats_1group(df_photo, ["NR"], keys)
 # fig4_p2 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="Latency (s)", stats_args=stats_args)
-# fig4_p2.savefig(savefolder + "fig4_p2.pdf")
+# # fig4_p2.savefig(savefolder + "fig4_p2.pdf")
 
 # keys = ["pref2_malt_free", "pref2_cas_free"]
 # stats_args["sheet"] = "pref2_free_licks_nr"
 # data, df = prep4estimationstats_1group(df_behav, ["NR"], keys)
 # fig4_p3 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="Licks (free)", stats_args=stats_args)
-# fig4_p3.savefig(savefolder + "fig4_p3.pdf")
+# # fig4_p3.savefig(savefolder + "fig4_p3.pdf")
 
 # keys = ["control", "pref2"]
 # stats_args["sheet"] = "pref2_choices_nr"
 # data, df = prep4estimationstats_1group(df_behav, ["NR"], keys)
 # fig4_p4 = barscatter_plus_estimation_vs50_1col(data, df, colors="expt", ylabel="Casein preference", stats_args=stats_args)
-# fig4_p4.savefig(savefolder + "fig4_p4.pdf")
+# # fig4_p4.savefig(savefolder + "fig4_p4.pdf")
 
 # keys = ["pref2_auc_malt", "pref2_auc_cas"]
 # stats_args["sheet"] = "pref2_auc_nr"
 # data, df = prep4estimationstats_1group(df_photo, ["NR"], keys)
 # fig4_p6 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="AUC", stats_args=stats_args)
-# fig4_p6.savefig(savefolder + "fig4_p6.pdf")
+# # fig4_p6.savefig(savefolder + "fig4_p6.pdf")
 
-# # For Fig 4_lower panel - diet reversal for NR to PR rats, pref3
+# # # For Fig 4_lower panel - diet reversal for NR to PR rats, pref3
 # keys = ["pref3_malt_forced", "pref3_cas_forced", ]
 # stats_args["sheet"] = "pref3_forced_licks_nr"
 # data, df = prep4estimationstats_1group(df_behav, ["NR"], keys)
 # fig4_p7 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="Licks (forced)", stats_args=stats_args)
-# fig4_p7.savefig(savefolder + "fig4_p7.pdf")
+# # fig4_p7.savefig(savefolder + "fig4_p7.pdf")
 
 # keys = ["pref3_malt_lats_fromsip", "pref3_cas_lats_fromsip"]
 # stats_args["sheet"] = "pref3_latency_nr"
 # data, df = prep4estimationstats_1group(df_photo, ["NR"], keys)
 # fig4_p8 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="Latency (s)", stats_args=stats_args)
-# fig4_p8.savefig(savefolder + "fig4_p8.pdf")
+# # fig4_p8.savefig(savefolder + "fig4_p8.pdf")
 
 # keys = ["pref3_malt_free", "pref3_cas_free", ]
 # stats_args["sheet"] = "pref3_free_licks_nr"
 # data, df = prep4estimationstats_1group(df_behav, ["NR"], keys)
 # fig4_p9 = barscatter_plus_estimation_1group(data, df, colors="expt", ylabel="Licks (free)", stats_args=stats_args)
-# fig4_p9.savefig(savefolder + "fig4_p9.pdf")
+# # fig4_p9.savefig(savefolder + "fig4_p9.pdf")
 
 # keys = ["control", "pref3"]
 # stats_args["sheet"] = "pref3_choices_nr"
 # data, df = prep4estimationstats_1group(df_behav, ["NR"], keys)
 # fig4_p10 = barscatter_plus_estimation_vs50_1col(data, df, colors="expt", ylabel="Casein preference", stats_args=stats_args)
-# fig4_p10.savefig(savefolder + "fig4_p10.pdf")
+# # fig4_p10.savefig(savefolder + "fig4_p10.pdf")
 
 # keys = ["pref3_auc_malt", "pref3_auc_cas", ]
 # stats_args["sheet"] = "pref3_auc_nr"
@@ -918,11 +918,11 @@ f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_J
 # fig5_p3 = barscatter_plus_estimation_1group(data, df, colors="control", ylabel="Licks (free)", stats_args=stats_args)
 # fig5_p3.savefig(savefolder + "fig5_p3.pdf")
 
-# keys = ["control", "pref2"]
-# stats_args["sheet"] = "pref2_choices_pr"
-# data, df = prep4estimationstats_1group(df_behav, ["PR"], keys)
-# fig5_p4 = barscatter_plus_estimation_vs50_1col(data, df, colors="control", ylabel="Casein preference", stats_args=stats_args)
-# fig5_p4.savefig(savefolder + "fig5_p4.pdf")
+# # keys = ["control", "pref2"]
+# # stats_args["sheet"] = "pref2_choices_pr"
+# # data, df = prep4estimationstats_1group(df_behav, ["PR"], keys)
+# # fig5_p4 = barscatter_plus_estimation_vs50_1col(data, df, colors="control", ylabel="Casein preference", stats_args=stats_args)
+# # fig5_p4.savefig(savefolder + "fig5_p4.pdf")
 
 # keys = ["pref2_auc_malt", "pref2_auc_cas", ]
 # stats_args["sheet"] = "pref2_auc_pr"
@@ -949,11 +949,11 @@ f.savefig("C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_J
 # fig5_p9 = barscatter_plus_estimation_1group(data, df, colors="control", ylabel="Licks (free)", stats_args=stats_args)
 # fig5_p9.savefig(savefolder + "fig5_p9.pdf")
 
-# keys = ["control", "pref3"]
-# stats_args["sheet"] = "pref3_choices_pr"
-# data, df = prep4estimationstats_1group(df_behav, ["PR"], keys)
-# fig5_p10 = barscatter_plus_estimation_vs50_1col(data, df, colors="control", ylabel="Casein preference", stats_args=stats_args)
-# fig5_p10.savefig(savefolder + "fig5_p10.pdf")
+# # keys = ["control", "pref3"]
+# # stats_args["sheet"] = "pref3_choices_pr"
+# # data, df = prep4estimationstats_1group(df_behav, ["PR"], keys)
+# # fig5_p10 = barscatter_plus_estimation_vs50_1col(data, df, colors="control", ylabel="Casein preference", stats_args=stats_args)
+# # fig5_p10.savefig(savefolder + "fig5_p10.pdf")
 
 # keys = ["pref3_auc_malt", "pref3_auc_cas", ]
 # stats_args["sheet"] = "pref3_auc_pr"
