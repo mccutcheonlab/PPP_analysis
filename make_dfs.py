@@ -16,7 +16,8 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-
+import trompy as tp
+from scipy import stats
 import dill
 
 def choicetest(x):
@@ -118,6 +119,77 @@ def convert_events(events, t2sMap):
     
     return events_convert
 
+def find_delta(df, keys_in, epoch=[100,149]):
+    
+    epochrange = range(epoch[0], epoch[1])
+    
+    keys_out = ['delta_1', 'delta_2', 'delta_3']
+        
+    for k_in, k_out in zip(keys_in, keys_out):
+        cas_auc = [np.trapz(x[epochrange])/10 for x in df[k_in[0]]]
+        malt_auc = [np.trapz(x[epochrange])/10 for x in df[k_in[1]]]
+        df[k_out] = [c-m for c, m in zip(cas_auc, malt_auc)]
+    
+    return df
+
+def shuffledcomp(cas, malt, nshuf=1000):
+    ncas = len(cas)
+    
+    realdiff = np.mean(cas) - np.mean(malt)
+    
+    alltrials = cas+malt
+    shufcomps = []
+    for i in range(nshuf):
+        shuftrials = np.random.permutation(alltrials)
+        diff = np.mean(shuftrials[:ncas]) - np.mean(shuftrials[ncas:])
+        shufcomps.append(diff)
+
+    exceed = [1 for x in shufcomps if x > abs(realdiff)]
+    
+    return sum(exceed)/nshuf
+
+def findpeak(snips):
+    time_to_peak = []
+    for snip in snips:
+        time_to_peak.append(np.argmax(snip[100:])/10)
+        
+    return(time_to_peak)
+
+def get_start_auc(key, makefig=False, figfile=""):
+
+    print("Analysing", key)
+    s = pref_sessions[key]
+    
+    sip0 = min(s.cas["sipper"][0], s.malt["sipper"][0])
+    
+    start_t = start_times[key] / s.fs
+    
+    print("Total time analysed is",  sip0-start_t)
+    
+    data = s.data_filt[int(start_t*s.fs):int(sip0*s.fs)]
+    
+    if makefig:
+        data2plot = data+np.abs(np.min(data)*2)
+        if s.diet == "NR":
+            color=col["nr_cas"]
+        elif s.diet == "PR":
+            color = col["pr_cas"]
+        f, ax = plt.subplots(figsize=(1.5,0.5))
+        ax.plot(data2plot, color=color)
+        # ax.text(0,0,key)
+        tp.invisible_axes(ax)
+        ax.plot([0, 0], [0, 0.1], color="k")
+        ax.plot([0, s.fs*5], [0, 0], color="k")
+        try:
+            f.savefig(figfile)
+        except:
+            pass
+
+    min_value = np.min(data)
+    data = data + np.abs(min_value)
+    
+    return np.mean(data)
+
 # Looks for existing data and if not there loads pickled file
 try:
     type(sessions)
@@ -211,18 +283,6 @@ for j, c_licks_forc, m_licks_forc, c_lats_forc, m_lats_forc, c_lats_forc_fromsip
     df_photo[c_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].cas['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_lats_forc_fromsip] = [np.nanmean(pref_sessions[x].malt['lats'], axis=0) for x in pref_sessions if pref_sessions[x].session == j]
 
-# for j, c_licks_free, m_licks_free, c_licks_free1st, m_licks_free1st in zip(included_sessions,
-#                            ['pref1_cas_licks_free', 'pref2_cas_licks_free', 'pref3_cas_licks_free'],
-#                            ['pref1_malt_licks_free', 'pref2_malt_licks_free', 'pref3_malt_licks_free'],
-#                            ['pref1_cas_licks_free1st', 'pref2_cas_licks_free1st', 'pref3_cas_licks_free1st'],
-#                            ['pref1_malt_licks_free1st', 'pref2_malt_licks_free1st', 'pref3_malt_licks_free1st']):
-#     df_photo[c_licks_free] = [average_without_noise(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-#     df_photo[m_licks_free] = [average_without_noise(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-#     df_photo[c_licks_free1st] = [get_first_trial(pref_sessions[x].cas['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-#     df_photo[m_licks_free1st] = [get_first_trial(pref_sessions[x].malt['snips_licks_free']) for x in pref_sessions if pref_sessions[x].session == j]
-    
-
-
 for j, c_lats_all, m_lats_all in zip(included_sessions,
                                      ['pref1_cas_lats_all', 'pref2_cas_lats_all', 'pref3_cas_lats_all'],
                                      ['pref1_malt_lats_all', 'pref2_malt_lats_all', 'pref3_malt_lats_all']):
@@ -251,95 +311,6 @@ for j, c_peak, m_peak in zip(included_sessions,
                                      ['pref1_malt_peak', 'pref2_malt_peak', 'pref3_malt_peak']):
     df_photo[c_peak] = [average_peak_without_noise(pref_sessions[x].cas["snips_licks_forced"]) for x in pref_sessions if pref_sessions[x].session == j]
     df_photo[m_peak] = [average_peak_without_noise(pref_sessions[x].malt["snips_licks_forced"]) for x in pref_sessions if pref_sessions[x].session == j]
-
-## new function to calculate different snip baseline
-def variablesnipper(data_filt, fs, events, all_events_baseline,
-                                      trialLength=30,
-                                      snipfs=10,
-                                      preTrial=10,
-                                      threshold=8,
-                                      peak_between_time=[0, 1],
-                                      latency_events=[],
-                                      latency_direction='pre',
-                                      max_latency=30,
-                                      verbose=True,
-                                      removenoisefromaverage=True,
-                                      **kwargs):
-    
-   # Parse arguments relating to trial length, bins etc
-
-    if preTrial > trialLength:
-        baseline = trialLength / 2
-        print("preTrial is too long relative to total trialLength. Changing to half of trialLength.")
-    else:
-        baseline = preTrial
-    
-    if 'bins' in kwargs.keys():
-        bins = kwargs['bins']
-        print(f"bins given as kwarg. Fs for snip will be {trialLength/bins} Hz.")
-    else:
-        if snipfs > fs-1:
-            print('Snip fs is too high, reducing to data fs')
-            bins = 0
-        else:
-            bins = int(trialLength * snipfs)
-    
-    print('Number of bins is:', bins)
-    
-    if 'baselinebins' in kwargs.keys():
-        baselinebins = kwargs['baselinebins']
-        if baselinebins > bins:
-            print('Too many baseline bins for length of trial. Changing to length of baseline.')
-            baselinebins = int(baseline*snipfs)
-        baselinebins = baselinebins
-    else:
-        baselinebins = int(baseline*snipfs)
-    
-    if len(events) < 1:
-        print('Cannot find any events. All outputs will be empty.')
-        return {}
-    else:
-        if verbose: print('{} events to analyze.'.format(len(events)))
-
-    # find closest baseline event for each timelocked event
-    events_baseline = []
-    for event in events:
-        events_baseline.append([e for e in all_events_baseline if e < event][-1])
-        
-    # calculate mean and SD of baseline by taking 10s window butting in 100 bins and working out
-    baseline_snips,_ = tp.snipper(data_filt, events_baseline,
-                           fs=fs,
-                           bins=100,
-                           preTrial=10,
-                           trialLength=10,
-                           adjustBaseline=False)
-    
-    baseline_mean = np.mean(baseline_snips, axis=1)
-    baseline_sd = np.std(baseline_snips, axis=1)
-    
-    filt_snips,_ = tp.snipper(data_filt, events,
-                                   fs=fs,
-                                   bins=bins,
-                                   preTrial=baseline,
-                                   trialLength=trialLength,
-                                   adjustBaseline=False)
-    
-    filt_snips_z = []
-    for snip, mean, sd in zip(filt_snips, baseline_mean, baseline_sd):
-        filt_snips_z.append([(x-mean)/sd for x in snip])
-      
-    return filt_snips_z
-
-s = sessions["PPP1-7_s10"]
-
-forced_licks = [licks for licks in x.cas['lickdata']['rStart'] if licks in s.cas['licks-forced']]
-
-s.cas["snips_licks_forced"]["snips_filt_z"] = variablesnipper(s.data_filt, s.fs, forced_licks, s.cas["sipper"])
-
-forced_licks = [licks for licks in x.cas['lickdata']['rStart'] if licks in s.malt['licks-forced']]
-
-s.malt["snips_licks_forced"]["snips_filt_z"] = variablesnipper(s.data_filt, s.fs, forced_licks, s.malt["sipper"])
-
 
 # Assembles dataframe for reptraces
 
@@ -409,150 +380,154 @@ for s, pref in zip(['s10', 's11', 's16'],
         df_heatmap.at[rat, pref + '_malt'] = removenoise(x.malt[event], key=signal)
         df_heatmap.at[rat, pref + '_malt_event'] = getsipper(x.malt[event])
 
-# Assembles dataframe for reptraces     for SIPPER TRIALS    
+### Makes dataframe with delta values for summary figure (fig. 6)
+epoch = [100, 149]
+photokeys = [['pref1_cas_licks_forced', 'pref1_malt_licks_forced'],
+        ['pref2_cas_licks_forced', 'pref2_malt_licks_forced'],
+        ['pref3_cas_licks_forced', 'pref3_malt_licks_forced']]
 
-groups = ['NR_cas', 'NR_malt', 'PR_cas', 'PR_malt']
-rats = ['PPP1-7', 'PPP1-7', 'PPP1-4', 'PPP1-4']
-pref_list = ['pref1', 'pref2', 'pref3']
+df_delta = find_delta(df_photo, photokeys, epoch=epoch)
 
-traces_list = [[16, 14, 13, 5],
-          [6, 3, 19, 14],
-          [13, 13, 13, 9]]
+### Makes dataframe for piechart data with significantly different rat-by-rat comparisons
+cols = ["id", "rat", "session", "diet", "t-stat", "p-val"]
 
-event = 'snips_sipper'
+df_pies = pd.DataFrame(columns=cols)
 
-df_reptraces_sip = pd.DataFrame(groups, columns=['group'])
-df_reptraces_sip.set_index(['group'], inplace=True)
-
-for s, pref, traces in zip(['s10', 's11', 's16'],
-                           pref_list,
-                           traces_list):
-
-    df_reptraces_sip[pref + '_photo_blue'] = ""
-    df_reptraces_sip[pref + '_photo_uv'] = ""
-    df_reptraces_sip[pref + '_licks'] = ""
-    df_reptraces_sip[pref + '_sipper'] = ""
+for key in sessions.keys():
+    s = sessions[key]
+    tmp = s.cas['snips_licks_forced']
+    cas_snips = [snip for snip, noise in zip(tmp['filt_z'], tmp['noise']) if noise == False]
+    s.cas_auc_bytrial = [np.trapz(snip[100:149])/10 for snip in cas_snips]
     
-    for group, rat, trace in zip(groups, rats, traces):
-        
-        x = pref_sessions[rat + '_' + s]
-        
-        if 'cas' in group:
-            trial = x.cas[event]
-            sip = x.cas['sipper'][trace]
-            all_licks = x.cas['licks']
-            all_sips = x.cas['sipper']
-        elif 'malt' in group:
-            trial = x.malt[event]
-            sip = x.malt['sipper'][trace]
-            all_licks = x.malt['licks']
-            all_sips = x.malt['sipper']
-        
-        df_reptraces_sip.at[group, pref + '_licks'] = [l-sip for l in all_licks if (l>sip-10) and (l<sip+20)]
-        df_reptraces_sip.at[group, pref + '_sipper'] = [s-sip for s in all_sips if (s-sip<0.01) and (s-sip>-10)]
-        df_reptraces_sip.at[group, pref + '_photo_blue'] = trial['blue'][trace]
-        df_reptraces_sip.at[group, pref + '_photo_uv'] = trial['uv'][trace]
-
-rats = np.unique(rats)
-df_heatmap_sip = pd.DataFrame(rats, columns=['rat'])
-df_heatmap_sip.set_index(['rat'], inplace=True)
-
-
-
-for s, pref in zip(['s10', 's11', 's16'],
-                           pref_list):
-
-    df_heatmap_sip[pref + '_cas'] = ""
-    df_heatmap_sip[pref + '_malt'] = ""
-    df_heatmap_sip[pref + '_cas_event'] = ""
-    df_heatmap_sip[pref + '_malt_event'] = ""
+    tmp = s.malt['snips_licks_forced']
+    malt_snips = [snip for snip, noise in zip(tmp['filt_z'], tmp['noise']) if noise == False]
+    s.malt_auc_bytrial = [np.trapz(snip[100:149])/10 for snip in malt_snips]
     
-    for rat in rats:
-        x = pref_sessions[rat + '_' + s]
-        
-        df_heatmap_sip.at[rat, pref + '_cas'] = removenoise(x.cas[event])
-        df_heatmap_sip.at[rat, pref + '_cas_event'] = getfirstlick(x.cas, event)
-        df_heatmap_sip.at[rat, pref + '_malt'] = removenoise(x.malt[event])
-        df_heatmap_sip.at[rat, pref + '_malt_event'] = getfirstlick(x.malt, event)
-
-
-rat = 'PPP1-7'
-n = 4   # for PPP1-4: 16, 27, 38   ; for PPP1-7: 3 16 22
-padding = 40 * x.fs
-pre = 5
-post = 10
-
-x = pref_sessions[rat + '_s10']
-
-blue_sig = x.data
-uv_sig = x.dataUV
-
-all_licks = np.concatenate((x.cas['licks'], x.malt['licks']))
-all_licks_convert = convert_events(all_licks, x.t2sMap)
-
-all_events = np.concatenate((x.cas['sipper'], x.malt['sipper']))
-all_events = np.sort(all_events)
-
-all_events_convert = convert_events(all_events, x.t2sMap)
-
-start = int(all_events_convert[n-1]-padding)
-stop = int(all_events_convert[n+1]+padding)
-
-datarange = range(start, stop)
-
-longtrace = {}
-longtrace['blue'] = blue_sig[datarange]
-longtrace['uv'] = uv_sig[datarange]
-longtrace['all_licks'] = [lick-start for lick in all_licks_convert if (lick>start) and (lick<stop)]
-longtrace['all_events'] = []
-longtrace['start'] = start
-longtrace['stop'] = stop
-longtrace['pre'] = pre
-longtrace['post'] = post
-longtrace['fs'] = x.fs
-longtrace['f0'] = [np.mean(longtrace['blue']), np.mean(longtrace['uv'])]
-
-for eventN, event in zip([n-1, n, n+1],
-                         ['event1', 'event2', 'event3']):
-    event_time = all_events[eventN]
-    longtrace['all_events'].append(convert_events([event_time], x.t2sMap)[0] - start)
-
-    trace_start = int(convert_events([event_time-pre], x.t2sMap)[0])
-    trace_stop = int(convert_events([event_time+post], x.t2sMap)[0])
+    print(s.rat, s.diet, s.session)
+    shufttest = shuffledcomp(s.cas_auc_bytrial, s.malt_auc_bytrial)
     
-    tracerange = range(trace_start, trace_stop)
+    result = stats.ttest_ind(s.cas_auc_bytrial, s.malt_auc_bytrial)
     
-    longtrace[event]={}
-    longtrace[event]['blue'] = blue_sig[tracerange]
-    longtrace[event]['uv'] = uv_sig[tracerange]
-    longtrace[event]['licks'] = [lick-event_time for lick in all_licks if (lick > event_time-pre) and (lick < event_time+post)]
-
+    print(key, s.diet, result, s.peakdiff[1], shufttest)
+    
+    tmp = {"id": key,
+            "rat": s.rat,
+            "session": s.session,
+            "diet": s.diet,
+            "t-stat": result[0],
+            "p-val": result[1],
+            "shuf-p": shufttest}
+    
+    df_pies = df_pies.append(tmp, ignore_index=True)
 
 
 pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_dfs_pref.pickle', 'wb')
-dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace], pickle_out)
+dill.dump([df_behav, df_photo, df_reptraces, df_heatmap, df_delta, df_pies], pickle_out)
 pickle_out.close()
 
-#from ppp_publication_figs import *
+
+### For making dictionaries with latencies to lick and peak
+
+NR_cas ={"time2peak": [], "latency": []}
+NR_malt ={"time2peak": [], "latency": []}
+PR_cas ={"time2peak": [], "latency": []}
+PR_malt ={"time2peak": [], "latency": []}
+
+for key in pref_sessions.keys():
+    s = pref_sessions[key]
+    if s.session == "s10":
+        
+        casdata = s.cas["snips_sipper"]
+        maltdata = s.malt["snips_sipper"]
+        
+        if s.diet == "NR":
+            NR_cas["time2peak"].append(findpeak(casdata["filt_z"]))
+            NR_cas["latency"].append(casdata["latency"])
+            
+            NR_malt["time2peak"].append(findpeak(maltdata["filt_z"]))
+            NR_malt["latency"].append(maltdata["latency"])
+        elif s.diet == "PR":
+            PR_cas["time2peak"].append(findpeak(casdata["filt_z"]))
+            PR_cas["latency"].append(casdata["latency"])
+            
+            PR_malt["time2peak"].append(findpeak(maltdata["filt_z"]))
+            PR_malt["latency"].append(maltdata["latency"])
+
+df_nr_cas = pd.DataFrame(data={"latency": tp.flatten_list(NR_cas["latency"]), "time2peak": tp.flatten_list(NR_cas["time2peak"])})
+df_nr_malt = pd.DataFrame(data={"latency": tp.flatten_list(NR_malt["latency"]), "time2peak": tp.flatten_list(NR_malt["time2peak"])})
+df_pr_cas = pd.DataFrame(data={"latency": tp.flatten_list(PR_cas["latency"]), "time2peak": tp.flatten_list(PR_cas["time2peak"])})
+df_pr_malt = pd.DataFrame(data={"latency": tp.flatten_list(PR_malt["latency"]), "time2peak": tp.flatten_list(PR_malt["time2peak"])})
+
+pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_dfs_latencies.pickle', 'wb')
+dill.dump([df_nr_cas, df_nr_malt, df_pr_cas, df_pr_malt], pickle_out)
+pickle_out.close()
 
 
-## to find rep traces
-#x = pref_sessions['PPP1-4_s10']
-#trials = x.malt['snips_sipper']
-#trialsb = trials['blue']
-#
-#
-#
-#i = 6
-#fig, ax = plt.subplots()
-#ax.plot(trialsb[i])
-#ax.annotate(x.malt['lats'][i], xy=(100,0.1))
-#
+### To get AUC from beginning of session
+start_times = {"PPP1-1_s10": 62052,
+               "PPP1-2_s10": 175600,
+               "PPP1-3_s10": 99691,
+               "PPP1-4_s10": 269571,
+               "PPP1-5_s10": 105794,
+               "PPP1-6_s10": 258890,
+               "PPP1-7_s10": 110880,
+               "PPP3-2_s10": 263458,
+               "PPP3-3_s10": 78328,
+               "PPP3-4_s10": 180053,
+               "PPP3-5_s10": 119018,
+               "PPP3-8_s10": 109863,
+               "PPP4-1_s10": 1017,
+               "PPP4-4_s10": 1017,
+               "PPP4-6_s10": 92570}
 
-# possibles 'PPP1-4_s10' - 6, 13
+NR_aucs = []
+PR_aucs = []
 
+for key in start_times.keys():
+    auc = get_start_auc(key)
+    diet = pref_sessions[key].diet
+    if diet == "NR":
+        NR_aucs.append(auc)
+    elif diet == "PR":
+        PR_aucs.append(auc)
+    else:
+        print("problem assigning AUC to group")
+        
+df_NR_startAUC = pd.DataFrame(data=NR_aucs)
+df_PR_startAUC = pd.DataFrame(data=PR_aucs)
 
-### TO DO!!!
-### remove noise trials from grouped data
-### figure out a way of excluding certain rats (e.g. PPP1.8) maybe just a line that removes at beginning of this code
-##
+pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_dfs_startAUC.pickle', 'wb')
+dill.dump([df_NR_startAUC, df_PR_startAUC], pickle_out)
+pickle_out.close()
+
+### For making dataframes for conditioning data
+try:
+    pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_cond.pickle', 'rb')
+except FileNotFoundError:
+    print('Cannot access pickled file')
+
+cond_sessions, rats = dill.load(pickle_in)
+    
+rats = {}
+
+for session in cond_sessions:
+    x = cond_sessions[session]
+    if x.rat not in rats.keys():
+        rats[x.rat] = x.diet
+    
+cas_sessions = ['cond1-cas1', 'cond1-cas2']
+malt_sessions = ['cond1-malt1', 'cond1-malt2']  
+
+df_cond = pd.DataFrame([x for x in rats], columns=['rat'])
+df_cond['diet'] = [rats.get(x) for x in rats]
+
+for cas, malt in zip(cas_sessions, malt_sessions):
+    df_cond[cas] = [np.float(cond_sessions[x].cas) for x in cond_sessions if cond_sessions[x].sessiontype == cas]
+    df_cond[malt] = [np.float(cond_sessions[x].malt) for x in cond_sessions if cond_sessions[x].sessiontype == malt]
+
+df_cond['cond1-cas-all'] = df_cond['cond1-cas1'] + df_cond['cond1-cas2']
+df_cond['cond1-malt-all'] = df_cond['cond1-malt1'] + df_cond['cond1-malt2']
+
+pickle_out = open('C:\\Github\\PPP_analysis\\data\\ppp_dfs_cond.pickle', 'wb')
+dill.dump(df_cond, pickle_out)
+pickle_out.close()

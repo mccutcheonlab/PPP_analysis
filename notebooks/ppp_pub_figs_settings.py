@@ -50,7 +50,13 @@ try:
 #    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
     
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
-    df_behav, df_photo, df_reptraces, df_heatmap, df_reptraces_sip, df_heatmap_sip, longtrace = pd.read_pickle(pickle_in)
+    df_behav, df_photo, df_reptraces, df_heatmap, df_delta, df_pies = pd.read_pickle(pickle_in, compression=None)
+    
+    pickle_in = open(pickle_folder + 'ppp_dfs_cond.pickle', 'rb')
+    df_cond = pd.read_pickle(pickle_in, compression=None)
+    
+    # pickle_in = open('C:\\Github\\PPP_analysis\\data\\ppp_latencies.pickle', 'wb')
+    # x1data, y1data, x2data, y2data, x3data, y3data, x4data, y4data = pd.read_pickle(pickle_in, compression=None)
 
 except FileNotFoundError:
     print('Cannot access pickled file(s)')
