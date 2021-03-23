@@ -423,7 +423,8 @@ for label in df['datalabel']:
 df['sol'] = sol
 
 df.to_csv(csvfile)
-result = run([Rscriptpath, "--vanilla", "ppp_summaryANOVA_2way_within_within.R", csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+Rfile = statsfolder+"ppp_summaryANOVA_2way_within_within.R"
+result = run([Rscriptpath, "--vanilla", Rfile, csvfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
 print(result.returncode, result.stderr, result.stdout)
 
 
