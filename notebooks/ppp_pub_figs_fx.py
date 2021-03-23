@@ -413,7 +413,7 @@ def barscatter_plus_estimation(data, df, ylabel="", stats_args={}):
     
     ax1.set_ylabel(ylabel, fontsize=6)
     
-    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args)
+    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args, idx=(("control1", "test1"), ("control2", "test2")), plottype="twogroup")
     
     equalize_y(ax2)
     
@@ -453,7 +453,7 @@ def barscatter_plus_estimation_1group(data, df, colors="control", ylabel="", sta
     
     ax1.set_ylabel(ylabel, fontsize=6)
     
-    estimation_plot_1group(df, barx=barx, ax=ax2, stats_args=stats_args)
+    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args, idx=("control1", "test1"), plottype="onegroup")
     equalize_y(ax2)
     
     ax1.set_xlim([0.2,2.8])
@@ -492,7 +492,7 @@ def barscatter_plus_estimation_summary(data, df, colors="control", ylabel="", st
     ax1.set_yticks([0, 0.5, 1.0])
     ax1.set_xlim([0.2, 3.8])
     
-    estimation_plot_summary(df, barx=barx, ax=ax2, stats_args=stats_args)
+    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args, idx=("control1", "test1", "test2"), plottype="summary")
     
     equalize_y(ax2)
     
@@ -536,7 +536,7 @@ def barscatter_plus_estimation_vs50_2col(data, df, ylabel="", stats_args={}):
     
     ax2 = ax1.twinx() 
     
-    estimation_plot_horiz(df, barx=barx, ax=ax2, stats_args=stats_args)
+    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args, idx=("control1", "test1"), plottype="horiz")
     
     ax1.set_ylim([-0.03, 1.1])
     ax2.set_ylim([-0.53, 0.6])
@@ -556,502 +556,119 @@ def barscatter_plus_estimation_vs50_2col(data, df, ylabel="", stats_args={}):
 
     return f
 
-def barscatter_plus_estimation_vs50_1col(data, df, colors="control", ylabel="", stats_args={}):
+def estimation_plot(df, barx=[], ax=[], stats_args={}, idx=("control1", "test1"), plottype="onegroup"):
     
-    data = [data[1], []]
+    est_stats = db.load(df, idx=idx, id_col="rat", paired=True)   
+    e = est_stats.mean_diff
+    results = e.results
     
-    grouplabel=['NR', 'PR']
-    if colors == "expt":
-        barfacecolor = [col['pr_cas']]
+    try:
+        with pd.ExcelWriter(stats_args["file"], mode="a", engine="openpyxl") as writer:
+            results.to_excel(writer, sheet_name=stats_args["sheet"])
+    except:
+        print("No stats file to write to.")
+
+    contrast_xtick_labels = []
+    
+    dabest_obj  = e.dabest_obj
+    plot_data   = e._plot_data
+    xvar        = e.xvar
+    yvar        = e.yvar
+    is_paired   = e.is_paired
+
+    all_plot_groups = dabest_obj._all_plot_groups
+    idx             = dabest_obj.idx
+    
+    default_violinplot_kwargs = {'widths':0.5, 'vert':True,
+                               'showextrema':False, 'showmedians':False}
+        
+    violinplot_kwargs = default_violinplot_kwargs
+    
+    ticks_to_skip   = np.cumsum([len(t) for t in idx])[:-1].tolist()
+    ticks_to_skip.insert(0, 0)
+    
+    # Then obtain the ticks where we have to plot the effect sizes.
+    ticks_to_plot = [t for t in range(0, len(all_plot_groups))
+                    if t not in ticks_to_skip]
+
+    ticks_to_plot = [barx[tick] for tick in ticks_to_plot]
+    
+    fcolors = [col['nr_cas'], col['pr_cas']]
+    
+    for j, tick in enumerate(ticks_to_plot):
+        current_group     = results.test[j]
+        current_control   = results.control[j]
+        current_bootstrap = results.bootstraps[j]
+        current_effsize   = results.difference[j]
+        current_ci_low    = results.bca_low[j]
+        current_ci_high   = results.bca_high[j]
+
+        v = ax.violinplot(current_bootstrap[~np.isinf(current_bootstrap)],
+                                      positions=[tick],
+                                      **violinplot_kwargs)
+
+        halfviolin_alpha=0.7
+        halfviolin(v, fill_color=fcolors[j], alpha=halfviolin_alpha)
+    
+        ytick_color="black"
+        es_marker_size=4
+
+    #     # Plot the effect size.
+        ax.plot([tick], current_effsize, marker='o',
+                            color=ytick_color,
+                            markersize=es_marker_size)
+        # Plot the confidence interval.
+        ax.plot([tick, tick],
+                            [current_ci_low, current_ci_high],
+                            linestyle="-",
+                            color=ytick_color,
+                            # linewidth=group_summary_kwargs['lw'],
+                            linewidth=1)
+        
+    trans = transforms.blended_transform_factory(
+                        ax.transData, ax.transAxes)
+    ax.spines["bottom"].set_visible(False)
+    
+    if plottype == "twogroup":
+        ax.axhline(color="black")
+        ax.plot([barx[0], barx[1]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
+        ax.plot([barx[2], barx[3]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
+        
+        for xtick in barx:
+            ax.plot([xtick, xtick], [-0.1, -0.05], transform=trans, color="black", clip_on=False)
+            
+        for xtick in ticks_to_plot:
+            ax.text(xtick, -0.12, "C-M", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
+    
+        ax.set_ylabel("Paired difference", fontsize=6)
+    
+    elif plottype == "onegroup":
+        ax.axhline(color="black")
+        ax.plot([barx[0], barx[1]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
+        
+        for xtick in barx:
+            ax.plot([xtick, xtick], [-0.1, -0.05], transform=trans, color="black", clip_on=False)
+            
+        for xtick in ticks_to_plot:
+            ax.text(xtick, -0.12, "C-M", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
+    
+        ax.set_ylabel("Paired difference", fontsize=6)
+        
+    elif plottype == "horiz":
+        ax.axhline(color="grey", linestyle="dashed")
+        
+    elif plottype == "summary":
+        ax.axhline(color="black")
+        
+        for xtick in ticks_to_plot:
+            ax.text(xtick, -0.04, "vs.\nd1", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
+
+        ax.set_ylabel("Diff. vs. Pref. 1", fontsize=6)
+        
     else:
-        barfacecolor = [col['nr_cas']]
-    
-    f, ax1 = plt.subplots(figsize=(1, 1.75),
-                         gridspec_kw={"left": 0.35, "right": 0.85, "bottom": 0.1})
-
-    
-    _, barx, _, _ = tp.barscatter(data, ax=ax1, paired=False,
-                                  barfacecoloroption = 'individual',
-                                  barfacecolor = barfacecolor,
-                                  scatteredgecolor = ['xkcd:charcoal'],
-                                  scatterlinecolor = 'xkcd:charcoal',
-                                  # grouplabel=grouplabel,
-                                  # barlabels=['Cas', 'Malt', 'Cas', 'Malt'],
-                                  scattersize = 10,
-                                  barwidth=0.9,
-                                  spaced=True,
-                                  xspace=0.1,)
-
-    ax1.set_ylabel(ylabel, fontsize=6)
-    
-    ax2 = ax1.twinx() 
-    
-    estimation_plot_horiz_1col(df, barx=barx, ax=ax2, stats_args=stats_args)
-    
-    ax1.set_ylim([-0.03, 1.1])
-    ax2.set_ylim([-0.53, 0.6])
-    
-    ax1.set_yticks([0, 0.5, 1])
-    # ax2.set_yticks([-0.5, 0, 0.5])
-    ax2.set_yticks([])
-    
-    ax1.set_xlim([0.2,2.8])
-
-    
-    trans = transforms.blended_transform_factory(
-                    ax1.transData, ax1.transAxes)
-
-    return f
-
-def estimation_plot(df, barx=[], ax=[], stats_args={}):
-    
-    est_stats = db.load(df, idx=(("control1", "test1"), ("control2", "test2")), id_col="rat", paired=True)
-    # est_stats.mean_diff.plot()
-    
-    e = est_stats.mean_diff
-    results = e.results
-    
-    try:
-        with pd.ExcelWriter(stats_args["file"], mode="a", engine="openpyxl") as writer:
-            results.to_excel(writer, sheet_name=stats_args["sheet"])
-    except:
-        print("No stats file to write to.")
-
-    contrast_xtick_labels = []
-    
-    dabest_obj  = e.dabest_obj
-    plot_data   = e._plot_data
-    xvar        = e.xvar
-    yvar        = e.yvar
-    is_paired   = e.is_paired
-    
-    
-    all_plot_groups = dabest_obj._all_plot_groups
-    idx             = dabest_obj.idx
-    
-    default_violinplot_kwargs = {'widths':0.5, 'vert':True,
-                               'showextrema':False, 'showmedians':False}
-    # if plot_kwargs["violinplot_kwargs"] is None:
-    #     violinplot_kwargs = default_violinplot_kwargs
-    # else:
-    #     violinplot_kwargs = merge_two_dicts(default_violinplot_kwargs,
-    #                                         plot_kwargs["violinplot_kwargs"])
+        print("Not a valid option for plottype.")
         
-    violinplot_kwargs = default_violinplot_kwargs
-    
-    ticks_to_skip   = np.cumsum([len(t) for t in idx])[:-1].tolist()
-    ticks_to_skip.insert(0, 0)
-    
-    # Then obtain the ticks where we have to plot the effect sizes.
-    ticks_to_plot = [t for t in range(0, len(all_plot_groups))
-                    if t not in ticks_to_skip]
-
-    ticks_to_plot = [barx[tick] for tick in ticks_to_plot]
-    
-    fcolors = [col['nr_cas'], col['pr_cas']]
-    
-    for j, tick in enumerate(ticks_to_plot):
-        current_group     = results.test[j]
-        current_control   = results.control[j]
-        current_bootstrap = results.bootstraps[j]
-        current_effsize   = results.difference[j]
-        current_ci_low    = results.bca_low[j]
-        current_ci_high   = results.bca_high[j]
-        
-    #     # Create the violinplot.
-    #     # New in v0.2.6: drop negative infinities before plotting.
-        v = ax.violinplot(current_bootstrap[~np.isinf(current_bootstrap)],
-                                      positions=[tick],
-                                      **violinplot_kwargs)
-
-
-
-        halfviolin_alpha=0.7
-        halfviolin(v, fill_color=fcolors[j], alpha=halfviolin_alpha)
-    
-        ytick_color="black"
-        es_marker_size=4
-
-    #     # Plot the effect size.
-        ax.plot([tick], current_effsize, marker='o',
-                            color=ytick_color,
-                            markersize=es_marker_size)
-        # Plot the confidence interval.
-        ax.plot([tick, tick],
-                            [current_ci_low, current_ci_high],
-                            linestyle="-",
-                            color=ytick_color,
-                            # linewidth=group_summary_kwargs['lw'],
-                            linewidth=1)
-        
-    ax.spines["bottom"].set_visible(False)
-    ax.axhline(color="black")
-    
-    trans = transforms.blended_transform_factory(
-                    ax.transData, ax.transAxes)
-
-    ax.plot([barx[0], barx[1]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
-    ax.plot([barx[2], barx[3]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
-    
-    for xtick in barx:
-        ax.plot([xtick, xtick], [-0.1, -0.05], transform=trans, color="black", clip_on=False)
-        
-    for xtick in ticks_to_plot:
-        ax.text(xtick, -0.12, "C-M", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
-
-    ax.set_ylabel("Paired difference", fontsize=6)
-
-def estimation_plot_horiz(df, barx=[], ax=[], stats_args={}):
-    
-    est_stats = db.load(df, idx=(("control1", "test1"), ("control2", "test2")), id_col="rat", paired=True)
-    
-    e = est_stats.mean_diff
-    results = e.results
-    
-    try:
-        with pd.ExcelWriter(stats_args["file"], mode="a", engine="openpyxl") as writer:
-            results.to_excel(writer, sheet_name=stats_args["sheet"])
-    except:
-        print("No stats file to write to.")
-    
-    dabest_obj  = e.dabest_obj
-    plot_data   = e._plot_data
-    xvar        = e.xvar
-    yvar        = e.yvar
-    is_paired   = e.is_paired
-    
-    
-    all_plot_groups = dabest_obj._all_plot_groups
-    idx             = dabest_obj.idx
-    
-    default_violinplot_kwargs = {'widths':0.5, 'vert':True,
-                               'showextrema':False, 'showmedians':False}
-        
-    violinplot_kwargs = default_violinplot_kwargs
-    
-    ticks_to_skip   = np.cumsum([len(t) for t in idx])[:-1].tolist()
-    ticks_to_skip.insert(0, 0)
-    
-    # Then obtain the ticks where we have to plot the effect sizes.
-    ticks_to_plot = [t for t in range(0, len(all_plot_groups))
-                    if t not in ticks_to_skip]
-    
-    ticks_to_plot = [barx[tick] for tick in ticks_to_plot]
-    
-    fcolors = [col['nr_cas'], col['pr_cas']]
-    
-    for j, tick in enumerate(ticks_to_plot):
-        current_group     = results.test[j]
-        current_control   = results.control[j]
-        current_bootstrap = results.bootstraps[j]
-        current_effsize   = results.difference[j]
-        current_ci_low    = results.bca_low[j]
-        current_ci_high   = results.bca_high[j]
-
-    #     # Create the violinplot.
-    #     # New in v0.2.6: drop negative infinities before plotting.
-        v = ax.violinplot(current_bootstrap[~np.isinf(current_bootstrap)],
-                                      positions=[tick],
-                                      **violinplot_kwargs)
-
-
-
-        halfviolin_alpha=0.7
-        halfviolin(v, fill_color=fcolors[j], alpha=halfviolin_alpha)
-    
-        ytick_color="black"
-        es_marker_size=4
-
-    #     # Plot the effect size.
-        ax.plot([tick], current_effsize, marker='o',
-                            color=ytick_color,
-                            markersize=es_marker_size)
-        # Plot the confidence interval.
-        ax.plot([tick, tick],
-                            [current_ci_low, current_ci_high],
-                            linestyle="-",
-                            color=ytick_color,
-                            # linewidth=group_summary_kwargs['lw'],
-                            linewidth=1)
-        
-    ax.spines["bottom"].set_visible(False)
-    # ax.spines["right"].set_visible(True)
-    ax.axhline(color="grey", linestyle="dashed")
-    
-    trans = transforms.blended_transform_factory(
-                    ax.transData, ax.transAxes)
-
-def estimation_plot_1group(df, barx=[], ax=[], stats_args={}):
-    
-    est_stats = db.load(df, idx=("control1", "test1"), id_col="rat", paired=True)
-    
-    e = est_stats.mean_diff
-    results = e.results
-    
-    try:
-        with pd.ExcelWriter(stats_args["file"], mode="a", engine="openpyxl") as writer:
-            results.to_excel(writer, sheet_name=stats_args["sheet"])
-    except:
-        print("No stats file to write to.")
-        
-    contrast_xtick_labels = []
-    
-    dabest_obj  = e.dabest_obj
-    plot_data   = e._plot_data
-    xvar        = e.xvar
-    yvar        = e.yvar
-    is_paired   = e.is_paired
-    
-    
-    all_plot_groups = dabest_obj._all_plot_groups
-    idx             = dabest_obj.idx
-
-    default_violinplot_kwargs = {'widths':0.5, 'vert':True,
-                               'showextrema':False, 'showmedians':False}
-        
-    violinplot_kwargs = default_violinplot_kwargs
-    
-    ticks_to_skip   = np.cumsum([len(t) for t in idx])[:-1].tolist()
-    ticks_to_skip.insert(0, 0)
-    
-    # Then obtain the ticks where we have to plot the effect sizes.
-    ticks_to_plot = [t for t in range(0, len(all_plot_groups))
-                    if t not in ticks_to_skip]
-
-    ticks_to_plot = [barx[tick] for tick in ticks_to_plot]
-    
-    fcolors = [col['nr_cas'], col['pr_cas']]
-    
-    for j, tick in enumerate(ticks_to_plot):
-        current_group     = results.test[j]
-        current_control   = results.control[j]
-        current_bootstrap = results.bootstraps[j]
-        current_effsize   = results.difference[j]
-        current_ci_low    = results.bca_low[j]
-        current_ci_high   = results.bca_high[j]
-
-        v = ax.violinplot(current_bootstrap[~np.isinf(current_bootstrap)],
-                                      positions=[tick],
-                                      **violinplot_kwargs)
-
-        halfviolin_alpha=0.7
-        halfviolin(v, fill_color=fcolors[j], alpha=halfviolin_alpha)
-    
-        ytick_color="black"
-        es_marker_size=4
-
-    #     # Plot the effect size.
-        ax.plot([tick], current_effsize, marker='o',
-                            color=ytick_color,
-                            markersize=es_marker_size)
-        # Plot the confidence interval.
-        ax.plot([tick, tick],
-                            [current_ci_low, current_ci_high],
-                            linestyle="-",
-                            color=ytick_color,
-                            # linewidth=group_summary_kwargs['lw'],
-                            linewidth=1)
-        
-    ax.spines["bottom"].set_visible(False)
-    ax.axhline(color="black")
-    
-    trans = transforms.blended_transform_factory(
-                    ax.transData, ax.transAxes)
-
-    ax.plot([barx[0], barx[1]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
-    
-    for xtick in barx:
-        ax.plot([xtick, xtick], [-0.1, -0.05], transform=trans, color="black", clip_on=False)
-        
-    for xtick in ticks_to_plot:
-        ax.text(xtick, -0.12, "C-M", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
-
-    ax.set_ylabel("Paired difference", fontsize=6)
-
-def estimation_plot_horiz_1col(df, barx=[], ax=[], stats_args={}):
-    
-    est_stats = db.load(df, idx=("control1", "test1"), id_col="rat", paired=True)
-    
-    e = est_stats.mean_diff
-    results = e.results
-    
-    try:
-        with pd.ExcelWriter(stats_args["file"], mode="a", engine="openpyxl") as writer:
-            results.to_excel(writer, sheet_name=stats_args["sheet"])
-    except:
-        print("No stats file to write to.")
-        
-    contrast_xtick_labels = []
-    
-    dabest_obj  = e.dabest_obj
-    plot_data   = e._plot_data
-    xvar        = e.xvar
-    yvar        = e.yvar
-    is_paired   = e.is_paired
-    
-    
-    all_plot_groups = dabest_obj._all_plot_groups
-    idx             = dabest_obj.idx
-
-    default_violinplot_kwargs = {'widths':0.5, 'vert':True,
-                               'showextrema':False, 'showmedians':False}
-        
-    violinplot_kwargs = default_violinplot_kwargs
-    
-    ticks_to_skip   = np.cumsum([len(t) for t in idx])[:-1].tolist()
-    ticks_to_skip.insert(0, 0)
-    
-    # Then obtain the ticks where we have to plot the effect sizes.
-    ticks_to_plot = [t for t in range(0, len(all_plot_groups))
-                    if t not in ticks_to_skip]
-
-    ticks_to_plot = [barx[tick] for tick in ticks_to_plot]
-
-    fcolors = [col['nr_cas'], col['pr_cas']]
-    
-    for j, tick in enumerate(ticks_to_plot):
-        current_group     = results.test[j]
-        current_control   = results.control[j]
-        current_bootstrap = results.bootstraps[j]
-        current_effsize   = results.difference[j]
-        current_ci_low    = results.bca_low[j]
-        current_ci_high   = results.bca_high[j]
-
-    #     # Create the violinplot.
-    #     # New in v0.2.6: drop negative infinities before plotting.
-        v = ax.violinplot(current_bootstrap[~np.isinf(current_bootstrap)],
-                                      positions=[tick],
-                                      **violinplot_kwargs)
-
-
-
-        halfviolin_alpha=0.7
-        halfviolin(v, fill_color=fcolors[j], alpha=halfviolin_alpha)
-    
-        ytick_color="black"
-        es_marker_size=4
-
-    #     # Plot the effect size.
-        ax.plot([tick], current_effsize, marker='o',
-                            color=ytick_color,
-                            markersize=es_marker_size)
-        # Plot the confidence interval.
-        ax.plot([tick, tick],
-                            [current_ci_low, current_ci_high],
-                            linestyle="-",
-                            color=ytick_color,
-                            # linewidth=group_summary_kwargs['lw'],
-                            linewidth=1)
-        
-    ax.spines["bottom"].set_visible(False)
-    # ax.spines["right"].set_visible(True)
-    ax.axhline(color="grey", linestyle="dashed")
-    
-    trans = transforms.blended_transform_factory(
-                    ax.transData, ax.transAxes)
-
-def estimation_plot_summary(df, barx=[], ax=[], stats_args={}):
-    
-    
-    est_stats = db.load(df, idx=("control1", "test1", "test2"), id_col="rat", paired=False)
-    
-    e = est_stats.mean_diff
-    results = e.results
-    
-    try:
-        with pd.ExcelWriter(stats_args["file"], mode="a", engine="openpyxl") as writer:
-            results.to_excel(writer, sheet_name=stats_args["sheet"])
-    except:
-        print("No stats file to write to.")
-        
-    contrast_xtick_labels = []
-    
-    dabest_obj  = e.dabest_obj
-    plot_data   = e._plot_data
-    xvar        = e.xvar
-    yvar        = e.yvar
-    is_paired   = e.is_paired
-    
-    
-    all_plot_groups = dabest_obj._all_plot_groups
-    idx             = dabest_obj.idx
-    
-    default_violinplot_kwargs = {'widths':0.5, 'vert':True,
-                               'showextrema':False, 'showmedians':False}
-    # if plot_kwargs["violinplot_kwargs"] is None:
-    #     violinplot_kwargs = default_violinplot_kwargs
-    # else:
-    #     violinplot_kwargs = merge_two_dicts(default_violinplot_kwargs,
-    #                                         plot_kwargs["violinplot_kwargs"])
-        
-    violinplot_kwargs = default_violinplot_kwargs
-    
-    ticks_to_skip   = np.cumsum([len(t) for t in idx])[:-1].tolist()
-    ticks_to_skip.insert(0, 0)
-    
-    # Then obtain the ticks where we have to plot the effect sizes.
-    ticks_to_plot = [t for t in range(0, len(all_plot_groups))
-                    if t not in ticks_to_skip]
-
-    ticks_to_plot = [barx[tick] for tick in ticks_to_plot]
-    
-    fcolors = [col['nr_cas'], col['pr_cas']]
-    
-    for j, tick in enumerate(ticks_to_plot):
-        current_group     = results.test[j]
-        current_control   = results.control[j]
-        current_bootstrap = results.bootstraps[j]
-        current_effsize   = results.difference[j]
-        current_ci_low    = results.bca_low[j]
-        current_ci_high   = results.bca_high[j]
-        
-    #     # Create the violinplot.
-    #     # New in v0.2.6: drop negative infinities before plotting.
-        v = ax.violinplot(current_bootstrap[~np.isinf(current_bootstrap)],
-                                      positions=[tick],
-                                      **violinplot_kwargs)
-
-
-
-        halfviolin_alpha=0.7
-        halfviolin(v, fill_color=fcolors[j], alpha=halfviolin_alpha)
-    
-        ytick_color="black"
-        es_marker_size=4
-
-    #     # Plot the effect size.
-        ax.plot([tick], current_effsize, marker='o',
-                            color=ytick_color,
-                            markersize=es_marker_size)
-        # Plot the confidence interval.
-        ax.plot([tick, tick],
-                            [current_ci_low, current_ci_high],
-                            linestyle="-",
-                            color=ytick_color,
-                            # linewidth=group_summary_kwargs['lw'],
-                            linewidth=1)
-        
-    ax.spines["bottom"].set_visible(False)
-    ax.axhline(color="black")
-    
-    trans = transforms.blended_transform_factory(
-                    ax.transData, ax.transAxes)
-
-    # ax.plot([barx[0], barx[1]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
-    # ax.plot([barx[2], barx[3]], [-0.05, -0.05], transform=trans, color="black", clip_on=False)
-    
-    # for xtick in barx:
-    #     ax.plot([xtick, xtick], [-0.1, -0.05], transform=trans, color="black", clip_on=False)
-        
-    for xtick in ticks_to_plot:
-        ax.text(xtick, -0.04, "vs.\nd1", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
-    
-    # ax.text(ticks_to_plot[0], -0.12, "2 - 1", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
-    # ax.text(ticks_to_plot[1], -0.12, "3 - 1", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
-    
-    # ax.text(2.5, -0.12, "vs. pref1", ha="center", va="top", transform=trans, color="black", clip_on=False, fontsize=6)
-
-    ax.set_ylabel("Diff. vs. Pref. 1", fontsize=6)
+    return results
 
 ### Fig fx for Fig 6G, pie charts showing proportions of rats with sig diff activation
 def get_proportions(df, session, diet, p="p-val"):

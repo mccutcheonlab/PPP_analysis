@@ -831,6 +831,7 @@ stats_args["file"] = "" # Comment this line out to write a new stats file
 
 # compares NR and PR preferences on pref test 1 - stats used in paper but not plot
 # keys = ["control", "pref1"]
+# stats_args["sheet"] = "pref1_choices"
 # data, df = prep4estimationstats(df_behav, ["NR", "PR"], keys)
 # temp = db.load(df, idx=("test1", "test2"), id_col="rat")
 # e = temp.mean_diff
