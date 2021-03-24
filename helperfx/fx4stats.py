@@ -74,6 +74,11 @@ def ppp_summaryANOVA_1way(df, cols, csvfile, dietgroup):
     print(result.returncode, result.stderr, result.stdout)
     return result
 
+def stats_bodyweight():
+    Rfile = statsfolder+"bw_fi_stats.R"
+    result = run([Rscriptpath, "--vanilla", Rfile], stdout=PIPE, stderr=PIPE, universal_newlines=True)
+    print(result.returncode, result.stderr, result.stdout)
+
 def stats_pref_behav(df_behav, df_photo, prefsession='1', verbose=True):
     if verbose: print('\nAnalysis of preference session ' + prefsession)
         
