@@ -535,7 +535,7 @@ def barscatter_plus_estimation_vs50_2col(data, df, ylabel="", stats_args={}):
     
     ax2 = ax1.twinx() 
     
-    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args, idx=("control1", "test1"), plottype="horiz")
+    estimation_plot(df, barx=barx, ax=ax2, stats_args=stats_args, idx=(("control1", "test1"), ("control2", "test2")), plottype="horiz")
     
     ax1.set_ylim([-0.03, 1.1])
     ax2.set_ylim([-0.53, 0.6])
