@@ -559,7 +559,11 @@ def barscatter_plus_estimation_vs50_2col(data, df, ylabel="", stats_args={}):
 
 def estimation_plot(df, barx=[], ax=[], stats_args={}, idx=("control1", "test1"), plottype="onegroup"):
     
-    est_stats = db.load(df, idx=idx, id_col="rat", paired=True)   
+    if plottype == "summary":
+        est_stats = db.load(df, idx=idx, id_col="rat", paired=False)
+    else:
+        est_stats = db.load(df, idx=idx, id_col="rat", paired=True)
+        
     e = est_stats.mean_diff
     results = e.results
     
