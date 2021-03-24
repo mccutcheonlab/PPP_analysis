@@ -20,7 +20,6 @@ import dill
 import scipy.signal as sig
 from scipy import stats
 
-from fx4behavior import *
 import sessionfigs as sessionfigs
 
 import trompy as tp
@@ -180,6 +179,19 @@ def dividelicks(licks, time):
     after = [x for x in licks if x > time]
     
     return before, after  
+
+def latencyCalc(licks, cueon, cueoff=10, nolat=np.nan, lag=3):
+    if type(cueoff) == int:
+        cueoff = [i+cueoff for i in cueon]
+    lats=[]
+    for on,off in zip(cueon, cueoff): 
+        try:
+            currentlat = [i-(on+lag) for i in licks if (i>on) and (i<off)][0]
+        except IndexError:
+            currentlat = nolat
+        lats.append(currentlat)
+
+    return(lats)
 
 def metafile2sessions(xlfile, metafile, datafolder, outputfolder, sheetname='metafile'):
     tp.metafilemaker(xlfile, metafile, sheetname=sheetname, fileformat='txt')

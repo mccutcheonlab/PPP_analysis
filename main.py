@@ -6,36 +6,40 @@ Created on Tue Jan 14 12:14:26 2020
 """
 # May need to run this first in ipython %matplotlib qt5
 
+import sys
+sys.path.append('..\\helperfx')
+
 import dill
 
 from fx4assembly import *
 
-picklefolder = 'C:\\Github\\PPP_analysis\\data\\'
+picklefolder = '..\\data\\'
+rawdatafolder = 'E:\\DA_and_Reward\\'
 
-ppp1_sessions = metafile2sessions('E:\\DA_and_Reward\\es334\PPP1\\PPP1.xlsx',
-                                  'E:\\DA_and_Reward\\es334\PPP1\\PPP1_metafile',
-                                  'E:\\DA_and_Reward\\es334\\PPP1\\tdtfiles\\',
-                                  'E:\\DA_and_Reward\\es334\\PPP1\\output\\',
+ppp1_sessions = metafile2sessions(rawdatafolder + 'es334\PPP1\\PPP1.xlsx',
+                                  rawdatafolder + 'es334\PPP1\\PPP1_metafile',
+                                  rawdatafolder + 'es334\\PPP1\\tdtfiles\\',
+                                  rawdatafolder + 'es334\\PPP1\\output\\',
                                   sheetname='metafile')
 
-ppp3_sessions = metafile2sessions('E:\\DA_and_Reward\\gc214\\PPP3\\PPP3.xlsx',
-                                  'E:\\DA_and_Reward\\gc214\\PPP3\\PPP3_metafile',
-                                  'E:\\DA_and_Reward\\gc214\\PPP3\\tdtfiles\\',
-                                  'E:\\DA_and_Reward\\gc214\\PPP3\\output\\',
+ppp3_sessions = metafile2sessions(rawdatafolder + 'gc214\\PPP3\\PPP3.xlsx',
+                                  rawdatafolder + 'gc214\\PPP3\\PPP3_metafile',
+                                  rawdatafolder + 'gc214\\PPP3\\tdtfiles\\',
+                                  rawdatafolder + 'gc214\\PPP3\\output\\',
                                   sheetname='PPP3_metafile')
 
-ppp4_sessions = metafile2sessions('E:\\DA_and_Reward\\gc214\\PPP4\\PPP4.xlsx',
-                                  'E:\\DA_and_Reward\\gc214\\PPP4\\PPP4_metafile',
-                                  'E:\\DA_and_Reward\\gc214\\PPP4\\tdtfiles\\',
-                                  'E:\\DA_and_Reward\\gc214\\PPP4\\output\\',
+ppp4_sessions = metafile2sessions(rawdatafolder + 'gc214\\PPP4\\PPP4.xlsx',
+                                  rawdatafolder + 'gc214\\PPP4\\PPP4_metafile',
+                                  rawdatafolder + 'gc214\\PPP4\\tdtfiles\\',
+                                  rawdatafolder + 'gc214\\PPP4\\output\\',
                                   sheetname='PPP4_metafile')
 
 ppp_sessions = {**ppp1_sessions, **ppp3_sessions, **ppp4_sessions}
 
-savefile=True
+savefile=False
 makefigs=False
 
-assemble_pref = True
+assemble_pref = False
 assemble_single = False
 assemble_exclusion = False
 assemble_cond1 = False # No photometry recordings for PPP4 during conditioning so cannot analyse this way using TDT timestamps
@@ -53,7 +57,7 @@ if assemble_pref:
                                      'PPP3-1', 'PPP3-6', 'PPP3-7',
                                      'PPP4-2', 'PPP4-3', 'PPP4-5', 'PPP4-7', 'PPP4-8'],
                   sessions_to_include = ['s10', 's11', 's16'],
-                  outputfile='C:\\Github\\PPP_analysis\\data\\ppp_pref.pickle',
+                  outputfile=picklefolder+'ppp_pref.pickle',
                   savefile=savefile,
                   makefigs=makefigs)
     
@@ -64,7 +68,7 @@ if assemble_cond1:
                                      'PPP3-1', 'PPP3-6', 'PPP3-7',
                                      'PPP4-2', 'PPP4-3', 'PPP4-5', 'PPP4-7', 'PPP4-8'],
                   sessions_to_include = ['s6', 's7', 's8', 's9'],
-                  outputfile='C:\\Github\\PPP_analysis\\data\\ppp_cond.pickle',
+                  outputfile=picklefolder+'ppp_cond.pickle',
                   savefile=savefile,
                   makefigs=makefigs)
 
@@ -74,7 +78,7 @@ if assemble_cond1_metafiledata:
                                      'PPP3-1', 'PPP3-6', 'PPP3-7',
                                      'PPP4-2', 'PPP4-3', 'PPP4-5', 'PPP4-7', 'PPP4-8'],
                                     sessions_to_include = ['s6', 's7', 's8', 's9'],
-                                    outputfile='C:\\Github\\PPP_analysis\\data\\ppp_cond.pickle')
+                                    outputfile=picklefolder+'ppp_cond.pickle')
     
 # Code to run for single rat
 if assemble_single:
@@ -105,7 +109,7 @@ if assemble_exclusion:
                                      'PPP3-1', 'PPP3-7',
                                      'PPP4-2', 'PPP4-3', 'PPP4-5', 'PPP4-7', 'PPP4-8'],
                   sessions_to_include = ['s10', 's11', 's16'],
-                  outputfile='C:\\Github\\PPP_analysis\\data\\ppp_pref_excl.pickle',
+                  outputfile=picklefolder+'ppp_pref_excl.pickle',
                   savefile=savefile,
                   makefigs=makefigs)
 
