@@ -5,40 +5,28 @@ Created on Fri Aug 31 10:07:17 2018
 @author: James Rig
 """
 
-# import JM_general_functions as jmf
-# import JM_custom_figs as jmfig
-import pandas as pd
-import numpy as np
+import sys
+sys.path.append('..\\helperfx')
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.transforms as transforms
 
-#import rpy2.robjects as ro
-#from rpy2.robjects import r, pandas2ri, numpy2ri
-#pandas2ri.activate()
-#numpy2ri.activate()
-
 from scipy import stats
 
 import trompy as tp
-
+import numpy as np
 import dabest as db
 import pandas as pd
 
-from ppp_pub_figs_settings import *
-
-# col={}
-# col['np_cas'] = 'xkcd:silver'
-# col['np_malt'] = 'white'
-# col['lp_cas'] = 'xkcd:kelly green'
-# col['lp_malt'] = 'xkcd:light green'
+from settings4figs import *
+from fx4figs import *
 
 # Loads in data
 
-xlfile = "C:\\GitHub\\PPP_analysis\\data\\PPP_body weight and food intake.xlsx"
-statsfolder = "C:\\GitHub\\PPP_analysis\\stats\\"
-figsfolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
+xlfile = "..\\data\\PPP_body weight and food intake.xlsx"
+statsfolder = "..\\stats\\"
+figsfolder = "..\\figs\\"
 
 # Body weight data
 df = pd.read_excel(xlfile, sheet_name='PPP_bodyweight')
@@ -97,7 +85,6 @@ fi = [foodintake_NR, foodintake_PR]
 
 # Creates figure and sets general parameters, e.g. size, column widths
 
-
 fig1A = plt.figure(figsize=(3.1,2))
 fig1A.subplots_adjust(wspace=0.01, hspace=0.6, top=0.85, bottom=0.25, left=0.15, right=0.95)
 
@@ -118,13 +105,8 @@ ax1.set_xlabel('Days since diet switch', fontsize=8)
 ax1.spines['right'].set_visible(False)
 ax1.spines['top'].set_visible(False)
 
-
-
-
 # Saves figure
 fig1A.savefig(figsfolder+"body weight.pdf")
-
-
 
 """
 Code for running stats using R
@@ -149,7 +131,7 @@ command given above.'
 
 from subprocess import PIPE, run
 
-Rscriptpath = 'C:\\Program Files\\R\\R-4.0.3\\bin\\Rscript'
+Rscriptpath = 'C:\\Program Files\\R\\R-4.0.4\\bin\\Rscript'
 Rprogpath = statsfolder+"bw_fi_stats.R"
 
 result = run([Rscriptpath, "--vanilla", Rprogpath], stdout=PIPE, stderr=PIPE, universal_newlines=True)
@@ -167,6 +149,8 @@ print(result.returncode, result.stderr, result.stdout)
 # print(fi_stats)
 
 # To make food intake graph with estimation stats
+
+
 
 def halfviolin(v, half='right', fill_color='k', alpha=1,
                 line_color='k', line_width=0):
@@ -193,8 +177,6 @@ def halfviolin(v, half='right', fill_color='k', alpha=1,
         b.set_linewidth(line_width)
 
 
-# https://acclab.github.io/DABEST-python-docs/tutorial.html
-
 
 df1 = pd.DataFrame(fi[0])
 df1.reset_index(inplace=True)
@@ -205,8 +187,6 @@ df2.reset_index(inplace=True)
 df2.columns = ["cage", "PR"]
 
 df_new = pd.concat([df1, df2], sort=True)
-
-
 
 # Creates figure and sets general parameters, e.g. size, column widths
 
