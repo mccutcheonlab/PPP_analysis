@@ -12,10 +12,14 @@ import numpy as np
 import trompy as tp
 import xlrd
 
-Rscriptpath = 'C:\\Program Files\\R\\R-4.0.4\\bin\\Rscript'
-statsfolder = 'C:\\Github\\PPP_analysis\\stats\\'
+from scipy.stats.stats import pearsonr
+from sklearn.linear_model import LinearRegression
 
-book = xlrd.open_workbook("C:\\Github\\PPP_analysis\\stats\\estimation_stats.xlsx")
+# Change this line to point to Rscript installation
+Rscriptpath = 'C:\\Program Files\\R\\R-4.0.4\\bin\\Rscript'
+statsfolder = '..\\stats\\'
+
+book = xlrd.open_workbook(statsfolder+"estimation_stats.xlsx")
 
 run([Rscriptpath, "--vanilla", statsfolder+"installez.R"], stdout=PIPE, stderr=PIPE, universal_newlines=True)
 
@@ -319,7 +323,89 @@ def output_estimation_stats(book, sheet, rowx, string="", unit=""):
         sh.cell_value(rowx=rowx, colx=10),
         sh.cell_value(rowx=rowx, colx=18)))
     
+def calcmodel(df_behav, df_delta, diet, n=5000):
 
+    if diet != "both":
+        dfx1 = df_behav.xs(diet, level=1)
+        dfx2 = df_delta.xs(diet, level=1)
+    else:
+        dfx1 = df_behav
+        dfx2 = df_delta
+        
+    x1vals = np.array([dfx1['pref1'].to_numpy(), dfx1['pref2'].to_numpy(), dfx1['pref3'].to_numpy()]).reshape((1,-1))
+    x2vals = np.array([dfx2[photo_keys[0]].to_numpy(), dfx2[photo_keys[1]].to_numpy(), dfx2[photo_keys[2]].to_numpy()]).reshape((1,-1))
+    
+    pr=pearsonr(x1vals.squeeze(), x2vals.squeeze())
+    print("Pearson R for {}: r={:.2f}, p={:.3f}".format(diet, pr[0], pr[1]))
+    
+    X = np.vstack((x1vals, x2vals)).T
+    
+    nrats = int(np.shape(X)[0] / 3)
+    
+    y = np.array([1]*nrats + [2]*nrats + [3]*nrats)
+    
+    model = LinearRegression(normalize=True).fit(X, y)
+    
+    print("Betas for {}: behavior, {:.2f}; photometry, {:.2f}".format(
+        diet, model.coef_[0], model.coef_[1]))
+    
+    coefs = []
+    for i in range(0, n):
+        sample_index = np.random.choice(range(0, len(y)), len(y))
+        
+        X_samples = X[sample_index]
+        y_samples = y[sample_index]
+        
+        lr = LinearRegression()
+        lr.fit(X_samples, y_samples)
+        coefs.append(lr.coef_)
+        
+    return model, np.array(coefs)
+
+def calcmodel_state(df_behav, df_delta, diet, n=5000):
+    
+    if diet != "both":
+        dfx1 = df_behav.xs(diet, level=1)
+        dfx2 = df_delta.xs(diet, level=1)
+    else:
+        dfx1 = df_behav
+        dfx2 = df_delta
+        
+    x1vals = np.array([dfx1['pref1'].to_numpy(), dfx1['pref2'].to_numpy(), dfx1['pref3'].to_numpy()]).reshape((1,-1))
+    x2vals = np.array([dfx2['delta_1'].to_numpy(), dfx2['delta_2'].to_numpy(), dfx2['delta_3'].to_numpy()]).reshape((1,-1))
+
+    pr=pearsonr(x1vals.squeeze(), x2vals.squeeze())
+    # print("Pearson R for {}: r={:.2f}, p={:.3f}".format(diet, pr[0], pr[1]))
+    
+    X = np.vstack((x1vals, x2vals)).T
+    
+    nrats = int(np.shape(X)[0] / 3)
+    
+    if diet == "NR":
+        y = np.array([1]*nrats + [0]*nrats + [0]*nrats)
+    elif diet == "PR":
+        y = np.array([0]*nrats + [1]*nrats + [1]*nrats)
+    elif diet == "both":
+        print("difficult")
+
+    model = LinearRegression(normalize=True).fit(X, y)
+    print("Betas for {}: behavior, {:.2f}; photometry, {:.2f}".format(
+        diet, model.coef_[0], model.coef_[1]))
+    
+    coefs = []
+    for i in range(0, n):
+        sample_index = np.random.choice(range(0, len(y)), len(y))
+        
+        X_samples = X[sample_index]
+        y_samples = y[sample_index]
+        
+        lr = LinearRegression()
+        lr.fit(X_samples, y_samples)
+        coefs.append(lr.coef_)
+        
+    return model, np.array(coefs)
+
+photo_keys = ["delta_1", "delta_2", "delta_3"]
 
 # def make_stats_df(df_photo, key_suffixes, prefsession='1', epoch=[100, 149]):
 #     epochrange = range(epoch[0], epoch[1])

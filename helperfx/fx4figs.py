@@ -19,8 +19,7 @@ import trompy as tp
 from scipy.stats import linregress
 from scipy.stats import gaussian_kde
 
-
-from ppp_pub_figs_settings import *
+from fx4figs import *
 
 def makeheatmap(ax, data, events=None, ylabel='Trials', xscalebar=False, sort=True):
     ntrials = np.shape(data)[0]
