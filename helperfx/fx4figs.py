@@ -19,7 +19,7 @@ import trompy as tp
 from scipy.stats import linregress
 from scipy.stats import gaussian_kde
 
-from fx4figs import *
+from settings4figs import *
 
 def makeheatmap(ax, data, events=None, ylabel='Trials', xscalebar=False, sort=True):
     ntrials = np.shape(data)[0]
@@ -552,6 +552,8 @@ def barscatter_plus_estimation_vs50_2col(data, df, ylabel="", stats_args={}):
         
     for xtick, label in zip(xticks, grouplabel):
         ax1.text(xtick, -0.03, label, ha="center", va="top", transform=trans, fontsize=6)
+        
+    # ax1.set_xlim([0,4])
 
     return f
 

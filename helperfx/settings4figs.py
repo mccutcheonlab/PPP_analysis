@@ -41,7 +41,7 @@ scattersize=30
 
 # Looks for existing data and if not there loads pickled file
 try:
-    pickle_folder = 'C:\\Github\\PPP_analysis\\data\\'
+    pickle_folder = '..\\data\\'
     
 #    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
 #    df_sacc_behav = dill.load(pickle_in)
@@ -64,7 +64,7 @@ except FileNotFoundError:
 # usr = jmf.getuserhome()
 
 savefigs=True
-savefolder = 'C:\\Github\\PPP_analysis\\figs\\'
+savefolder = '..\\figs\\'
 # savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
 
 #Set general rcparams
