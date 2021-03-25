@@ -43,12 +43,6 @@ scattersize=30
 try:
     pickle_folder = '..\\data\\'
     
-#    pickle_in = open(pickle_folder + 'ppp_dfs_sacc.pickle', 'rb')
-#    df_sacc_behav = dill.load(pickle_in)
-#    
-#    pickle_in = open(pickle_folder + 'ppp_dfs_cond1.pickle', 'rb')
-#    df_cond1_behav, df_cond1_photo = dill.load(pickle_in)
-    
     pickle_in = open(pickle_folder + 'ppp_dfs_pref.pickle', 'rb')
     df_behav, df_photo, df_reptraces, df_heatmap, df_delta, df_pies = pd.read_pickle(pickle_in, compression=None)
     
@@ -59,17 +53,12 @@ try:
     # x1data, y1data, x2data, y2data, x3data, y3data, x4data, y4data = pd.read_pickle(pickle_in, compression=None)
 
 except FileNotFoundError:
-    print('Cannot access pickled file(s)')
-
-# usr = jmf.getuserhome()
+    print('Cannot access pickled file(s). Maybe try running download_dfs() to retrieve them.')
 
 savefigs=True
 savefolder = '..\\figs\\'
-# savefolder = "C:\\Users\\jmc010\\Dropbox\\Publications in Progress\\PPP Paper\\04_JNS\\Figs\\"
 
 #Set general rcparams
-
-#mpl.style.use('classic')
 
 mpl.rcParams['figure.figsize'] = (4.8, 3.2)
 mpl.rcParams['figure.dpi'] = 100
