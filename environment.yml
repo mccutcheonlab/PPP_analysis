@@ -200,7 +200,7 @@ dependencies:
     - scikit-learn==0.23.2
     - tdt==0.3.3
     - threadpoolctl==2.1.0
-    - trompy==0.12.2
+    - trompy==0.12.5
     - xlsxwriter==1.2.8
 prefix: C:\ProgramData\Anaconda3\envs\ppp
 
