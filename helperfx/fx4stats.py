@@ -16,7 +16,7 @@ from scipy.stats.stats import pearsonr
 from sklearn.linear_model import LinearRegression
 
 # Change this line to point to Rscript installation
-Rscriptpath = 'C:\\Program Files\\R\\R-4.0.4\\bin\\Rscript'
+Rscriptpath = 'C:\\Program Files\\R\\R-4.0.5\\bin\\Rscript'
 statsfolder = '..\\stats\\'
 
 book = xlrd.open_workbook(statsfolder+"estimation_stats.xlsx")

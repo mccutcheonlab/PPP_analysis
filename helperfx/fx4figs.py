@@ -713,7 +713,7 @@ def condfigs(df, keys, dietmsk, cols, ax):
                  barfacecolor = cols,
                  scatteredgecolor = ['xkcd:charcoal'],
                  scatterlinecolor = 'xkcd:charcoal',
-                 scattersize = 50,
+                 scattersize = 30,
                  ax=ax)
 
     return barx
@@ -743,7 +743,7 @@ def scatter(x, y, ax, color="black", solution=""):
     x = x[x<20]
     
     # ax.scatter(x, y, marker="o", edgecolor=color, facecolor="none")
-    ax.scatter(x, y, marker="o", edgecolor="none", facecolor=color, alpha=0.1)
+    ax.scatter(x, y, s=12, marker="o", edgecolor="none", facecolor=color, alpha=0.1)
     
     slope, intercept, r, p, se = linregress(x, y)
     
@@ -761,11 +761,11 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["red", "black"]):
     
     # Set up figure grid
     gs = gridspec.GridSpec(2, 2, wspace=0.1, hspace=0.1,
-                           bottom=0.15, left=0.15, right=0.85, top=0.85,
+                           bottom=0.2, left=0.2, right=0.85, top=0.85,
                            width_ratios=[1,0.2], height_ratios=[0.2,1])
     
     #Initialize figure
-    f = plt.figure(figsize=(3,3))
+    f = plt.figure(figsize=(2.3,2.3))
     
     # Create main axis
     main_ax = f.add_subplot(gs[1, 0])
@@ -773,8 +773,8 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["red", "black"]):
     scatter(x1, y1, main_ax, color=colors[0], solution="Casein")
     scatter(x2, y2, main_ax, color=colors[1], solution="Maltodextrin")
     
-    main_ax.set_ylabel("Time to peak (s)", fontsize=8)
-    main_ax.set_xlabel("Latency (s)", fontsize=8)
+    main_ax.set_ylabel("Time to peak (s)", fontsize=6)
+    main_ax.set_xlabel("Latency (s)", fontsize=6)
     
     # main_ax.tick
     
@@ -782,7 +782,7 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["red", "black"]):
     lat_ax = f.add_subplot(gs[0, 0], sharex=main_ax)
     lat_ax.tick_params(labelbottom=False)
     lat_ax.set_yticks([])
-    lat_ax.set_ylabel("Density", fontsize=8)
+    lat_ax.set_ylabel("Density", fontsize=6)
     
     density1 = gaussian_kde(x1)
     density2 = gaussian_kde(x2)
@@ -799,7 +799,7 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["red", "black"]):
     peak_ax = f.add_subplot(gs[1, 1], sharey=main_ax)
     peak_ax.tick_params(labelleft=False)
     peak_ax.set_xticks([])
-    peak_ax.set_xlabel("Density", fontsize=8)
+    peak_ax.set_xlabel("Density", fontsize=6)
     
     density1 = gaussian_kde(y1)
     density2 = gaussian_kde(y2)
@@ -815,8 +815,8 @@ def scatter_plus_density(x1, y1, x2, y2, colors=["red", "black"]):
     label_ax = f.add_subplot(gs[0,1])
     tp.invisible_axes(label_ax)
 
-    label_ax.text(0,0.5,"Maltodextrin", color=colors[1], fontsize=8)
-    label_ax.text(0,0.2,"Casein", color=colors[0], fontsize=8)
+    label_ax.text(0,0.5,"Maltodextrin", color=colors[1], fontsize=6)
+    label_ax.text(0,0.1,"Casein", color=colors[0], fontsize=6)
     
     label_ax.set_ylim([0,1])
     
