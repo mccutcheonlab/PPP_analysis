@@ -2,6 +2,11 @@
 """
 Created on Mon Mar  5 13:16:41 2018
 
+The function estimation_plot uses modified source code from the dabest Python
+package used under conditions of a BSD 3-Clause Clear License.
+Copyright (c) 2016-2020 Joses W. Ho. All rights reserved.
+https://github.com/ACCLAB/DABEST-python
+
 @author: jaimeHP
 """
 import matplotlib.gridspec as gridspec
@@ -558,6 +563,12 @@ def barscatter_plus_estimation_vs50_2col(data, df, ylabel="", stats_args={}):
     return f
 
 def estimation_plot(df, barx=[], ax=[], stats_args={}, idx=("control1", "test1"), plottype="onegroup"):
+    """
+    This function uses modified source code from the dabest Python package, 
+    Copyright (c) 2016-2020 Joses W. Ho
+    All rights reserved.
+    https://github.com/ACCLAB/DABEST-python
+    """
     
     if plottype == "summary":
         est_stats = db.load(df, idx=idx, id_col="rat", paired=False)
